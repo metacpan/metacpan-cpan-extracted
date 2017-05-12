@@ -1,0 +1,15 @@
+Revision history for delicious-backup
+
+0.013   2008-04-07
+        fix packaging issues
+
+0.012   2007-03-25
+        remove workaround, as Net::Delicious 1.11 fixes the problem
+
+0.011   2007-03-24
+        work around feature (and related bug) in Net::Delicious 1.1 regarding
+        persistent caching
+
+0.01    2004-11-12 15:55
+        initial release
+        seems to work

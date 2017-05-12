@@ -1,0 +1,25 @@
+Changes
+extra/toyDGE.sam
+extra/toyRNASeq.sam
+extra/toySageGenieFile.csv
+extra/toyTAR.bed.gz
+lib/CracTools/DigitagCT.pm
+lib/CracTools/DigitagCT/Analyzer.pm
+lib/CracTools/DigitagCT/Analyzer/Annotation.pm
+lib/CracTools/DigitagCT/Analyzer/RNASeq.pm
+lib/CracTools/DigitagCT/Analyzer/SAGE.pm
+lib/CracTools/DigitagCT/Analyzer/Tiling.pm
+lib/CracTools/DigitagCT/Const.pm
+lib/CracTools/DigitagCT/Structure.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MYMETA.yml
+README
+scripts/digitagCT
+t/00-load-common.t
+t/CracTools::DigitagCT::Structure.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

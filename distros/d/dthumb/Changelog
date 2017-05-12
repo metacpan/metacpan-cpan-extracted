@@ -1,0 +1,13 @@
+dthumb 0.2 - Fri Mar 04 2011
+
+    * Add progressbar, introduces new dependency Time::Progress
+    * Show filename in lightbox
+    * The HTML title is now configurable, it defaults to the current directory
+    * Add -r/--recreate option to recreate all thumbnails
+    * Detect changed images via mtime
+
+dthumb 0.1 - Sun Feb 27 2011
+
+    * Support for jpg/png with Image::Imlib2
+    * Includes Javascript lightbox
+    * Some configuration via commandline arguments

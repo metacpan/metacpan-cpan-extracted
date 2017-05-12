@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<pkg:package name="Indexing Check Tags 2" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+	<pkg:content>
+		<pkg:outlineMarker OutlineName="r" id="root" visible="true" render="false">
+			
+<pkg:outlineMarker OutlineName="0" id="0" visible="true">
+<div>
+<h1>0<a name="titlepage"></a></h1>
+
+
+<p> </p><center><p></p><p>1 </p>
+<p><strong>3<sup><font size="2">4</font></sup> 6<br  />
+</strong><strong>8 </strong></p></center>
+</div>
+</pkg:outlineMarker><!-- 0 -->
+
+<pkg:outlineMarker OutlineName="A" id="A" visible="true">
+<div>
+<h1>1<a name="1"></a></h1>
+
+<p>3 <table><tr><td>5</td><td><b><sup>6</sup></b></td></tr></table> 8 
+  <!-- StartFragment -->
+  <table><tr><td>0</td> <td>2</td></tr></table> 4 6 
+&#160; 8 0 
+</p>
+</div>
+2</pkg:outlineMarker><!-- A -->
+</pkg:outlineMarker><!-- root -->
+</pkg:content>
+</pkg:package>

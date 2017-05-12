@@ -1,0 +1,2 @@
+This directory should be empty, but ExtUtils::Manifest doesn't
+understand that, so thbbt.

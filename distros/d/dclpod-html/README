@@ -1,0 +1,42 @@
+DCLPod/Html version 0.01
+========================
+
+This module provides an executable called dcl2html that will
+convert pod within DCL comments into html file.  For example,
+instead of commenting your procedure like this:
+
+    $! do some stuff
+
+You might consider:
+
+    $!=head1 NAME
+    $!
+    $!stuffy.com - do some stuff
+    $!
+
+etc.  See perldoc perlpod for an explanation of pod.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   mmk
+   mmk test
+   mmk install
+
+DEPENDENCIES
+
+This module was derived from modifications to the Pod::Html pacakge that
+shipper witrh perl 5.8.1 (not anything later).
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Peter Prymmer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm, OSoft
+
+use lib 'lib';
+
+use strict;
+use warnings;
+
+use YAML;
+
+local $SIG{__WARN__};
+
+my $test_book = 'test_packages/QuickStartGuide.jar';
+if(@ARGV) {
+  $test_book = $ARGV[0];
+}
+
+use dtRdr::Annotation::IO;
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+my $book = dtRdr::Book->new_from_uri($test_book);
+my $anno_io = dtRdr::Annotation::IO->new(uri => 'annotations/');
+$anno_io->apply_to($book);
+
+my %data;
+my @node_order;
+my $root = $book->toc;
+
+# ability to stop early
+my $count = 1;
+my $limit;
+$limit = 2;
+
+my $sub = sub {
+  my $node = shift;
+  #($node == $root) and return;
+  $book->get_content($node);
+  my $id = $node->id;
+  $data{$id} and die "bah";
+  my $chars = $book->get_cache_chars($node);
+  my $short_chars = $chars;
+  $short_chars =~ s/^(.{19}).*(.{18})$/$1...$2/s;
+
+  $data{$id} = length($chars);
+  #push(@node_order, $node->id);
+  print $id, ': ', $data{$id}, " |$short_chars|\n";
+  $count++;
+  ($count > $limit) and exit;
+};
+$root->_rmap($sub);
+
+#print YAML::Dump(\@node_order, \%data);
+
+# vim:ts=2:sw=2:et:sta

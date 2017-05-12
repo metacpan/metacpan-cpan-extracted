@@ -1,0 +1,39 @@
+DeltaX modules version 3.17
+===========================
+
+This is collection of DeltaX modules written especially for masser (see
+masser.sourceforge.net), but some of them may be used separately.
+
+DeltaX::Config    - module for parsing configuration files
+DeltaX::Database  - module which hiddens differences between databases
+                    (sequences, date formats etc.)
+DeltaX::Language  - module for parsing files with text labels and messages
+                    in various languages
+DeltaX::Page      - parsing pages for masser
+DeltaX::Session   - session management for web applications
+DeltaX::Trace     - simple module for writing trace messages
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI (for DeltaX::Database)
+  Time::HiRes (for DeltaX::Database - statistics)
+
+COPYRIGHT AND LICENCE
+
+This package is free software; you can use it under "Artistic License" from
+Perl.
+
+Copyright (C) 2002-2003 DELTA E.S., Czech Republic (www.deltaes.cz)
+Copyright (C) 2009-2010, Radas s.r.o., Czech Republic (www.radas-atc.cz)
+

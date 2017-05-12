@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+anno_client - talk directly to the server
+
+=cut
+
+package bin::anno_client;
+
+use Getopt::Helpful;
+use YAML::Syck ();
+
+my $get_cred = sub {die "no credentials"};
+sub main {
+  my (@args) = @_;
+
+  my $user;
+  my $rev;
+  my $hopt = Getopt::Helpful->new(
+    usage => 'CALLER get|post|put|delete <id> [opts]',
+    ['u|user=s', \$user, '<name=pass>',
+      'username and/or password'],
+    ['r|revision=i', \$rev, '<revnum>', 'existing revision'],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+  my ($action, $id) = @args;
+  $action = uc($action);
+  my $anno;
+  if($action =~ m/POST|PUT/) {
+    (-t STDIN) and warn "type your yaml now\n";
+    my $str = do {local $/; <STDIN>};
+    $anno = YAML::Syck::Load($str);
+  }
+  unless(defined($id)) {
+    # it better be on stdin
+    ($action =~ m/POST|PUT/) or
+      $hopt->usage("must have id to GET|DELETE");
+    if($action eq 'PUT') {
+      defined($id = $anno->{id}) or die "no id in $anno";
+    }
+  }
+
+  my $pass;
+  if($user) {
+    ($user, $pass) = split(/=/, $user);
+  }
+
+  my $server = 'localhost:8085';
+  # read config and such
+  if((not ($user and $pass)) and (-e 'server_details.yml')) {
+    my $conf = YAML::Syck::LoadFile('server_details.yml');
+    $conf = $conf->{anno_servers}{$server} or
+      die "no config for '$server'";
+    unless($user) {
+      $user = $conf->{'*default'};
+    }
+    unless($pass) {
+      $pass = $conf->{$user};
+    }
+  }
+  $get_cred = sub {return($user, $pass)};
+
+  my $uri = 'http://' . $server . '/';
+  $uri .= 'annotation/' unless(($id || '') eq 'manifest');
+  $uri .= $id . '.yml' if($id);
+  $uri .= '?rev=' . $rev if(defined($rev));
+
+  my @and;
+  if($action =~ m/POST|PUT/) {
+    @and = ([content_type => 'text/x-yaml'], YAML::Syck::Dump($anno));
+  }
+
+  my $ua = MyUA->new();
+  warn "$action $uri @and";
+  my $ans = $ua->req($action, $uri, @and);
+  print $ans->content;
+
+}
+
+BEGIN {
+  package MyUA;
+  use base 'LWP::UserAgent';
+  sub get_basic_credentials {$get_cred->()};
+  sub req {
+    my $self = shift;
+    my $ans = $self->request(HTTP::Request->new(@_));
+    my %want = (
+      POST   => 201,
+      DELETE => 200,
+      PUT    => 200,
+      GET    => 200,
+    );
+    ($ans->code == $want{$_[0]}) or
+      die "bad answer ", $ans->code, " ", $ans->content;
+    return($ans);
+  }
+} # end MyUA
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::anno_client::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::anno_client';

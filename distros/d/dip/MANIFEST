@@ -1,0 +1,35 @@
+bin/dip
+Changes
+examples/dancr/dancr.pl
+examples/dancr/dip/count-new.dip
+examples/dancr/dip/count-uri-new-with-ustack.dip
+examples/dancr/dip/dbi-prepare.dip
+examples/dancr/dip/dump-requests.dip
+examples/dancr/dip/request-quant.dip
+examples/dancr/public/css/style.css
+examples/dancr/README.txt
+examples/dancr/schema.sql
+examples/dancr/test.pl
+examples/dancr/views/layouts/main.tt
+examples/dancr/views/login.tt
+examples/dancr/views/show_entries.tt
+lib/dip.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-compile.t
+t/000-report-versions.t
+toolkit/count-new.dip
+toolkit/oneliners.txt
+xt/critic.t
+xt/eol.t
+xt/no-tabs.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod-syntax.t
+xt/synopsis.t
+xt/unused-vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

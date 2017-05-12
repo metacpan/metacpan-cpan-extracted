@@ -1,0 +1,38 @@
+dirtyRSS - A dirty but self-contained RSS parser
+
+SYNOPSIS
+
+  use dirtyRSS;
+
+  $tree = parse($in);
+
+  die("$tree\n") unless (ref $tree);
+
+  disptree($tree, 0);
+
+DESCRIPTION
+
+  dirtyRSS is a terribly dirty RSS parser, which doesn't require any other module
+  to work. It parses a string, and creates a tree, which represents the RSS feed.
+
+  It doesn't support the complete XML syntax, only things that are commonly used
+  in feeds.
+
+  All tags are lowercased, namespace indicators are removed, and several typical
+  non-RSS-2.0 tags are translated shamelessly to their 2.0 counterpart. There is
+  also plenty of fiddling with the data on the way.
+
+  The only good thing about this parser, is that it works most of the time, and
+  it makes the tree look as if it came from an RSS 2.0, for a large parts of
+  feeds of various sorts.
+
+  If the parse fails, an error message is passed via the return value, rather
+  than a reference to an array.
+
+HISTORY
+
+  The module is part of the Editaste site, http://www.editaste.com
+
+AUTHOR
+
+  Eli Billauer, <perldev@editaste.com>

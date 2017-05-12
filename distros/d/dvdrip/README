@@ -1,0 +1,639 @@
+I.   
+             http://www.exit1.org/dvdrip/index.cipp
+           provides an easy to use but feature-rich Gtk+ GUI to control almost all
+           aspects of the ripping and transcoding process. It uses the widely
+           known video processing swissknife transcode and many other Open Source
+           tools. dvd::rip itself is licensed under GPL / Perl Artistic License.
+
+                     "And note: it's spelt dvd::rip, and nothing else."
+
+II.  NOTE
+
+   This README is automatically generated from the same sources which
+   are used for the dvd::rip homepage. You'll allways get the latest
+   news and information from the homepage.
+   
+     http://www.exit1.org/dvdrip/
+   
+   Also the homepage contains an extensive user documentation for
+   standard and cluster mode, with screenshots, diagrams and more.
+   This README covers only the installation not the usage of dvd::rip.
+   
+III. 
+                      http://www.exit1.org/dvdrip/doc/install.cipp
+              __________________________________________________________________
+
+              * 1.1 Binary distributions
+
+              * 1.1.1 Debian packages
+              * 1.1.2 SuSE packages
+              * 1.1.3 Mandrake packages
+              * 1.1.4 RedHat packages
+              * 1.1.5 gentoo packages
+              * 1.1.6 FreeBSD port
+              * 1.1.7 OpenBSD port
+
+           1.2 Source download
+     * 1.2.1 dvd::rip tarball download
+     * 1.2.2 CVS access
+
+     1.3 Requirements
+     * 1.3.1 External command line tools
+     * 1.3.2 Perl 5.6.0 or better
+     * 1.3.3 Perl modules
+     * 1.3.4 rar (for vobsub compression)
+
+     1.4 Install from source
+     * 1.4.1 Install dvd::rip
+     * 1.4.2 Update dvd::rip
+     * 1.4.3 Multiple dvd::rip versions in parallel
+
+     1.5 Uninstall dvd::rip
+
+     1.6 Download this documentation
+     __________________________________________________________________
+
+   This chapter describes how you can get and install dvd::rip. You can
+   try one of the several binary distributions or install it from the
+   source.
+
+   1.1 Binary distributions
+
+   Installation of dvd::rip isn't that hard, but fulfilling the
+   requirements actually is (simply because there are a lot ;). So you
+   should first try a binary installation using the package manager of
+   your Linux distribution. This should track all dependencies
+   automatically and speed up things significantly.
+
+   1.1.1 Debian packages
+
+   Christian Marillat builds video related Debian packages and publishes
+   them on his website http://www.debian-multimedia.org. You can use
+   apt-get to install the packages if you add one of the following entries
+   (depending on your distribution) to your /etc/apt/sources.list file:
+
+deb http://www.debian-multimedia.org sarge main
+deb http://www.debian-multimedia.org etch main
+deb http://www.debian-multimedia.org sid main
+deb http://www.debian-multimedia.org experimental main
+
+   You will find all packages to compile transcode on your own (if you
+   need always the very latest versions), or can get binaries of
+   reasonably recent transcode versions directly. The same applies to
+   dvd::rip.
+
+   The dvd::rip package is called dvdrip.
+
+   1.1.2 SuSE packages
+
+   On packman.links2linux.org you find several video related RPM's,
+   including dvd::rip and transcode:
+
+     dvd::rip at packman.links2linux.org
+     http://packman.links2linux.org/ homepage
+
+   1.1.3 Mandrake packages
+
+   Mandrake users can get actual dvd::rip and transcode RPM's from the
+   Penguin Liberation Front lair.
+
+     http://plf.zarb.org/
+
+   1.1.4 RedHat packages
+
+   Matthias Saou does a great job in building dvd::rip and other
+   multimedia related packages. You can find them at freshrpms.net. This
+   is a direct link the dvd::rip package:
+
+     http://freshrpms.net/rpm/perl-Video-DVDRip
+
+   1.1.5 gentoo packages
+
+   You can get dvd::rip and transcode from the official gentoo package
+   repository:
+
+     http://packages.gentoo.org/search/?sstring=dvdrip
+
+   1.1.6 FreeBSD port
+
+   dvd::rip is available in the FreeBSD ports collection. To install from
+   source, cd to ${PORTSDIR}/multimedia/dvdrip and type 'make install
+   clean'. To install a binary package of the port, type 'pkg_add -r
+   dvdrip'. Note however that the default installation of the transcode
+   port which dvd::rip depends on is very minimalistic, it is recommended
+   to look at the Makefile of the transcode port, enable all the options
+   you need for dvd::rip and install the transcode port from source.
+   Thanks to Michael Nottebrock, who maintains the FreeBSD port.
+
+   1.1.7 OpenBSD port
+
+   Since June 2004 we have also an official OpenBSD port of dvd::rip. You
+   find it under graphics/dvdrip. Thanks to the maintainer Waldemar
+   Brodkorb.
+
+   1.2 Source download
+
+   1.2.1 dvd::rip tarball download
+
+   You can download dvd::rip sources from this server or all stable
+   releases from any CPAN mirror.
+
+   Local download of the latest stable release: (currently no unstable
+   release available)
+
+     dvdrip-0.98.10.tar.gz
+     dvdrip-0.98.10.tar.gz.asc (GnuPG signature, get key)
+
+   CPAN download directory: (list of mirrors)
+
+     http://www.cpan.org/modules/by-authors/id/J/JR/JRED/
+
+   You can download older versions from here:
+
+     http://www.exit1.org/dvdrip/dist/
+     http://www.exit1.org/dvdrip/dist/pre/
+
+   This is a directory, which contains several user contributed files, you
+   probably find useful:
+
+     http://www.exit1.org/dvdrip/contrib/
+
+   1.2.2 CVS access
+
+   This is mainly intended for developers and CVS experienced users. This
+   CVS repository is only a read only mirror of my main repository. It's
+   updated manually when I publish releases or pre-releases, so there is
+   no advantage for normal users compared to downloading the tar balls
+   (besides making it easier using "cvs update" ;)
+
+   Since development of dvd::rip is divided into two branches, you get the
+   current (unstable) version, if you don't specifiy a release tag. If you
+   want to access a stable version, add -r rel-MAJOR-MINOR-PATCH to your
+   cvs checkout command (example: for 0.48.5 this is -r rel-0-48-5). If
+   you always want to have the latest stable patch release, use -r
+   rel-MAJOR-MINOR-patches (e.g. -r rel-0-50-patches). All subsequent
+   updates will stay on this branch (here: 0.50). The easiest way of
+   switching to another branch is creating a new checkout using the
+   corresponding release tag.
+
+   Root                            Module Unstable tag Stable tag
+   :pserver:cvs@cvs.exit1.org:/cvs dvdrip none         rel-MAJOR-MINOR-PATCH
+
+   1.2.2.1 CVS examples
+
+   Log into CVS server with:
+
+cvs -z3 -d :pserver:cvs@cvs.exit1.org:/cvs login
+
+          (Press ENTER for password)
+
+   Checkout latest version of the actual stable branch (here 0.50.x):
+
+cvs -z3 -d :pserver:cvs@cvs.exit1.org:/cvs checkout -r rel-0-50-patches dvdrip
+
+   Checkout a specific stable/bugfix version (here 0.50.13) with:
+
+cvs -z3 -d :pserver:cvs@cvs.exit1.org:/cvs checkout -r rel-0-50-13 dvdrip
+
+   Checkout the current development version with:
+
+cvs -z3 -d :pserver:cvs@cvs.exit1.org:/cvs checkout dvdrip
+
+   Update a checkout - created using one of the commands above - with:
+
+cd dvdrip; cvs -z3 update
+
+   1.3 Requirements
+
+   dvd::rip is a Gtk+ based program written in Perl, using the video
+   processing tool transcode and many other tools for the internals. So
+   you first have to get some prerequisites before installing dvd::rip.
+
+   dvd::rip expects all command line tools mentioned here to be found in
+   the standard search PATH.
+
+   1.3.1 External command line tools
+
+   This table gives a brief overview of the tools used by dvd::rip
+   (everything but the Perl modules - see the chapters below for more
+   information about them). Most tools are optional - the corresponding
+   dvd::rip modules are just switched off, if you don't have them.
+
+   But you need at least the tools marked mandatory, otherwise dvd::rip
+   will complain with an error message on startup. You can get also a
+   dvd::rip window listing this information, refer to the corresponding
+   chapter in the documentation for details.
+
+   Tool Comment Mandatory Suggested Minimum Maximum
+   transcode dvd::rip is nothing without transcode Yes 1.0.2 0.6.14 -
+   ImageMagick Needed for preview image processing Yes 6.2.3 4.0.0 -
+   ffmpeg FFmpeg video converter command line program No 0.4.10 -
+   xvid4conf xvid4 configuration tool No 1.12 1.6 -
+   subtitle2pgm Needed for subtitles No 0.3 0.3 -
+   lsdvd Needed for faster DVD TOC reading No 0.15 0.15 -
+   rar Needed for compressed vobsub subtitles No 2.71 2.71 2.99
+   mplayer Needed for subtitle vobsub viewing No 1.00 0.90 -
+   ogmtools Needed for OGG/Vorbis No 1.5 1.0.0 -
+   dvdxchap For chapter progress bar (ogmtools) No 1.5 1.0.0 -
+   mjpegtools Needed for (S)VCD encoding No 1.6.2 1.6.0 -
+   xine Can be used to view DVD's/files No 0.9.15 0.9.13 -
+   fping Only for cluster mode master No 2.4 2.2 -
+   hal Used for DVD device scanning No 0.5.7 0.5 -
+
+   1.3.2 Perl 5.6.0 or better
+
+   You need a recent Perl version on your system. Perl 5.8.x is
+   recommended, 5.6.0 and 5.6.1 should work also. dvd::rip won't start
+   with Perl versions prior to 5.6.0. Actual distributions ship minimum
+   5.6.1, so this shouldn't be a real problem, anyway.
+
+   1.3.3 Perl modules
+
+   Since dvd::rip is mostly written in Perl it requires a bunch of Perl
+   modules. Check if your distribution has installation packages for them,
+   otherwise download them from CPAN and install from source.
+
+   Some required Perl modules are shipped with dvd::rip for your
+   convenience. These are pure Perl modules which need no C-Compiler or
+   something like that for installation. dvd::rip detects if these modules
+   are missing on your system and installs them together with its own
+   program files. Refer to the Install from source chapter for details
+   about this mechanism.
+
+   This table lists all Perl modules, usual names for installation
+   packages and CPAN URL's for download:
+
+   Perl Module Package name CPAN URL Shipped with dvd::rip
+   Gtk2 libgtk2-perl search.cpan.org No
+   Event libevent-perl search.cpan.org No
+   Locale::TextDomain libintl-perl-xs search.cpan.org No
+   Gtk2::Ex::FormFactory libgtk2-ex-formfactory-perl search.cpan.org Yes
+   AnyEvent libanyevent-perl search.cpan.org Yes
+   Event::ExecFlow libevent-execflow-perl search.cpan.org Yes
+   Event::RPC libevent-rpc-perl search.cpan.org Yes
+
+   To install a Perl module from source, execute these commands:
+
+tar xfz Some-Perl-Module-x.xx.tar.gz
+cd Some-Perl-Module-x.xx
+perl Makefile.PL
+make test
+sudo make install
+
+   1.3.4 rar (for vobsub compression)
+
+   Some special notes about the rar program. MPlayer supports vobsub files
+   compressed with rar, but you need a 2.x version, 3.x and higher doesn't
+   work. You can get a 2.x version locally from here:
+
+     http://www.exit1.org/dvdrip/contrib/rarlnx271.sfx.bin
+
+   I suggest to install the binary to e.g. /usr/local/bin. Then configure
+   this path using the Preferences dialog.
+
+   1.4 Install from source
+
+   1.4.1 Install dvd::rip
+
+   This is quite easy, if you have managed to install the packages
+   mentioned above... ;)
+
+   Download the .tar.gz archive of the dvd::rip version you want to
+   install. Then extract the file, change into the created directory, and
+   execute the Makefile.PL script:
+
+# as a normal user
+tar xfz dvdrip-x.xx.tar.gz
+cd dvdrip-x.xx
+perl Makefile.PL
+
+   As mentioned in the Required Perl modules chapter above dvd::rip can
+   install some of the required Perl modules for you automatically. If
+   dvd::rip detects such missing modules on your system, you get an output
+   like this from perl Makefile.PL:
+
+Note:
+-----
+The following modules are required for dvd::rip but not found on your
+system. They're shipped with dvd::rip for your convenience and will be
+installed automatically when you run 'make install':
+
+  AnyEvent Event::ExecFlow Event::RPC
+
+You can ignore the 'prerequisite not found' warnings beyond for them.
+
+If you don't like this and want to install these modules manually
+just set SKIP_UNPACK_REQUIRED_MODULES before executing Makefile.PL,
+e.g. this way:
+
+  SKIP_UNPACK_REQUIRED_MODULES=1 perl Makefile.PL
+
+Checking if your kit is complete...
+Looks good
+Warning: prerequisite AnyEvent 1.02 not found.
+Warning: prerequisite Event::ExecFlow 0.62 not found.
+Warning: prerequisite Event::RPC 0.89 not found.
+Writing Makefile for Video::DVDRip
+
+   If your distribution has installation packages for these modules, it's
+   recommended to use these. Install them and run 'perl Makefile.PL'
+   again.
+
+   Now run 'make test' and if no errors were reported 'make install' (as
+   root):
+
+make test
+sudo make install
+
+   You can ommit the "make install" step. But then you can execute the
+   'dvdrip' binary only from the build directory and you must put
+   "$PWD/bin" into your PATH (export PATH=$PWD:$PATH), otherwise dvd::rip
+   can't find its files.
+
+   1.4.2 Update dvd::rip
+
+   Updating is just like installing. The only thing you should be aware of
+   is switching the underlying Perl version. This way you easily can get
+   two versions of dvd::rip installed in your system, because dvd::rip
+   installs its libraries in your Perl library directory. Such a
+   installation mixing isn't recommended unless you know exactly what
+   you're doing. So it's better to remove the old version from the old
+   Perl directory if you change the Perl version (refer to the uninstall
+   chapter for details).
+   Read the Changes file!
+
+   I strongly suggest you should read at least the latest change log entry
+   of the Changes file, resp. all entries of the versions you probably
+   skipped in case of an update. It contains important release notes, e.g.
+   about compatibility issues, and all relevant changes from release to
+   release.
+
+   Note:
+   Changes on the unstable branch are logged in the file Changes.unstable.
+
+   1.4.3 Multiple dvd::rip versions in parallel
+
+   It's possible to use several dvd::rip versions in parallel on your
+   system, but you can install only one version using make install into
+   your system directories.
+
+   Just extract another dvd::rip version you want to use somewhere, enter
+   the created directory (dvdrip-x.xx) and execute perl Makefile.PL &&
+   make here (no make install). Add the actual directory to your PATH
+   (export PATH=$PWD:$PATH) and you can start this version with bin/dvdrip
+   from this directory. All files and libraries located in the actual
+   distribution directory will be used. The . in PATH is neccessary,
+   otherwise some dvd::rip helper binaries may be taken from another
+   place.
+
+tar xvfz dvdrip-x.xx.tar.gz
+cd dvdrip-x.xx
+perl Makefile.PL && make
+export PATH=$PWD:$PATH
+bin/dvdrip
+
+   1.5 Uninstall dvd::rip
+
+   If you didn't use a package manager to install dvd::rip and you want to
+   uninstall it, follow these instructions. This is necessary, if you
+   accidentally mixed several versions on your system, which may result in
+   a broken dvd::rip at all. In this case best thing is to remove all
+   instances and to do a clean installation afterwards.
+
+   dvd::rip mainly consists of a bunch of Perl modules which reside in the
+   Perl library directory of your Perl interpreter. Easiest way to find
+   this directory is to use the locate program. Then a few executables
+   belong to dvd::rip, which also can be found using locate. This is an
+   example session of how this works:
+
+% locate DVDRip.pm
+/usr/local/share/perl/5.8.0/Video/DVDRip.pm
+% rm -r /usr/local/share/perl/5.8.0/Video/DVDRip*
+% locate dvdrip
+/usr/bin/dvdrip
+/usr/bin/dvdrip-exec
+/usr/bin/dvdrip-master
+...
+% rm /usr/bin/dvdrip*
+
+   In words: find a Perl library directory called Video with DVDRip.pm in
+   it. Remove the DVDRip.pm file and the subdirectory called DVDRip. Then
+   find the location of the binaries and remove them - see the list above.
+   If you find multiple instances this way, remove them all.
+
+   1.6 Download this documentation
+
+   You can download a static HTML version of this documentation:
+
+     http://www.exit1.org/dvdrip/dist/dvdrip-doc-html-0.98.10.tar.bz2
+
+   A PDF version is also available (generated using the excellent tool
+   htmldoc):
+
+     http://www.exit1.org/dvdrip/dist/dvdrip-doc-0.98.10.pdf.bz2
+     __________________________________________________________________
+
+IV.  
+                    [1]http://www.exit1.org/dvdrip/list.cipp
+           dvd::rip users, you should subscribe to the dvdrip-users mailing list.
+           This list is low traffic and announces, patches etc. will be posted
+           here, too.
+
+           The language of the mailing list is english.
+
+        This is a closed mailing list: subscribe before posting
+
+           The list is closed to prevent members and administrators from getting
+           flooded by spam. So you have to subscribe before posting. Postings from
+           non subscribed addresses are discarded without notification!
+
+           Important: You must use the sender address, which is subscribed to the
+           mailing list, because the list manager has no idea of your alternative
+           mail addresses. Postings with unknown sender addresses are discarded
+           without notification!
+
+           Before posting any questions or bug reports: please first check the
+           [3]documentation, in particular the [4]FAQ.
+
+             * [5]Mailing list subscription
+             * [6]Searchable mailing list archive
+
+        The list is registered for reading at [7]gmane.org, a mailing list to
+   news gateway, which has a public searchable mailing list archive:
+     * [8]Mailing list archive at gmane.org
+
+   Please note, that you can't post to the gmane.comp.video.dvdrip.user
+   newsgroup. You must be a regular list member for posting.
+
+   Because dvd::rip is highly transcode related, I suggest subscribing to
+   the [9]transcode-user mailing list, too.
+
+   IMPORTANT NOTE:
+   Don't post any illegal stuff here, e.g. requesting or offering movie
+   downloads or something like this! Members breaking this simple rule
+   will be removed immediately.
+
+   Please note: copying encrypted DVD's is illegal in many countries. Also
+   it's illegal to provide information about how this could be
+   accomplished. So don't send any questions regarding encrypted DVD's or
+   DVD cracking tools to the author of dvd::rip or to the dvd::rip mailing
+   list. Corresponding mails will be silently ignored, correspondent posts
+   will be removed from the mailing list archive without notification.
+
+URL References
+
+   1. http://www.exit1.org/dvdrip/list.cipp
+   3. http://www.exit1.org/dvdrip/doc/
+   4. http://www.exit1.org/dvdrip/doc/faq.cipp
+   5. http://lists.exit1.org/mailman/listinfo/dvdrip-users
+   6. http://www.exit1.org/archive/dvdrip-users/
+   7. http://www.gmane.org/
+   8. http://news.gmane.org/thread.php?group=gmane.comp.video.dvdrip.user
+   9. http://lists.exit1.org/mailman/listinfo/transcode-users
+
+V.  
+               [1]http://www.exit1.org/dvdrip/support.cipp
+   [3]documentation, in particular the [4]FAQ, subscribe to the
+   [5]dvdrip-users mailing list and ask your question there (but not
+   before you read all information on this page!).
+
+   Eric S. Raymond wrote an excellent article about [6]"How To Ask
+   Questions The Smart Way ". You probably want to take a look at it
+   before posting ;)
+
+Reporting bugs and suggestions (*please* read this!)
+
+   If you want to send a bug report, patch or feature request, please make
+   sure, that you're using the most recent version of dvd::rip (at least
+   the latest stable release). Also first check the [7]documentation, in
+   particular the [8]FAQ, the [9]ChangeLog and the [10]mailing list
+   archive to see, if the bug is reported and probably fixed already in
+   the development release. For feature requests, please check if it's not
+   already noted on the [11]TODO list. We all know, reading documentation
+   is boring, but it saves time ;) Thanks.
+
+   It's really important that you add the following information to your
+   bug reports, otherwise you'll likely don't get any helpful answers
+   (probably no answer at all, because for most people it's boring to ask
+   for this again and again...):
+     * a description of how the bug can be reproduced.
+     * information about your Linux installation, in particular which
+       distribution/version you are using
+     * exact versions of all affected packages. That's always dvd::rip and
+       transcode, but often a bunch of other packages are important, e.g.
+       ogmtools (if it's about ogg/vorbis) or mjpegtools (if it's about
+       (S)VCD processing) and so on. You can get a list of most of these
+       version numbers by pressing Ctrl+D in the dvd::rip main window.
+     * information about usage of binary packages or self compiled
+       packages. In case of binary packages: from where did you get them.
+     * if dvd::rip crashes or it looks like an internal dvd::rip bug and
+       not like a bug of external command execution, add the output of
+       "perl -V".
+     * if a specific command executed by dvd::rip fails, grab the
+       corresponding command line from the log and execute it by hand. It
+       is important that you add the complete command line and the
+       complete command output to your report.
+
+transcode related issues
+
+   If dvd::rip mainly works for you but you encounter problems ripping
+   specific DVDs, this is probably a transcode problem. Maybe you want to
+   report this directly to the transcode developers resp. to the
+   [12]transcode-users list. If you're not sure about this, report the
+   problem to the dvdrip-users list, and we'll see, what we can do for
+   you. But aware, that you may be pointed to the transcode-users list...
+   ;)
+
+Encrypted DVD's
+
+   Please note: copying encrypted DVD's is illegal in many countries. Also
+   it's illegal to provide information about how this could be
+   accomplished. So don't send any questions regarding encrypted DVD's or
+   DVD cracking to the author of dvd::rip or to the dvd::rip mailing list.
+   Corresponding mails will be silently ignored, correspondent posts will
+   be removed from the mailing list archive without notification.
+
+Contribute with patches
+
+   Patches are welcome, preferably unified context diffs created this way
+   (if you're familiar with CVS, you should use the [13]CVS repository and
+   create patches with CVS):
+  cd Video-DVDRip-0.48.2.patched
+  make realclean
+  cd ..
+  diff -urN Video-DVDRip-0.48.2 Video-DVDRip-0.48.2.patched > patchfile.txt
+
+   where Video-DVDRip-0.48.2 is the root directory of the original
+   distribution and Video-DVDRip-0.48.2.patched your modified version.
+   Without the make realclean all files created during make are added to
+   the patch, what's not what we want.
+
+If it simply works
+
+   If dvd::rip works for you without any problems and you like it, don't
+   hesitate to drop a mail. Next to all those problem and bug reports some
+   positive postings delight every coders heart ;)
+
+Contact the author
+
+   If you don't want to post to the mailing list for some reasons, you can
+   contact me by mail. But be aware, that the response time may be longer,
+   comparing to a list posting. The address is:
+   [14]Joern Reder <joern AT zyn.de>. Please place the word "dvd::rip"
+   somewhere in the subject, in addition to your real topic, because this
+   helps me classifying your email correctly. Thanks.
+
+GnuPG Key
+
+   You can send PGP encrytped mails to the author. Please use the
+   following key:
+
+   Key ID         285CF473
+   Fingerprint    0B9C 37B5 070B 8D87 8851 A703 DA13 62D0 285C F473
+   Get it         [15]Fetch from wwwkeys.de.pgp.net
+
+   From 0.50.14 on all dvd::rip releases are signed with this key.
+
+URL References
+
+   1. http://www.exit1.org/dvdrip/support.cipp
+   3. http://www.exit1.org/dvdrip/doc/
+   4. http://www.exit1.org/dvdrip/doc/faq.cipp
+   5. http://www.exit1.org/dvdrip/list.cipp
+   6. http://catb.org/~esr/faqs/smart-questions.html
+   7. http://www.exit1.org/dvdrip/doc/
+   8. http://www.exit1.org/dvdrip/doc/faq.cipp
+   9. http://www.exit1.org/dvdrip/changes.cipp
+  10. http://www.exit1.org/archive/dvdrip-users/
+  11. http://www.exit1.org/dvdrip/todo.cipp
+  12. http://lists.exit1.org/mailman/listinfo/transcode-users
+  13. http://www.exit1.org/dvdrip/doc/install.cipp#cvs
+  14. mailto:?subject=dvd::rip
+  15. http://wwwkeys.de.pgp.net:11371/pks/lookup?op=get&search=0x285CF473
+
+VI. CHANGES
+   $Id: Changes 2398 2010-03-06 13:06:46Z joern $
+
+   Revision history and release notes for dvd::rip.
+
+   0.98.11 [stable branch] Sat Mar 6 2010, joern
+    Notes:
+    - Event::ExecFlow version 0.64 is required for this version.
+      This fixes a bug where no error messages were shown after
+      ripping short. It was reported via Ubunutu Launchpad:
+      https://bugs.launchpad.net/ubuntu/+source/dvdrip/+bug/478710
+      (You find it in the perl-modules/ directory, which was updated
+       to the most recent versions btw)
+      
+    Features:
+    - Updated Danish and Catalan translation. Thanks to Ysangkok,
+      Kenneth Nielson and Joan Farrerons.
+    - Turn "ripping short" error message into a warning, so the
+      ripping process continues and it's up to the user to decide
+      whether this is critical or not.
+
+    Bugfixes:
+    - Fixed h264 2pass cluster mode bug, generating a malformed
+      transcode command. Reported by semkath <semkath AT arcor.de>
+      and Christiaan Putter <ceputter AT googlemail.com>.
+

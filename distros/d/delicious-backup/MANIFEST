@@ -1,0 +1,11 @@
+README
+Changes
+bin/delbackup
+lib/Net/Delicious/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+t/pod-coverage.t
+t/pod.t
+t/perl-critic.t
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

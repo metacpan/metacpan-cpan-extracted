@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<pkg:package name="pre Check" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+<pkg:content>
+<pkg:outlineMarker OutlineName="A" id="root" visible="true" render="false">
+<pkg:outlineMarker OutlineName="B" id="B" visible="false">
+        <pre>
+        1: #!/usr/local/bin/perl 
+        2: 
+        3: print "Hello world\n"; 
+
+</pre>
+</pkg:outlineMarker><!-- B -->
+</pkg:outlineMarker><!-- A -->
+</pkg:content>
+</pkg:package>

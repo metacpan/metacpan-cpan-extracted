@@ -1,0 +1,24 @@
+The dTemplate compiled data has the following format:
+
+- number of variables in this template [ I32 ]
+- variable-hash [ 0-terminated string ]
+    - The hash-keys (variable names) are separated by spaces and stored as one
+      null-terminated string. The hash-key lookup is done by sequential scan
+- variable name => id table [ determined sized ]
+    - This table has exactly the same length as the previous null-terminated
+      string. After the lookup is done in the previous table, you can use the
+      same index in this table to lookup the code of the variable.
+- template chunks [ * ]
+    - chunk text size [ I32 ]
+    - chunk text [ determined size ]
+    - if not the last chunk:
+	- full matched string, including delimiters [ 0-terminated ]
+	- variable ID [ I32 ]
+	- variable path in qualified variable [ \0 terminated list ] (including variable name also)
+	    - variable path part [ \0 terminated strings ]
+	- encoder list [ \0 terminated list ]
+	    - encoder [ \0 terminated string ]
+	    - encoder parameter [ \0 terminated string ]
+	- printf format string [ \0 terminated string ]
+    - last chunk:
+	- \0

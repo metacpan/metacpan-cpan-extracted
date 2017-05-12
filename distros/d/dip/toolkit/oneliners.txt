@@ -1,0 +1,14 @@
+dip -e 'before { warn "$_->{sub_name}\n" } call qr/::new$/' myapp.pl
+
+dip -e 'before { count("constructor", ARGS(0)); $c{total}++ } call qr/::new$/' myapp.pl
+
+# Let's filter out objects created in the XML::XPath (and below) namespace
+
+dip -e 'before { count("constructor", ARGS(0)); $c{total}++ } call qr/^(?!XML::XPath).*::new$/' \
+    myapp.pl
+
+dip -s dip/count-new.dip myapp.pl
+
+dip -e 'before { count "constructor", ARGS(0), ustack(2); $c{total}++ } call qr/XML::LibXML::NodeList::new$/' \
+    myapp.pl
+

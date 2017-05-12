@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+sync_annotations - sync annotations from the console
+
+=cut
+
+package bin::sync_annotations;
+
+use lib 'lib';
+use dtRdr;
+use dtRdr::Annotation::IO;
+use dtRdr::Annotation::Sync::Standard;
+
+sub main {
+  my (@args) = @_;
+
+  # emulate client init:
+  dtRdr->program_dir('client/app.pl'); dtRdr->init;
+  $SIG{__WARN__} = 0;
+
+  my $anno_io =
+    dtRdr::Annotation::IO->new(uri => dtRdr->user_dir . 'annotations/');
+
+  # TODO command-line args need to control what books, servers, etc.  We
+  # should also allow sourcing that from the config file.  ATM, this is
+  # different than what Frame.pm does.
+  my @book_list;
+  unless(@book_list) {
+    use URI::Escape ();
+    my %seen;
+    push(@book_list,
+      # the un-libraried books
+      grep({my $s = $seen{$_}; $seen{$_} = 1; $s ? $_ : ()}
+        map({$_->{book}} $anno_io->items)
+      ),
+      map({URI::Escape::uri_escape($_)}
+        map({$_->book_id} map({$_->get_book_info} dtRdr->user->libraries))
+      ),
+    );
+  }
+  my ($server, @plus) = dtRdr->user->config->servers;
+  @plus and die "ok, time to fix this bit";
+  my $sync = dtRdr::Annotation::Sync::Standard->new($server->uri,
+    anno_io => $anno_io,
+    server  => $server,
+    books   => [@book_list],
+    (1 ? (auth_sub => sub {
+      my ($s, $uri, $realm) = @_;
+      my ($u, $p) = ($s->username, $s->password);
+      unless(defined($u)) {
+        print "enter username for $uri ($realm)\n";
+        chomp($u = <STDIN>);
+      }
+      unless(defined($p)) {
+        print "enter password\n";
+        chomp($p = <STDIN>);
+      }
+      # I should be able to store that in the config from here.
+      return($u, $p);
+    }): ()),
+  );
+  $sync->start;
+
+  my $counter = 0;
+  until($sync->done) {
+    $sync->work;
+    ($counter++ > 1000) and die "limit passed";
+  }
+  $sync->done or die "didn't complete?";
+  warn "said it is done!";
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::sync_annotations::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::sync_annotations';

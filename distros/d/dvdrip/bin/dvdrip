@@ -1,0 +1,192 @@
+#!/usr/bin/perl
+
+# $Id: dvdrip 2098 2006-06-17 15:00:27Z joern $
+
+#-----------------------------------------------------------------------
+# Copyright (C) 2001-2003 Jörn Reder <joern@zyn.de> All Rights Reserved
+#
+# This program is part of Video::DVDRip, which is free software; you can
+# redistribute it and/or modify it under the same terms as Perl itself.
+#-----------------------------------------------------------------------
+
+package Video::DVDRip;
+
+use strict;
+use lib 'lib';
+
+use Getopt::Std;
+use FileHandle;
+
+my $splash_fh;
+
+BEGIN {
+    if (    $ARGV[0] !~ /^-(v|-?version)$/
+         && $ARGV[0] !~ /^-(h|-?help)$/ ) {
+        $splash_fh = FileHandle->new;
+        $splash_fh->autoflush(1);
+        open( $splash_fh, "| dvdrip-splash" );
+    }
+}
+
+#-- l10n stuff
+use POSIX qw(setlocale);
+use Locale::TextDomain ("video.dvdrip");
+use Locale::Messages qw (bind_textdomain_filter
+                         bind_textdomain_codeset
+                         turn_utf_8_on LC_MESSAGES);
+setlocale( LC_MESSAGES, "" );
+
+BEGIN {
+    bind_textdomain_filter 'video.dvdrip', \&turn_utf_8_on;
+    bind_textdomain_codeset 'video.dvdrip', 'utf-8';
+}
+
+my $has_dvdrip_rc;
+BEGIN {  $has_dvdrip_rc = -f "$ENV{HOME}/.dvdriprc" }
+
+my $USAGE = __ "
+Usage: dvdrip [-c] [-d level] [-p file] [-f function [-t title-nr]] [file]
+       dvdrip --version | -version | -v
+
+       -c open cluster control window
+
+       -d set debugging level
+
+       -f execute one of the following functions (needs filename)
+          transcode         transcode the selected title
+          transcode_split   transcode and split the selected title
+
+       -t title-nr to which the function above should apply
+          (Default: last selected title)
+
+       -p preferences filename (Default: ~/.dvdriprc)
+          A new file is created, if it doesn't exist.
+
+";
+
+main: {
+    if ( $ARGV[0] =~ /^-(v|-?version)$/ ) {
+        $Video::DVDRip::PREFERENCE_FILE = "$ENV{HOME}/.dvdriprc";
+        require Video::DVDRip;
+        print $Video::DVDRip::VERSION, "\n";
+        exit 0;
+    }
+
+    if ( $ARGV[0] =~ /^-(h|-?help)$/ ) {
+        usage();
+    }
+
+    # get options
+    my %opt;
+    my $opt_ok = getopts( 'cd:f:t:p:', \%opt );
+    usage() if not $opt_ok;
+
+    my $open_cluster_control = $opt{c};
+    my $function             = $opt{f};
+    my $title_nr             = $opt{t};
+    my $prefs                = $opt{p};
+
+    usage() if $function and $function !~ /^(transcode|transcode_split)$/;
+
+    $Video::DVDRip::PREFERENCE_FILE = $prefs || "$ENV{HOME}/.dvdriprc";
+
+    require Video::DVDRip;
+    require Video::DVDRip::GUI::Main;
+
+    # fetch filename paramter
+    my $filename = shift @ARGV;
+
+    # no more args allowed
+    usage() if @ARGV;
+
+    # set requested debugging level
+    Video::DVDRip::GUI::Main->set_debug_level( $opt{d} || 0 );
+
+    # create GUI object
+    my $gui = Video::DVDRip::GUI::Main->new;
+
+    # open preferences window on first startup?
+    if ( not $has_dvdrip_rc ) {
+        $function = "preferences";
+    }
+
+    Glib::Timeout->add( 500, sub { hide_start_splash($splash_fh); 0 } );
+
+    # start GUI
+    $gui->start(
+        filename             => $filename,
+        open_cluster_control => $open_cluster_control,
+        function             => $function,
+        select_title         => $title_nr,
+    );
+
+    END {
+        eval { Gtk->exit(0) };
+    }
+}
+
+sub usage {
+    print $USAGE;
+    exit 1;
+}
+
+sub hide_start_splash {
+    my ($fh) = @_;
+    return unless $fh;
+    local $SIG{PIPE} = "IGNORE";
+    print $fh "\n";
+    close $fh;
+    1;
+}
+
+__END__
+
+=head1 NAME
+
+dvd::rip - GUI for copying DVDs
+
+=head1 SYNOPSIS
+
+  dvdrip [-c] [-d level] [-p file] [-f function [-t title-nr]] [file]
+  dvdrip --version | -version | -v
+
+      -c open cluster control window
+
+      -d set debugging level
+
+      -f execute one of the following functions (needs filename)
+         transcode         transcode the selected title
+         transcode_split   transcode and split the selected title
+
+      -t title-nr to which the function above should apply
+         (Default: last selected title)
+
+      -p preferences filename (Default: ~/.dvdriprc)
+         A new file is created, if it doesn't exist.
+
+=head1 DESCRIPTION
+
+dvd::rip is an easy to use but nevertheless feature rich
+DVD copy program for Linux and other Unices. It's written
+in Perl and uses Gtk for the GUI part. Internally the Linux
+video processing tool transcode is used for the most DVD and
+generally video / audio related purposes.
+
+You'll find all information regarding installation and usage of
+dvd::rip in the README file shipped with the distribution or
+on the dvd::rip homepage:
+
+  http://www.exit1.org/dvdrip/
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2005 by Joern Reder, All Rights Reserved.
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

@@ -1,0 +1,519 @@
+<?xml version="1.0"?>
+<pkg:package name="thout1.0_test_book" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author>gary varnell</pkg:author>
+<pkg:publisher>osoft inc.</pkg:publisher>
+	<pkg:content>
+		<pkg:outlineMarker OutlineName="thout1.0_test_book" id="root" title="thout1.0_test_book" render="false">
+			
+
+
+<pkg:outlineMarker OutlineName="Single XHTML to Thout - How To " id="0" visible="false">
+<div class="sect1">
+<h1 align="center" class="style1">Single XHTML to Thout - How To  </h1>
+
+  <p align="center" style='text-align:center'><font style='color:#000066'><img width="300"
+height="291" id="_x0000_i1025" src="images/thoutlogo.gif"  /></font></p>
+  <p align="center" style='text-align:center'><font
+style='font-size:18.0pt'>Thout 1.0 Test Book</font></p>
+  <p align="center" style='text-align:center'><br  />
+    <strong><font style='font-size:13.5pt'>by Gary Varnell</font></strong><b><font
+style='font-size:13.5pt'><br  />
+    <br  />
+    <strong>&#169;</strong></font></b> 2006 Osoft Inc. All rights reserverd </p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="About this document" id="about" >
+<div class="sect1">
+<h1>About this document<a name="about" id="about"></a></h1>
+
+  
+<pkg:outlineMarker OutlineName="Description" id="about_desc" >
+<div class="sect2">
+<h2>Description<a name="about_desc" id="about_desc"></a></h2>
+
+  <p>This document is a test file to help assure that all Thout 1.0 book capabilities are handled properly in the new reader.<br  />
+    All Thout 1.0 capabilities should be included in this document. </p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="Author" id="about_author" >
+<div class="sect2">
+<h2>Author<a name="about_author" id="about_author"></a></h2>
+
+  <p>Gary Varnell </p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="Copyright" id="about_copyright" >
+<div class="sect2">
+<h2>Copyright<a name="about_copyright" id="about_copyright"></a></h2>
+
+  <p>&#169; Osoft.inc 2004-2005 all Rights Reserved </p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="Legal" id="about_legal" >
+<div class="sect2">
+<h2>Legal<a name="about_legal" id="about_legal"></a></h2>
+
+<p>This document was created for internal test usage only.
+  .<br  />
+</p>
+  
+
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="level 1 node" id="level_1_node" >
+<div class="sect1">
+<h1><a name="level_1_node" id="level_1_node"></a>level 1 node</h1>
+
+  <p>This is a level 1 node<br  />
+    parent=book<br  />
+</p>
+  
+<pkg:outlineMarker OutlineName="level 2 node  " id="level_2_node" >
+<div class="sect2">
+<h2>level 2 node <a name="level_2_node"
+id="level_2_node"></a> </h2>
+
+  <p>This is a level 2 node<br  />
+    parent=level_1_node</p>
+  
+<pkg:outlineMarker OutlineName="level 3 node " id="level_3_node" >
+<div class="sect3">
+<h3>level 3 node <a name="level_3_node" id="level_3_node"></a></h3>
+
+  <p>This is a level 3_node<br  />
+    parent=level_2_node
+  </p>
+  
+
+
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="HTML_Test" id="html_test" >
+<div class="sect1">
+<h1>HTML_Test<a name="html_test" id="html_test"></a></h1>
+
+  <p>The following nodes test various html content types </p>
+  
+    
+<pkg:outlineMarker OutlineName="pre" id="pre" >
+<div class="sect2">
+<h2>pre<a name="pre" id="pre"></a></h2>
+
+    <p>The following text should be pre formatted in the display</p>
+    
+<pkg:outlineMarker OutlineName="1" id="1" visible="false" copy="true">
+<pre>
+if($0 eq ($ENV{PAR_ARGV_0} || __FILE__)) {
+	my $app = MainApp->new();
+	$app->MainLoop();
+}
+  </pre>
+</pkg:outlineMarker>
+
+    
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="image_gif " id="image_gif" >
+<div class="sect2">
+<h2>image_gif<a name="image_gif" id="image_gif"></a> </h2>
+
+    <p>You should see a gif image below<br  />
+    <img src="images/thoutlogo.gif" width="300" height="291"  />    </p>
+    <p>&#160;</p>
+    
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="image_png" id="image_png" >
+<div class="sect2">
+<h2>image_png<a name="image_png" id="image_png"></a></h2>
+
+    <p>You should see a png image below<br  />
+      If png images are handled properly, the background should be transparent.
+      <br  />
+<table width="100%"  border="0" cellpadding="6" cellspacing="0">
+  <tr>
+    <td bgcolor="#993300"><center>
+    <img src="images/dotreader_06a.png" width="640" height="480"  />    </center></td>
+  </tr>
+</table>
+       </p>
+    <p>&#160;</p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="links" id="links" >
+<div class="sect2">
+<h2>links<a name="links" id="links"></a></h2>
+
+  <p>
+		external: <a href="http://www.dotreader.com%20">http://www.dotreader.com</a><br  />
+		internal: <a href="level_1_node">level_1_node</a><br  />
+		internal2: <a href="pkg://level_1_node">pkg://level_1_node</a><br  />
+		internal3: <a href="pkg://thout1_test/level_1_node">pkg://thout1_test/level_1_node</a><br  />
+		
+	mail: <a href="mailto:gvarnel@osoft.com">mailto:gvarnel@osoft.com</a><br  />
+	<br  />
+	todo-add other protocals such as cross book and ftp </p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="node_attributes " id="node_attributes" >
+<div class="sect2">
+<h2>node_attributes<a name="node_attributes"
+id="node_attributes"></a> </h2>
+
+  <p>The following test the various node attributes such as:</p>
+  <ol>
+    <li> render=false</li>
+    <li>visible=false</li>
+    <li>renderchildren=false</li>
+    <li>showpage=id</li>
+    <li>copy=true</li>
+  </ol>
+	
+	
+  <pkg:outlineMarker OutlineName="TOC Icon Example" id="toc_icon_example" openIcon="images/lvl1_open.gif" closeIcon="images/lvl1_closed.gif" leafIcon="images/lvl1_leaf.gif">
+<div class="sect3">
+<h3>TOC Icon Example<a name="toc_icon_example" id="toc_icon_example"></a></h3>
+
+	<p>The icon int the TOC should change for this node based on whether the node is open or closed<br  />
+	  the next item should have a different leaf icon.</p>
+
+  
+  <pkg:outlineMarker OutlineName="Leaf Icon Example" id="leaf_icon_example"  leafIcon="images/lvl1_leaf.gif">
+    <div class="sect3">
+      <h4>Leaf Icon Example<a name="leaf_icon_example" id="leaf_icon_example"></a></h4>
+      
+      <br  />
+      <br  />
+      This item should have a different leaf icon then the other items.<br  />
+      A leaf is a toc item without any children <br  />
+      
+      
+    </div>
+  </pkg:outlineMarker>
+
+</div>
+  </pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="render=false" id="render_false" render="false">
+<div class="sect3">
+<h3>render=false<a name="render_false" id="render_false"></a></h3>
+
+<p>render=false<br  />
+This text should not appear because it is in a render = false node</p>
+
+<pkg:outlineMarker OutlineName="render_false_child1" id="render_false_child_1" >
+<div class="sect4">
+<h4>render_false_child1<a name="render_false_child_1" id="render_false_child_1"></a></h4>
+
+	<p>render_false_child1 This is the first child node of the render_false node </p>
+	
+	
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="render_false_child2" id="render_false_child_2" >
+<div class="sect4">
+<h4>render_false_child2<a name="render_false_child_2" id="render_false_child_2"></a></h4>
+
+	<p>render_false_child2 This is the second child node of the render_false node </p>
+	
+	
+
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="visible=false" id="visible_false" visible="false">
+<div class="sect3">
+<h3>visible=false<a name="visible_false" id="visible_false"></a></h3>
+
+	<p>visible=false<br  />
+	  This node should not render in the TOC navigation tree
+</p>
+	
+<pkg:outlineMarker OutlineName="visible_false_child_1" id="visible_false_child_1" >
+<div class="sect4">
+<h4>visible_false_child_1<a name="visible_false_child_1" id="visible_false_child_1"></a></h4>
+
+	<p>This is the first child of the visible = false node</p>
+	
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="visible_false_child_2" id="visible_false_child_2" >
+<div class="sect4">
+<h4>visible_false_child_2<a name="visible_false_child_2" id="visible_false_child_2"></a></h4>
+
+	<p>This is the second child of the visible = false node</p>
+	
+
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+
+  <pkg:outlineMarker OutlineName="renderchildren = false" id="renderchildren_false" renderchildren="false">
+<div class="sect3">
+<h3>renderchildren = false<a name="renderchildren_false" id="renderchildren_false"></a></h3>
+
+	<p>This nodes children should not be rendered when clicking on this node.<br  />
+  The nodes should however be displayed in the navigation tree, and their content should display<br  />
+  when they are clicked.</p>
+	
+<pkg:outlineMarker OutlineName="renderchildren_false_child_1" id="renderchildren_false_child_1" >
+<div class="sect4">
+<h4>renderchildren_false_child_1<a name="renderchildren_false_child_1" id="renderchildren_false_child_1"></a></h4>
+
+	<p>this is the content for render_children_false_child_1 - hopefully you clicked on this node and not render_children_false if you are seeing this!</p>
+	
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="renderchildren_false_child_2" id="renderchildren_false_child_2" >
+<div class="sect4">
+<h4>renderchildren_false_child_2<a name="renderchildren_false_child_2" id="renderchildren_false_child_2"></a></h4>
+
+	<p>this is the content for render_children_false_child_2 - hopefully you clicked on this node and not render_children_false if you are seeing this!</p>
+	
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="renderchildren_false_child_3" id="renderchildren_false_child_3" >
+<div class="sect4">
+<h4>renderchildren_false_child_3<a name="renderchildren_false_child_3" id="renderchildren_false_child_3"></a></h4>
+
+	<p>this is the content for render_children_false_child_3 - hopefully you clicked on this node and not render_children_false if you are seeing this!</p>
+	
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="showpage=&#34;about&#34;" id="showpage_about" showpage="about">
+<div class="sect4">
+<h4>showpage=&#34;about&#34;<a name="showpage_about" id="showpage_about"></a></h4>
+
+	<p>This text should not show up when you click the showpage=&#34;about&#34; link in the toc</p>
+	
+
+
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="Links " id="advancedtopics_externallinks" >
+<div class="sect2">
+<h2>Links <a name="advancedtopics_externallinks"
+id="advancedtopics_linkingtoothertopics"></a></h2>
+
+  <p><a href="http://www.dotreader.com">http://www.dotreader.com</a> - external html link </p>
+  <p><a href="ftp://ftp.freebsd.org/pub/freebsd/doc/">ftp://ftp.freebsd.org/pub/FreeBSD/doc/</a> - ftp link </p>
+  <p><a href="about">about</a> - internal link </p>
+  <p><a href="mailto:gary@2dgs.com">mailto:gary@2dgs.com</a> - mailto link </p>
+  
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="copy=true" id="copy_true" >
+<div class="sect2">
+  The next outlineMarker should be copyable.
+<h2>copy=true<a name="copy_true" id="copy_true"></a></h2>
+
+  
+<pkg:outlineMarker OutlineName="2" id="2" visible="false" copy="true">
+<pre>BEGIN {<br  />	# XXX stupid hack for now.  needs to tee/log/etc<br  />	if($PerlWrapper::BundlePath) {<br  />		open(STDERR, '&#62;', &#34;/tmp/thout.$$.err&#34;);<br  />		select STDERR; $| = 1;<br  />		$SIG{__DIE__} = sub {<br  />			warn $_[0];<br  />			die $_[0];<br  />		}<br  />	}<br  />}<br  /># XXX why is this an ENV var? --Eric<br  /># set par temp to data dir if it doesn't exist<br  />$ENV{'Thout_lib'}='';<br  />if ($ENV{'PAR_TEMP'}){<br  />	$ENV{'Thout_lib'} = $ENV{'PAR_TEMP'}.'/inc/';<br  />}</pre>
+</pkg:outlineMarker>
+
+  
+
+</div>
+</pkg:outlineMarker>
+</div>
+</pkg:outlineMarker>
+
+<pkg:outlineMarker OutlineName="Code Copy test" id="codecopytest">
+  These use a trick to hide the real source code, and display formatted source code.
+  
+  <pkg:outlineMarker OutlineName="Sams Copy test" id="samscodecopytest">
+    This example should work - uses renderchildren=false to hide cleaned-copyable code. 
+  <pkg:outlineMarker visible="false" OutlineName="hidden_ch04-programlisting-1" id="hidden_ch04-programlisting-1">
+    <pkg:outlineMarker showpage="clean_ch04-programlisting-1" copy="true" visible="false" OutlineName="" id="ch04-programlisting-1">
+      <pre class="programlisting">
+        1: #!/usr/local/bin/perl 
+        2: 
+        3: # Import the CGI module and create a query object to retrieve the 
+        4: # form input. 
+        5: use CGI; 
+        6: $query = new CGI; 
+        7: 
+        8: # Determine whether the user is of legal voting age. 
+        9: if ($query-&gt;param('age') &gt;= 18) { 
+        10:     $voter = 'yes'; 
+        11: } 
+        12: else { 
+        13:     $voter = 'no'; 
+        14: } 
+        15: 
+        16: # Print out a message indicating whether the user is 
+        17: # a registered voter or not. 
+        18: print $query-&gt;header; 
+        19: print "&lt;html&gt;&lt;head&gt;&lt;title&gt;Voting Age Check&lt;/title&gt;&lt;/head&gt;\n"; 
+        20: print "&lt;body&gt;\n"; 
+        21: print "&lt;h1&gt;Voting Age Check&lt;/h1&gt;\n"; 
+        22: if ($voter eq 'yes') { 
+        23:     print "&lt;p&gt;You are old enough to vote.&lt;/p&gt;\n"; 
+        24: } 
+        25: else { 
+        26:     print "&lt;p&gt;You are not yet old enough to vote.&lt;/p&gt;\n"; 
+        27: } 
+        28: print "&lt;/body&gt;&lt;/html&gt;\n" <pkg:outlineMarker renderchildren="false" visible="false" OutlineName="" id="hidden2_clean_ch04-programlisting-1"><pkg:outlineMarker visible="false" OutlineName="" id="clean_ch04-programlisting-1"><pre class="clean_code">
+          #!/usr/local/bin/perl 
+          
+          # Import the CGI module and create a query object to retrieve the 
+          # form input. 
+          use CGI; 
+          $query = new CGI; 
+          
+          # Determine whether the user is of legal voting age. 
+          if ($query-&gt;param('age') &gt;= 18) { 
+          $voter = 'yes'; 
+          } 
+          else { 
+          $voter = 'no'; 
+          } 
+          
+          # Print out a message indicating whether the user is 
+          # a registered voter or not. 
+          print $query-&gt;header; 
+          print "&lt;html&gt;&lt;head&gt;&lt;title&gt;Voting Age Check&lt;/title&gt;&lt;/head&gt;\n"; 
+          print "&lt;body&gt;\n"; 
+          print "&lt;h1&gt;Voting Age Check&lt;/h1&gt;\n"; 
+          if ($voter eq 'yes') { 
+          print "&lt;p&gt;You are old enough to vote.&lt;/p&gt;\n"; 
+          } 
+          else { 
+          print "&lt;p&gt;You are not yet old enough to vote.&lt;/p&gt;\n"; 
+          } 
+          print "&lt;/body&gt;&lt;/html&gt;\n"listingsCGI programs </pre></pkg:outlineMarker></pkg:outlineMarker></pre>
+    </pkg:outlineMarker>
+  </pkg:outlineMarker>
+  </pkg:outlineMarker>
+  
+  <pkg:outlineMarker OutlineName="Sams Copy test" id="samscodecopytestb">
+    Not sure about this one - uses visible = false to hide clean-copyable code
+  <pkg:outlineMarker visible="false" OutlineName="code:ch04-programlisting-1" id="hidden_ch04-programlisting-1b">
+    <pkg:outlineMarker showpage="clean_ch04-programlisting-1" copy="true" visible="false" OutlineName="" id="ch04-programlisting-1b">
+      <pre class="programlisting">
+        1: #!/usr/local/bin/perl 
+        2: 
+        3: # Import the CGI module and create a query object to retrieve the 
+        4: # form input. 
+        5: use CGI; 
+        6: $query = new CGI; 
+        7: 
+        8: # Determine whether the user is of legal voting age. 
+        9: if ($query-&gt;param('age') &gt;= 18) { 
+        10:     $voter = 'yes'; 
+        11: } 
+        12: else { 
+        13:     $voter = 'no'; 
+        14: } 
+        15: 
+        16: # Print out a message indicating whether the user is 
+        17: # a registered voter or not. 
+        18: print $query-&gt;header; 
+        19: print "&lt;html&gt;&lt;head&gt;&lt;title&gt;Voting Age Check&lt;/title&gt;&lt;/head&gt;\n"; 
+        20: print "&lt;body&gt;\n"; 
+        21: print "&lt;h1&gt;Voting Age Check&lt;/h1&gt;\n"; 
+        22: if ($voter eq 'yes') { 
+        23:     print "&lt;p&gt;You are old enough to vote.&lt;/p&gt;\n"; 
+        24: } 
+        25: else { 
+        26:     print "&lt;p&gt;You are not yet old enough to vote.&lt;/p&gt;\n"; 
+        27: } 
+        28: print "&lt;/body&gt;&lt;/html&gt;\n" 
+          <pkg:outlineMarker visible="false" render="false" OutlineName="" id="clean_ch04-programlisting-1b">
+            <pre class="clean_code">
+          #!/usr/local/bin/perl 
+          
+          # Import the CGI module and create a query object to retrieve the 
+          # form input. 
+          use CGI; 
+          $query = new CGI; 
+          
+          # Determine whether the user is of legal voting age. 
+          if ($query-&gt;param('age') &gt;= 18) { 
+          $voter = 'yes'; 
+          } 
+          else { 
+          $voter = 'no'; 
+          } 
+          
+          # Print out a message indicating whether the user is 
+          # a registered voter or not. 
+          print $query-&gt;header; 
+          print "&lt;html&gt;&lt;head&gt;&lt;title&gt;Voting Age Check&lt;/title&gt;&lt;/head&gt;\n"; 
+          print "&lt;body&gt;\n"; 
+          print "&lt;h1&gt;Voting Age Check&lt;/h1&gt;\n"; 
+          if ($voter eq 'yes') { 
+          print "&lt;p&gt;You are old enough to vote.&lt;/p&gt;\n"; 
+          } 
+          else { 
+          print "&lt;p&gt;You are not yet old enough to vote.&lt;/p&gt;\n"; 
+          } 
+          print "&lt;/body&gt;&lt;/html&gt;\n"listingsCGI programs
+            </pre>
+         </pkg:outlineMarker>
+      </pre>
+    </pkg:outlineMarker>
+  </pkg:outlineMarker>
+  </pkg:outlineMarker>
+  
+  
+</pkg:outlineMarker>	  
+		  
+<pkg:outlineMarker OutlineName="TODO" id="todo" >
+<div class="sect1">
+<h1>TODO<a name="todo" id="todo"></a></h1>
+
+	<p>source code image / text example using render = false and showpage <br  />
+	  This technique is currently used for books that have complicated source code markup such as arrows and symbols.<br  />
+	  An image is shown by default, but clicking on copy displays the hidden text.<br  />
+	  <br  />
+	  We also use this technique to show code with line numbers that are not rendered in the copy pane.
+	  <br  />
+  </p>
+
+</div>
+</pkg:outlineMarker>
+
+
+		</pkg:outlineMarker>
+	</pkg:content>
+</pkg:package>

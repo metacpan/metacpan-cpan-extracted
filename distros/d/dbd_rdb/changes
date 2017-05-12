@@ -1,0 +1,95 @@
+Version 1.16, (1.6.2002)
+
+New Features:
+        1) Named parameter markers
+        2) bind_param_input
+        => Stored procedures with IN,OUT and INOUT parameters are usable
+        3) support for date INTERVALs
+        4) more testing
+        5) little bit more docu
+
+Bugs fixed:
+        1) makefile now use a $SET PROC/PARSE=TRAD
+        2) memory leaks in fetch_attrib for sth and dbh
+
+tested with:
+        RDB 7.1, VMS 7.3
+        DBI 1.23
+        PERL 5.6.1 and 5.7.3 (DBI needed manual intervention to compile here)
+
+Version 1.15, (6.8.2001)
+
+Bugs fixed:
+        1) 'Statement' attribute of statement handle is now handled by DBI
+           and not from driver 
+        2) Makefile defines LNK$LIBRARY to use SYS$LIBRARY:SQL$USER.OLB
+
+Version 1.14
+
+Bugs fixed:
+        1) a string sent from perl to RDB was cut at the first \000 eventually
+	   taking not the full length. This disabled working with DBKEYs.
+
+
+Version 1.13
+
+Bugs fixed:
+        1) install failed during "mms test" not finding rdb.pm,
+           Fixed with the help of Peter Prymmer.
+        2) integer datatypes having a precision like integer(2) had
+           trailing whitespace if chopblanks option was off
+        3) during the "destroy" of a statement handle, the corresponding
+	   SQL statement is now released to RDB. The bug resulted in locking
+           when trying to do metadata changes with a statement handle 
+	   hanging around. The release happens when the statement handle
+	   is undef'ed.
+
+Known Problems:
+        1) An open database handle seems to lock some operations with a
+           "client xxx lock". E.g. a spawned RMU/LOAD starts working
+           only after disconnecting.
+	2) Build fails with MMS in an ODS-5 directory -> use MMK
+        3) The build fails during SQLMOD when extended parse style is on -> 
+	   disable extended parse style with $ set proc/parse=traditional
+        4) The distribution is created with a "mms dist" now. This
+	   results in all lowercase filenames, which should not
+	   hurt at least for VMS
+
+Version 1.12
+
+Bugs fixed:
+	1) The tarfile containes filenames without the correct cases, e.g.
+           "makefile.pl" instead of "Makefile.PL"
+
+
+Version 1.11
+
+Bugs fixed:
+	1) in version 1.1 i use two driver specific database handle 
+	   attribute names: "DateFormat" and "Hold" which are not
+	   compliant to the DBI standard. They are changed to:
+	   "rdb_dateformat" and "rdb_hold"
+	   
+
+Version 1.1
+  
+new:
+	1) attribute {DateFormat} during connect taking lib$dt_xxx format
+           which gives the input and output format for this connect
+        2) statement attributes (hopefully) supported as described in
+	   "Programming the perl DBI"
+	
+bugs fixed:
+        1) hide "end of stream" error for a "insert as select" in the "do" 
+           method
+	2) a insert statement executed more than once stored NULL into a 
+	   column everytime after the first NULL
+        3) makefile.pl: reference to the DBI-source directory changed to 
+           the DBI install directory
+        4) $dbh->tables method fixed
+	5) statement attribute "Hold" for select statements works now
+           correctly. Such a cursor survives a commit.
+	6) $dbh->do method use EXEC IMMEDIATE now only if no attr and 
+	   no bind_values are present. Otherwise it prepares and executes. 
+
+Version 1.0, initial release

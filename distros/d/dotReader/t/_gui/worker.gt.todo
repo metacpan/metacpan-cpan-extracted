@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+# TODO I can't find a failing/hanging situation here, so this is just
+# going to be a back-burner todo item for now.
+
+# strategy: if we run too long, we just die
+alarm(22); # XXX how long should you get?
+# for(0..10) { my $q = 0; for(0..10**6) {my $q += sqrt(17+10**8)}}
+
+use warnings;
+use strict;
+
+use inc::testplan(0, 12);
+use test_inc::loginit;
+
+use lib 'inc';
+require dtRdrTestUtil::GUI;
+
+set_testing(1); #scalar(@ARGV));
+
+local $SIG{__WARN__};
+
+use constant D => 0;
+
+my $count = 0;
+my $goal = 200;
+my $bot_done = 0;
+set_dosub(sub {
+  my $frame = the_package()->_main_frame;
+  my $minion = MultiTask::Minion->make(sub {
+    my $m = shift;
+    use dtRdr::UserAgent;
+    my $bot = dtRdr::UserAgent->new(
+      complete_sub => sub {
+        my $self = shift;
+        my ($token) = @_;
+        $bot_done = 1;
+        my %coll = $self->collect($token);
+        is($coll{response}->code, 200, '200 ok');
+        my $str_len = defined($coll{string}) ? length($coll{string}) : 0;
+        ok($str_len, "got $str_len bytes of text");
+      },
+    );
+    $bot->add_request('GET',
+      'http://svn.dotreader.com/svn/books/default/dotReader_beta_QSG.jar');
+    return(
+    work => sub {
+      #$frame->Refresh;
+      $count++;
+      $frame->statusbar->SetStatusText("working $count", 0);
+      $bot->pester;
+      if($bot_done) {
+        $count = $goal;
+        return $m->quit;
+      }
+      D and warn "minion working $count";
+      my $q = 0; for(1..10**5) {my $q += sqrt(17+10**8)}
+      ($count >= $goal) and $m->quit;
+      #Time::HiRes::sleep(0.1);
+    },
+    quit => sub {
+      D and warn "quit\n";
+      Wx::wxTheApp()->ExitMainLoop;
+      $m->SUPER_quit;
+    },
+    );
+  }); # end make minion
+  $frame->taskmaster->add($minion);
+});
+
+run();
+is($count, $goal, 'did it all');
+ok($bot_done, 'bot finished');
+
+done;
+# vim:ts=2:sw=2:et:sta

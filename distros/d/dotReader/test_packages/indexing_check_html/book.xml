@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<pkg:package name="Indexing Check" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+<pkg:content>
+<pkg:outlineMarker OutlineName="A" id="A" visible="true"
+>&lt;<pkg:outlineMarker OutlineName="B" id="B" visible="true"
+>&gt;<pkg:outlineMarker OutlineName="C" id="C" visible="true"
+>></pkg:outlineMarker><!-- C
+-->&amp;</pkg:outlineMarker><!-- B
+-->&quot;&apos;</pkg:outlineMarker><!-- A -->
+</pkg:content>
+</pkg:package>

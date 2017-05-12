@@ -1,0 +1,23 @@
+All
+
+DeltaX::Config
+
+DeltaX::Database
+
+  - check date and time formatting routines
+  - check docs
+
+DeltaX::Language
+
+DeltaX::Page
+
+DeltaX::Session
+
+  - implement full support for shared memory
+  - check implementation of shared memory and file storage
+
+DeltaX::Trace
+
+--
+Jakub Spicak <jakub.spicak@deltaes.cz>
+March 5, 2001

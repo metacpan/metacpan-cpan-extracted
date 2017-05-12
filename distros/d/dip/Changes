@@ -1,0 +1,53 @@
+Revision history for dip
+
+1.16 2012-03-03 22:12:36 Europe/Vienna
+    - The --script and --exec options can be given several times and be
+      interleaved
+    - The --verbose option can be given several times
+    - Options can be passed to dip scripts using --define key=value
+    - The count-uri-new-with-ustack.dip example dip script demonstrates how to
+      use options passed to dip scripts
+    - The dip program now assembles the whole Instrumentation code and writes
+      it to a temporary file; when perl is called with "-Mdip", that file's
+      name is passed. This is much cleaner and safer than passing the whole
+      instrumentation code on the command-line.
+    - Better documentation
+
+1.16 2012-03-01 15:18:27 Europe/Vienna
+    - better example dip scripts
+
+1.15 2012-02-29 23:18:12 Europe/Vienna
+    - quantize(): can be given names that are array refs; they will be joined
+      by single spaces to obtain the distribution name
+
+1.14 2012-02-29 20:10:39 Europe/Vienna
+    - also document that Term::ANSIColor constants are available
+
+1.13 2012-02-29 11:04:24 Europe/Vienna
+    - dip scripts are now prepended with "use strict; use warnings; use 5.10.0"
+    - fix typo in bin/dip synopsis (thanks berekuk)
+    - renamed 'dipdop' example to 'dancr'
+    - Adapted example dancer app for latest version of Dancer
+    - use Test::WWW::Mechanize::PSGI to test the whole site
+    - remove DDP dependency since DDP has many dependencies itself
+    - use Aspect 1.02 to load Aspect::Point::Functions
+    - document using modules in dip scripts
+
+1.12 2011-10-25 00:13:22 Europe/Vienna
+    - fix typo in bin/dip synopsis (thanks berekuk)
+    - more doc fixes
+
+1.112970  2011-10-24 12:39:07 Europe/Vienna
+    - converted the dist not to use Dist::Zilla anymore - I don't maintain that
+      many dists anymore, and it's easier for potential collaborators
+    - streamlined use of the coderef in $dip::dip
+
+1.111890  2011-07-08 10:44:48 Europe/Vienna
+    - expose Carp's longmess() and Data::Printer's p() to dip scripts
+    - improved documentation
+
+1.111460  2011-05-26 16:02:15 Europe/Vienna
+    - update for Aspect 1.00
+
+1.111060  2011-04-16 18:29:54 Europe/Vienna
+    - initial version

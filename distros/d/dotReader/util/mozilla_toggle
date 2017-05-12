@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ ! -e '/usr/local/stow/mozilla' ] ; then
+	echo "on"
+	ln -s /usr/lib/mozilla-real /usr/local/stow/mozilla
+else
+	echo "off"
+	rm /usr/local/stow/mozilla
+fi

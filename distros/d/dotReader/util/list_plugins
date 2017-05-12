@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm, OSoft
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+list_plugins - list detected plugins
+
+=cut
+
+package bin::list_plugins;
+
+use warnings;
+use strict;
+
+sub main {
+  my (@args) = @_;
+  (@args == 1) or die "usage: $0 dtRdr::Path::Name";
+  my $path = shift(@args);
+
+  require dtRdr::Plugins;
+  require dtRdr::Plugins::Book;
+  dtRdr::Plugins->init();
+
+  eval("require $path") or die;
+
+  print join("\n", $path->get_classes, '');
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::list_plugins::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::list_plugins';

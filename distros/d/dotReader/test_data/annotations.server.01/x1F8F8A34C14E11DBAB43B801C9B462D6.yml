@@ -1,0 +1,16 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+context: ~
+create_time: 1172022721
+end: 23
+id: x1F8F8A34C14E11DBAB43B801C9B462D6
+mod_time: ~
+node: cover
+public: 
+  owner: joe
+revision: 0
+selected: 
+  - to a Short Book
+start: 8
+title: to a Short Book
+type: dtRdr::Highlight

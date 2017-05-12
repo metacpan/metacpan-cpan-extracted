@@ -1,0 +1,56 @@
+My personal e-mail PGP key (only for old PGP software):
+-------------------------------------------------------
+
+Type Bits/KeyID    Date       User ID
+pub  1024/773F9921 1998/01/12 Milan Sorm <sorm@fi.muni.cz>
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: 2.6.3ia
+
+mQCNAzS6ALQAAAEEALzF9UoeJdgdEL11taCapPcySh552p8k2tS1AakOrAVByT3v
+qUI9YKbzmiiQ2IQhh7mwKo+HSyf24y9kJz7VqezTAaQQmzQ4KOUrBoT90PVEZ16k
+3EJvjQhykPvYC9DHxb6CdqOklCi5axVPZfW9+022wJB+Yxh5sjE05R53P5khAAUR
+tBxNaWxhbiBTb3JtIDxzb3JtQGZpLm11bmkuY3o+iQCVAwUQNLoAtDE05R53P5kh
+AQGf+gP+K7FOEl+3TPs8Lj4aMeN9gN1pnLAUDvxJZgmDsW7t1Zd8hgKV2hgl+jcQ
+P4NC0q52En2kkeo8XM3fnakl9renasADtvRgea5rZSrpQf3S6HoyUIapY5PDBhUn
+5IoOMloc9G71L1GJNIZTUfiBCc1xtasRCPikT70xucxf/R9BBJQ=
+=Y3j7
+-----END PGP PUBLIC KEY BLOCK-----
+
+---------------------------------------------------------------------------
+
+My RPM PGP key (for building RPMs - new PGP software):
+------------------------------------------------------
+
+Type Bits KeyID      Created    Algorithm       User ID
+sec+ 1024 0x9C63E499 1999-06-19 DSS             Milan Sorm <sorm@fi.muni.cz>
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: PGPfreeware 5.0i for non-commercial use
+
+mQGiBDdrtekRBAD4amIm3aSKaQMqHOoc3y1T37gKUUoxYPokRJBN8sE4ctvutEsy
+R2x5NZMWeGhmN3WL7dQvzEevyAIb65hS99Wk9MCvoE9xKOX+0NTyySlVe8P2m8aa
+3NlQ+IB1+Uom6olmKPX4BdTE6jQd/u+OA4cTcLeV8szX8P+1HrL8ByMXPwCg/x4O
+xCbO/3oWGDyh1Lhvab0gVYkEAL9RBzit8vbx/dzjI9eJih0In346vAA5MIrrbaoM
+RmOpuDohEKkNMTF7MpqGZWjDcFOvoCcCb1Ml3Kdv9tz/cmqArFZNIIJvwXWLHX66
+LQb9Vd+8WWn+vMKc05tmJTm/1eqDYAbofv0snqQhl7+aCA9qdnqjyuOMJWQMGJ5O
+/NPEBACLBD82+zguQTGpAXWlw+VRF2UE04C34AoMI1iWFWuGW+O2yEWAHCM5wQxb
+3oWI9gI0cng02Cqn66AQ/08hak94SEB8ecovk7WtxbDHsZOvaugtLRRJhIFjtC5T
+8F4evKXB3UhWhD9pOy3pgHyObWPVvSSxicC6UQMfmazEyDdW0bQcTWlsYW4gU29y
+bSA8c29ybUBmaS5tdW5pLmN6PokASwQQEQIACwUCN2u16QQLAwECAAoJEGqDIcqc
+Y+SZxEIAoL3fl+4rpor9hEywQ8lkVSWKB8ybAJwLjmBQTCnBNLzjLZezefC0wKMt
+WbkCDQQ3a7XrEAgA9kJXtwh/CBdyorrWqULzBej5UxE5T7bxbrlLOCDaAadWoxTp
+j0BV89AHxstDqZSt90xkhkn4DIO9ZekX1KHTUPj1WV/cdlJPPT2N286Z4VeSWc39
+uK50T8X8dryDxUcwYc58yWb/Ffm7/ZFexwGq01uejaClcjrUGvC/RgBYK+X0iP1Y
+TknbzSC0neSRBzZrM2w4DUUdD3yIsxx8Wy2O9vPJI8BD8KVbGI2Ou1WMuF040zT9
+fBdXQ6MdGGzeMyEstSr/POGxKUAYEY18hKcKctaGxAMZyAcpesqVDNmWn6vQClCb
+AkbTCD1mpF1Bn5x8vYlLIhkmuquiXsNV6TILOwACAggA7Vdx4BhlJSu9/cS7v0X0
+u6y+g2FbszWW3GorgtWq0JlEMIfzfsfnh4f5D8speHySKCuSI2OUZUJR95oGWbp6
+eUkSoiHzxhQ2Gim0Xe1vrpqAsMD8jVqosmv39jIrQosK7Rtt70WPdW+RCh2+E3Bw
+gn2qBcbRcqXAuNwSGhBcq61JmnAYr4MzJp4TerO3U/D8FaTL2XpIJbE3UHvle46b
+eQUfxmI3v4PhlAk0nfeNaQsgOQagnpvHoKVKk5U6SM3eTUk7xnxXxnWl1vAOfddF
+JcC0tv0F8YvPt5rX9fldmu2OsdtUDBuM9y5KJY/KH9jI7fsiNOvWhEwm1uLNy0zd
+D4kAPwMFGDdrtetqgyHKnGPkmRECMXoAoIXYJtlTTTh06SZfEQ7VfsS3x0mUAJ47
+9iNAmH4IoKHOtiXPYCvA1Vz/hQ==
+=C30y
+-----END PGP PUBLIC KEY BLOCK-----

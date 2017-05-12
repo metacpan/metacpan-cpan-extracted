@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use inc::testplan(1, 7);
+use test_inc::loginit;
+
+use constant { D => 0 };
+
+use Wx;
+use Wx::Event qw(
+  EVT_IDLE
+  EVT_TREE_SEL_CHANGED
+  EVT_TREE_SEL_CHANGING
+  EVT_TREE_ITEM_EXPANDED
+  );
+
+#BEGIN {
+#use inc::loginit;
+#}
+
+my $package = require("./client/app.pl");
+
+# NOTE: crash will typically happen here.  If it does, we're dead in
+# the water (probably a syntax error.)
+my $app = eval {$package->new(); };
+ok((not $@), "$package constructor") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+
+local $SIG{__WARN__};
+
+my $main_frame = $package->_main_frame;
+$main_frame->set_TESTING(1);
+my $first = sub {
+  $main_frame->sidebar->select_item('libraries');
+  my $tr = $main_frame->sidebar->libraries;
+  $tr->SetFocus();
+  my $id = $tr->GetRootItem;
+  $tr->Expand($id);
+  D and warn "$id children:", $tr->GetChildrenCount($id), " (", $tr->GetChildrenCount($id,0), ")\n";
+  ($id) = $tr->GetFirstChild($id); # My Libraries
+  $tr->Expand($id);
+  D and warn "$id children:",
+    $tr->GetChildrenCount($id), " (", $tr->GetChildrenCount($id,0), ")\n";
+  ($id) = $tr->GetFirstChild($id); # SQLLite test library
+  $tr->Expand($id);
+  D and warn "$id children:",
+    $tr->GetChildrenCount($id), " (", $tr->GetChildrenCount($id,0), ")\n";
+  D and warn "tr is ", $tr->GetId, "\n";
+  D and warn "text: ", $tr->GetItemText($id), "\n";
+  D and warn "data is ", $tr->GetPlData($id);
+  $tr->SelectItem($id); # BSD Book
+}; # first
+my @evt_subs = (
+  $first,
+);
+
+my $shim_type = ref($main_frame->bv_manager->htmlwidget);
+$shim_type =~ s/dtRdr::HTMLShim:://;
+my @checklist = (qw(
+  activate
+  book_open
+  ),
+  ($shim_type eq 'WxMozilla' ? 'html_loaded' : 'skip1'),
+  );
+my %ok = map({$_ => 0} @checklist);
+
+# our evt_sub will trigger this
+EVT_TREE_SEL_CHANGED($main_frame, $main_frame->sidebar->libraries,
+  sub {
+    my ($fr, $event) = @_;
+    $fr->sidebar->libraries->item_activated($event);
+    my $foc = Wx::Window::FindFocus();
+    D and warn "focus is on $foc (",
+      join(", ", $fr, $fr->sidebar->contents, $fr->sidebar), ")";
+    my $tb = $fr->sidebar->contents;
+    if(not(defined($foc)) or ($foc eq $fr->sidebar->contents)) {
+      $ok{activate}++;
+      D and warn "that's good";
+      my $id = $tb->GetRootItem;
+      $tb->UnselectAll;
+      $tb->IsExpanded($id) and $tb->Collapse($id);
+      $tb->Expand($id);
+      $tb->SelectItem($id);
+    }
+  });
+EVT_TREE_ITEM_EXPANDED($main_frame, $main_frame->sidebar->contents,
+  sub {
+    my ($fr, $event) = @_;
+    D and warn "event fired: ", $event->GetItem;
+    $ok{book_open}++;
+    $fr->sidebar->contents->item_activated($event);
+  });
+
+if($shim_type eq 'WxMozilla') {
+  # check the widget
+  require Wx::Mozilla::Event; Wx::Mozilla::Event->import(qw(
+    EVT_MOZILLA_LOAD_COMPLETE
+  ));
+
+  EVT_MOZILLA_LOAD_COMPLETE($main_frame->bv_manager->htmlwidget, -1,
+    sub {
+      D and warn "load complete";
+      $ok{html_loaded}++;
+    });
+}
+else {
+  $ok{skip1} = 1;
+}
+# setup the IDLE event
+my $idle_ok = 0;
+
+my $timer = Wx::Timer->new($main_frame);
+Wx::Event::EVT_TIMER($main_frame, -1, sub {
+  D and warn "hit timer";
+  EVT_IDLE($app, sub {});
+  $timer->Stop;
+  $app->ExitMainLoop;
+});
+
+my $switch = {in => 0};
+EVT_IDLE($app, sub {
+  $switch->{in} and return; # prevent piling-on
+  local $switch->{in} = 1;
+  D and warn "\n  idle ", time(), "\n";
+  $evt_subs[$idle_ok] and $evt_subs[$idle_ok]->();
+  $idle_ok or $timer->Start(1 * 1000);
+  $idle_ok++;
+  # XXX we occasionally some oddities here
+  #  hmm, depending on the number of annotations?
+  #($idle_ok >= 1) and $app->ExitMainLoop;
+  ($idle_ok >= 12) and $app->ExitMainLoop;
+  scalar(grep({!$ok{$_}} @checklist)) or $app->ExitMainLoop;
+  Wx::WakeUpIdle();
+  1;
+});
+
+# MainLoop only reacts to events, but we'll wrap it anyway.
+eval { $app->MainLoop(); };
+ok((not $@), "MainLoop done") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+
+# MeinLeap does not have a useful return value?
+ok(1, 'MainLoop');
+foreach my $item (@checklist) {
+  ok($ok{$item}, $item);
+}
+D and warn "idled $idle_ok times";
+ok($idle_ok, 'exit');
+
+done;
+# vim:ts=2:sw=2:et:sta

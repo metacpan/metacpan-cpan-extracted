@@ -1,0 +1,22 @@
+NAME
+    Delay_use - Modular loading is delayed.
+
+SYNOPSIS
+    use Delay_use;#export delay_use # When an error message is outputted to
+    STDERR $delay_use::DEBUG = 1;#default=0 # When ABORT at the time of an
+    error. $delay_use::ABORT = 1;#default=0
+
+    ex1) my $pkg_name = delay_use('CGI::Session') || delay_use( 'CGI' ) ||
+    die; my $query = $pkg_name->new; print $query->header;
+
+    ex2) delay_use( 'CGI' ,qw/:standard/ ) or die($delay_use::ERROR);
+
+AUTHOR
+    A. U. Thor, <makoto@cpan.org<
+
+COPYRIGHT AND LICENSE
+    Copyright 2005 by makoto@fes-total.com
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

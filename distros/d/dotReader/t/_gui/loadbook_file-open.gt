@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use inc::testplan(1, 7);
+use test_inc::loginit;
+
+use constant { D => 0 };
+
+use Wx;
+use Wx::Event qw(
+  EVT_IDLE
+  EVT_TREE_SEL_CHANGED
+  EVT_TREE_SEL_CHANGING
+  EVT_TREE_ITEM_EXPANDED
+  );
+
+my $package = require("./client/app.pl");
+
+# NOTE: crash will typically happen here.  If it does, we're dead in
+# the water (probably a syntax error.)
+my $app = eval {$package->new(); };
+ok((not $@), "$package constructor") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+
+my $main_frame = $package->_main_frame;
+local $SIG{__WARN__};
+########################################################################
+my %ok;
+my $load_book = sub {
+  $main_frame->backend_file_open('test_packages/ThoutPackageDoc.jar'); 
+  my $tr = $main_frame->sidebar->contents;
+  my $id = $tr->GetRootItem;
+  $id->IsOk and $ok{root}++;
+  D and warn "root in $id ", ($id->IsOk ? 'ok' : 'nope') , "\n";
+  my $cookie;
+  ($id, $cookie) = $tr->GetFirstChild($id);
+  $id->IsOk and $ok{child1}++;
+  D and warn "child in $id ", ($id->IsOk ? 'ok' : 'nope') , "\n";
+  ($id) = $tr->GetNextChild($id, $cookie);
+  $id->IsOk and $ok{child2}++;
+  D and warn "child in $id\n";
+
+};
+
+my @evt_subs = (
+  $load_book,
+);
+my @checklist = (qw(
+  root
+  child1
+  child2
+  ));
+%ok = map({$_ => 0} @checklist);
+
+########################################################################
+# setup the IDLE event
+my $idle_ok = 0;
+EVT_IDLE($app, sub {
+  $evt_subs[$idle_ok] and $evt_subs[$idle_ok]->();
+  $idle_ok++;
+  ($idle_ok >= 1) and $app->ExitMainLoop;
+  1;
+  });
+
+########################################################################
+# MainLoop only reacts to events, but we'll wrap it anyway.
+eval { $app->MainLoop(); };
+ok((not $@), "MainLoop done") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+
+# MeinLeap does not have a useful return value?
+ok(1, 'MainLoop');
+
+foreach my $item (@checklist) {
+  ok($ok{$item}, $item);
+}
+
+ok($idle_ok, 'exit');
+
+done;
+# vim:ts=2:sw=2:et:sta

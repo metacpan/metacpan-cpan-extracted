@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+dev_fetch_books - emulate svn:externals, sans annoying bits
+
+=head1 Synopsis
+
+The svn:externals functionality would be great if it could somehow not
+be consistently slow and noisy.  This reinvention means you have to
+manually update it, but means you get to manually update it.
+
+=cut
+
+package bin::dev_fetch_books;
+
+use File::Basename ();
+use YAML::Syck ();
+
+`which svn` or die "you have no svn";
+# no point is using what which said if it only causes problems.
+my $svn = 'svn';
+
+my $start_url = 'http://svn.dotreader.com/svn/dotreader/trunk/books';
+my $book_dir = 'books/';
+
+sub main {
+  my (@args) = @_;
+
+  unless(-e $book_dir) {
+    print "checkout to $book_dir\n";
+    system($svn, 'checkout', $start_url) and die "oops $?";
+  }
+
+  # otherwise, go into update mode
+
+  my $defs = YAML::Syck::LoadFile($book_dir . 'externals.yml');
+  ref($defs) or die "something wrong";
+
+  foreach my $dir (keys(%$defs)) {
+    local $| = 1;
+    print "$dir ... ";
+    my $dest_dir = $book_dir.$dir;
+    # TODO we could probably cut this time to 1/n by remembering the
+    # current HEAD rev for a given repository.
+    if(-e $dest_dir) {
+      system($svn, 'update', $dest_dir) and die "update $dir failed";
+    }
+    else {
+      system($svn, 'checkout', $defs->{$dir}, $dest_dir) and
+        die "checkout $dir failed";
+    }
+  }
+
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::dev_fetch_books::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::dev_fetch_books';

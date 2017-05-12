@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+mk_library - create a library
+
+=cut
+
+package bin::mk_library;
+
+use lib 'lib';
+
+use dtRdr::Library::YAMLLibrary;
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+use File::Basename qw(
+  basename
+  dirname
+);
+use Getopt::Long ();
+use File::Path ();
+
+sub main {
+  my (@args) = @_;
+
+  my $force = 0;
+  { # GRR
+    local @ARGV = @args;
+    Getopt::Long::GetOptions('f|force' => \$force);
+    @args = @ARGV;
+  }
+
+  my ($lib, @books) = @args;
+  $lib or die "usage: mk_library <libfile> <list-o-books>\n";
+
+  if(-e $lib) {
+    (-d $lib) and die "usage: mk_library <libfile> <list-o-books>\n";
+    $force or die "$lib file exists";
+    unlink($lib) or die "unlink $lib failed $!";
+  }
+
+  # put storage next to the lib
+  my $libstore = $lib;
+  ($libstore =~ s/\.yml//) or die "need better name than $lib";
+
+  if(-e $libstore) {
+    $force or die "$libstore exists";
+    File::Path::rmtree($libstore, 0, 0) or
+      die "cannot remove $libstore";
+  }
+  mkdir($libstore) or
+    die "cannot create storage directory '$libstore' $!";
+
+  dtRdr::Library::YAMLLibrary->create($lib);
+  my $library = dtRdr::Library::YAMLLibrary->new;
+  $library->load_uri($lib);
+  $library->set_name('Default Library');
+  $library->set_storage(basename($libstore));
+
+  foreach my $uri (@books) {
+    (-e $uri) or die "no file for book $uri";
+    my $book = eval {
+      dtRdr::Book->new_from_uri($uri);
+    };
+    if($@) {
+      warn "cannot load $uri -- $@ ... skipping\n";
+      next;
+    }
+    $book->add_to_library($library);
+  }
+
+
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::mk_library::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::mk_library';

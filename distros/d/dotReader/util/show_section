@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+show_section - dump the get_content results for a node
+
+=cut
+
+package bin::show_section;
+
+use lib 'lib';
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+use dtRdr::Annotation::IO;
+
+local $SIG{__WARN__};
+
+sub main {
+  my (@args) = @_;
+  my ($uri, $section, $dbg, $noswitch) = @args;
+  $dbg ||= 0;
+  $noswitch ||= 0;
+
+  (-e $uri) or die;
+  $section or die;
+
+  my $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+  my $storage_dir = 'annotations/';
+  my $anno_io = dtRdr::Annotation::IO->new(uri => $storage_dir);
+  $anno_io->apply_to($book);
+  my $toc = $noswitch ? $book->toc->get_by_id($section) : $book->find_toc($section);
+  $toc or die "didn't get anything for '$section'";
+  if($dbg > 1) { # get the canonical cache
+    $book->get_content($toc);
+  }
+  my $content = ($dbg ?
+    $book->get_NC($toc) :
+    $book->get_content($toc)
+    );
+  print $content;
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::show_section::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::show_section';

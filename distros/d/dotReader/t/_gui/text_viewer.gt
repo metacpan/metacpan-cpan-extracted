@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use inc::testplan(1, 12);
+use test_inc::loginit;
+
+use lib 'inc';
+use dtRdrTestUtil::ABook;
+
+BEGIN { use_ok('dtRdr::Note') };
+
+my $book = ABook_new_1_0('test_packages/copy_ok_check/book.xml');
+
+
+require dtRdrTestUtil::GUI;
+
+local $SIG{__WARN__};
+set_testing( scalar(@ARGV));
+set_dosub(sub {
+  my $frame = the_package()->_main_frame;
+  my $bvm = $frame->bv_manager;
+  $bvm->open_book($book);
+  my $bv = $bvm->book_view;
+  SKIP: {
+  if($^O eq 'darwin' and not $ENV{MRSPERL}) {
+    warn "\n\nTODO macs break here\n\n";
+    # NOTE I'm very sad: this appears to work when in an appbundle
+    skip('macs break here', 1);
+    return;
+  }
+  my $viewer = $bv->show_literal_section('1');
+  my $text = $viewer->copy_all;
+  ok($text);
+  } # end SKIP
+  # TODO check the clipboard vs that
+});
+run();
+# vim:ts=2:sw=2:et:sta

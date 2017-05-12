@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<pkg:package name="Duplicated IDs" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+<pkg:content>
+<pkg:outlineMarker OutlineName="A" id="A" visible="true" render="false">
+<pkg:outlineMarker OutlineName="B" id="B" visible="true">
+B
+	<pkg:outlineMarker OutlineName="C" id="C" visible="true">
+	C
+	</pkg:outlineMarker><!-- C -->
+</pkg:outlineMarker><!-- B -->
+<pkg:outlineMarker OutlineName="B" id="B" visible="true">
+B.##thout-autonumbered##.0
+	<pkg:outlineMarker OutlineName="C" id="C" visible="true">
+	C.##thout-autonumbered##.0
+	</pkg:outlineMarker><!-- C again -->
+</pkg:outlineMarker><!-- B again -->
+<pkg:outlineMarker OutlineName="B" id="B" visible="true">
+B.##thout-autonumbered##.1
+	<pkg:outlineMarker OutlineName="C" id="C" visible="true">
+	C.##thout-autonumbered##.1
+	</pkg:outlineMarker><!-- C again -->
+</pkg:outlineMarker><!-- B again -->
+</pkg:outlineMarker><!-- A -->
+</pkg:content>
+</pkg:package>

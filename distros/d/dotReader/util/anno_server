@@ -1,0 +1,1438 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+use lib 'lib';
+
+=head1 NAME
+
+anno_server - simple dotReader annotation server
+
+=head1 USAGE
+
+This is really only for testing, so to facilitate that it has a mode
+where it will start the server, run a system command, and then shutdown.
+In this mode, the pattern qr{\bADDR/} will be replaced with the server
+address (e.g. http://localhost:8088/.)
+
+  ./util/anno_server curl ADDR/TEST.yml
+
+Without arguments, it will just start the server.
+
+=cut
+
+package bin::anno_server;
+
+sub main {
+  my (@args) = @_;
+
+  my %users;
+  my $req_auth = 0;
+  my $auth_type = 'digest';
+  my $no_auth = 0;
+  my $time_shift;
+  my $latency;
+  my $invalid;
+  my $verbose = 0;
+  if(@args and ($args[0] =~ m/^-/)) {
+    require Getopt::Helpful;
+    my $users;
+    my $hopt = Getopt::Helpful->new(
+      usage => 'CALLER [options] -- child',
+      ['u|users=s', \$users, '<name=pass,name2=pass2>',
+        'users and passwords'],
+      ['r|require-auth', \$req_auth, '', 'auth always required'],
+      ['a|auth-type=s', \$auth_type, 'digest|basic', 'auth type'],
+      ['o|open-auth', \$no_auth, '', 'disable auth'],
+      ['t|time-shift=f', \$time_shift, '<seconds>', 'shift time'],
+      ['l|latency=f', \$latency, '<seconds>', 'latency'],
+      ['invalid', \$invalid, '', 'send invalid yaml'],
+      ['v|verbose!', \$verbose, '', 'make noise'],
+      '+help',
+    );
+    $hopt->Get_from(\@args);
+    if($users) {
+      foreach my $u (split(/\s*,\s*/, $users)) {
+        my ($n, $p) = split(/=/, $u, 2);
+        $users{$n} = $p;
+      }
+    }
+  }
+  my $storage_dir = 'annotations.server';
+  (-d $storage_dir) or
+    die "cannot run without a '$storage_dir' directory";
+  my $server;
+  if($auth_type) {
+    $auth_type = ucfirst(lc($auth_type));
+    $auth_type = {
+      Digest => 'DigestMD5',
+      Cookie => 'DumbCookie',
+    }->{$auth_type} || $auth_type;
+    unless(%users) {
+      if(-e 'server_details.yml') {
+        my $yml = YAML::Syck::LoadFile('server_details.yml');
+        %users = %{$yml->{anno_servers}{'localhost:8085'}};
+        delete($users{'*default'});
+      }
+    }
+  }
+  my $start = sub {
+    local $SIG{HUP};
+    $server = dtRdr::anno_server->new(
+      port    => 8085,
+      storage => $storage_dir,
+      (%users ? (users => \%users) : ()),
+      auth_required => $req_auth,
+      no_auth => $no_auth,
+      ($auth_type ? (auth_type => $auth_type) : ()),
+      ($time_shift ? (time_shift => $time_shift) : ()),
+      ($latency ? (latency => $latency) : ()),
+      ($verbose ? (verbose => 1) : ()),
+      ($invalid ? (invalid => 1) : ()),
+    );
+    $server->run;
+  };
+
+  @ARGV = (); # prevent CGI helpiness
+
+  if(@args) {
+    # run whatever is on the args, then quit
+    my $pid = open(my $fh, '-|');
+    defined($pid) or die 'cannot fork';
+    if($pid) {
+      my $out = <$fh>;
+      $out =~ m/connect to your server at (.*)/ or die "$out bad";
+      my $addr = $1;
+      #print $out;
+      @args = map({s#\bADDR(?:/|$)#$addr#; $_} @args);
+      warn join(" ", '#', @args), "\n";
+      system(@args);
+      #warn "yay, bye\n";
+      kill(9, $pid);
+    }
+    else {
+      close(STDIN); # doesn't really help though
+      $start->();
+    }
+  }
+  else {
+    $start->();
+  }
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::anno_server::main(@ARGV);
+}
+
+# bah! sleep doesn't prevent the connection formation
+# too bad, I guess the operating system  is doing its job!
+# BEGIN {
+# *{CORE::GLOBAL::accept} = sub (**) {
+#   my ($this, $that) = @_;
+#   #open(my $foo, '>', '/tmp/thbbt') or die;
+#   #Carp::cluck("accept");
+#   warn "accept @_";
+#   my $caller = caller;
+#   no strict 'refs';
+#   # XXX this is naive, but works
+#    sleep(4);
+#   #select(undef, undef, undef, 5);
+#   warn "yay";
+#   my $v = CORE::accept($this, *{$caller . '::' . $that});
+#   sleep(4);
+#   return($v);
+# };
+# }
+BEGIN {
+package dtRdr::anno_server;
+use HTTP::Server::Simple::CGI;
+our @ISA = qw(
+  HTTP::Server::Simple::CGI
+  HTTP::Server::Simple::Authenticate
+  HTTP::Server::Simple::Output
+);
+
+use CGI (); # NO IMPORTS
+use YAML::Syck ();
+use HTTP::Response ();
+use HTTP::Status ();
+use HTTP::Date ();
+use dtRdr::Annotation::IO;
+
+use Class::Accessor::Classy;
+ro 'anno_io';
+rw 'peeraddr';
+rw 'peername';
+ro 'auth_type';
+ro 'auth_required';
+ro 'no_auth';
+ro 'time_shift';
+ro 'latency';
+ro 'verbose';
+no  Class::Accessor::Classy;
+
+=head2 new
+
+  my $server = dtRdr::anno_server->new();
+
+=cut
+
+sub new {
+  my $class = shift;
+  my (%args) = @_;
+
+  my $self = $class->SUPER::new(delete($args{port}));
+
+  my $storage_dir = delete($args{storage}) or die;
+  $self->{anno_io} = dtRdr::Annotation::IO->new(uri => $storage_dir);
+
+  bless($self, $class);
+
+  foreach my $k (keys(%args)) {
+    exists($self->{$k}) and die "cannot have key $k";
+    $self->{$k} = $args{$k};
+  }
+  if($self->auth_required) {
+    unless($self->{users}) {
+      die "need users if requiring authentication";
+    }
+    $self->{auth_type} ||= 'Basic';
+  }
+  if($self->latency) {
+    require Time::HiRes;
+  }
+
+  return($self);
+} # end subroutine new definition
+########################################################################
+
+# XXX, cgi tramples on this in super, no importing!!!
+#sub header {
+#    my $self  = shift;
+#    my $tag   = shift;
+#    my $value = shift;
+#    warn "yay $tag => $value\n";
+#    $self->SUPER::header($tag, $value);
+#}
+#sub headers {
+#    my $self    = shift;
+#    my $headers = shift;
+#
+#    my $can_header = $self->can("header");
+#    while ( my ( $header, $value ) = splice @$headers, 0, 2 ) {
+#      warn "look for $header => $value\n";
+#        if ($can_header) {
+#            $self->header( $header => $value );
+#        }
+#    }
+#}
+
+# TO go non-cgi, we need to define these, plus parsing out the
+# request_url into url_param and other fun-ness
+#sub setup {
+#    my $self = shift;
+#    my @args = @_;
+#    $self->SUPER::setup(@_);
+#    while ( my ( $item, $value ) = splice @args, 0, 2 ) {
+#      # support single and dual-mode setters
+#      warn "config $item => $value";
+#      foreach my $method ('set_' . $item, $item) {
+#        if($self->can($method)) {
+#          $self->$method($value);
+#          last;
+#        }
+#      }
+#    }
+#}
+#
+#sub handler {
+#  die "@_";
+#}
+
+=head2 handle_request
+
+  $server->handle_request($cgi);
+
+=cut
+
+sub handle_request {
+  my $self = shift;
+  my ($cgi) = @_;
+  my $path = $cgi->path_info;
+  #warn "cgi object $cgi -- $path";
+  #warn "request $path\n";
+  $self->dispatch($path, $cgi);
+} # end subroutine handle_request definition
+########################################################################
+
+=head2 dispatch
+
+  $self->dispatch($path, $cgi);
+
+=cut
+
+sub dispatch {
+  my $self = shift;
+  my ($path, $cgi) = @_;
+  my $debug = 0;
+
+  if($self->auth_required) {
+    my $user = $self->authenticate;
+    $self->verbose and warn "user ? ", $user || '~';
+    defined($user) or return $self->output(401);
+  }
+
+  $path =~ s#/+#/#g; $path =~ s#^/##; # cleanup
+  my (@req) = split(/\//, $path);
+
+  my %args;
+  my %fmap = (
+    yml => 'x-yaml',
+    yaml => 'x-yaml',
+  );
+  # extract the format
+  if(@req and ($req[-1] =~ s/\.([^\.]+)$//)) {
+    my $f = $1;
+    $args{format} = $fmap{$f} || $f;
+  }
+
+  my $method = $cgi->request_method;
+  #warn "got \n", YAML::Syck::Dump([$self, $cgi]), ' ';
+  #warn "remote is ", $ENV{REMOTE_HOST}; # $self->peername;
+  #warn "remote is ", $cgi->remote_host;
+
+  if($debug) {
+    if($path eq 'HUP') {
+      # a silly reload
+      $self->output(202, 'HUP');
+      exec($0);
+    }
+    elsif($path eq 'EXIT') {
+      $self->output(202, 'EXIT');
+      exit;
+    }
+  }
+  if($path eq '') {
+    $self->output(
+      CGI->start_html(-title => 'dotReader Annotation Server'),
+      "<p>Hello.</p>",
+      CGI->end_html
+    );
+  }
+  elsif($path eq 'config.yml') {
+    # TODO test with return $self->output(404, 'not here');
+    my $yml = "---\n";
+    if(($self->auth_type || '') eq 'DumbCookie') {
+      $yml = YAML::Syck::Dump({
+        login => {
+          url => $ENV{SERVER_URL} . 'login',
+          template => 'username=#USERNAME#&password=#PASSWORD#',
+        }
+      });
+    }
+    $self->output({Content_Type => 'text/x-yaml'}, $yml);
+  }
+  elsif($path eq 'version.yml') {
+    $self->output({Content_Type => 'text/x-yaml'},
+      '---', "type: annotation_server", "version: 0.1"
+    );
+  }
+  elsif($path eq 'login') {
+    my $user = $cgi->param('username');
+    my $pass = $cgi->param('password');
+    $self->verbose and warn "# login $user=$pass";
+    my $dc = 'HTTP::Server::Simple::Authenticate::DumbCookie';
+    unless($dc->check($self, $user, $pass)) {
+      $self->output(403, 'bad login');
+      return;
+    }
+    my $cookie = CGI->cookie(
+      -name      => 'sessionID',
+      -value     => $dc->cookie_val($user, $pass),
+      -expires   => '+1h',
+      -domain    => '.localhost.local',
+    );
+    #warn "making cookie ", CGI->header(-cookie => $cookie);
+    $self->output({Set_Cookie => $cookie}, 'cool');
+  }
+  elsif($path eq 'check_cookie') {
+    my $cookie = $cgi->cookie('sessionID');
+    #warn join("\n", map({"$_ => $ENV{$_}"} keys(%ENV)));
+    if($cookie) {
+      my $user = $self->authenticate || '~';
+      $self->output("yay! a cookie from '$user'");
+    }
+    else {
+      $self->output(403, 'no cookie');
+    }
+  }
+  elsif($path eq 'TEST.yml') {
+    $self->output({Content_Type => 'text/x-yaml'},
+      YAML::Syck::Dump({a => 1, b => 2, c => [3,4]})
+    );
+  }
+  elsif($self->can($method . '_' . $req[0])) {
+    $self->verbose and warn "# $method $path\n";
+    my $part = shift(@req);
+    my $runmethod = $method . '_' . $part;
+    $self->$runmethod(\@req, %args, cgi => $cgi);
+  }
+  else {
+    warn "404";
+    $self->output(404,
+    '<html> <head> <title>404 - Not found</title> </head>
+        <body> oops </body>
+      </html>'
+    );
+  }
+} # end subroutine dispatch definition
+########################################################################
+
+=head1 CGI abstraction/workaround
+
+=head2 url_param
+
+  $self->url_param($cgi);
+
+=cut
+
+sub url_param {
+  my $self = shift;
+  my ($cgi) = @_;
+
+  # TODO non-cgi mechanism?
+
+  my %p = map({
+      my @vals = $cgi->url_param($_);
+      (@vals > 1) ? ($_ => [@vals]) : ($_ => $vals[0])
+    }
+    $cgi->url_param
+  );
+  #warn "p ", %p;
+  #warn "keywords: ", join(", ", @{$p{keywords}}) if($p{keywords});
+
+  return(%p);
+} # end subroutine url_param definition
+########################################################################
+
+=head2 read_client_data
+
+Deal with CGI's failed helpiness.
+
+  my ($fmt, $string) = $self->read_client_data($cgi);
+
+=cut
+
+sub read_client_data {
+  my $self = shift;
+  my ($cgi) = @_;
+
+  my ($fmt, $string);
+  # XXX  if CGI.pm hasn't already ruined your day, consider what happens
+  # if data is form-encoded...
+  $fmt = $ENV{CONTENT_TYPE};
+  ('application/x-www-form-urlencoded' eq $fmt) and
+    die "all bets are off when fmt is $fmt";
+  #warn "$fmt";
+  my $method = $cgi->request_method;
+  if($method eq 'POST') {
+    # See, CGI.pm was being helpy and has already slurped STDIN, but
+    # only on a POST request.  Sigh.
+    $string = $cgi->param('POSTDATA');
+  }
+  elsif($method eq 'PUT') {
+    my $length = $ENV{CONTENT_LENGTH};
+    read(STDIN, $string, $length);
+  }
+  else {
+    die;
+  }
+  return($fmt, $string);
+} # end subroutine read_client_data definition
+########################################################################
+
+=head1 REST API
+
+=head2 GET_manifest
+
+  $self->GET_manifest(\@path_rem, $cgi);
+
+=cut
+
+sub GET_manifest {
+  my $self = shift;
+  my ($path, %args) = @_;
+
+  my $cgi = $args{cgi} or die;
+  my $fmt = $args{format} || 'x-yaml'; # should default it?
+
+  my %params = $self->url_param($args{cgi});
+
+  my %select;
+  if(my $books = $params{book}) {
+    $select{book} = ref($books) ? $books : [$books];
+    # uh, did cgi just be too helpy?
+    require URI::Escape;
+    $_ = URI::Escape::uri_escape($_, '^A-Za-z0-9.-')
+      for(@{$select{book}});
+  }
+
+  # pick a format and get the answers
+  my $D = $self->formatter($fmt) or
+    return $self->output(501, "Cannot do format '$fmt'");
+
+  my %have = $self->manifest(%select);
+  my @out = ($D->(\%have));
+  #warn "GET_manifest ok\n";
+  $self->output({Content_Type => "text/$fmt"}, @out);
+} # end subroutine GET_manifest definition
+########################################################################
+
+=head2 GET_annotation
+
+  $self->GET_annotation($path, %args);
+
+=cut
+
+sub GET_annotation {
+  my $self = shift;
+  my ($path, %args) = @_;
+
+  (@$path == 1) or die "path (@$path) too long";
+
+  my $cgi = $args{cgi} or die;
+  my $fmt = $args{format} || 'yml'; # should default it?
+
+  my $D = $self->formatter($fmt) or
+    return $self->output(501, "Cannot do format '$fmt'");
+
+  my ($id) = @$path;
+  my $ds = eval {$self->anno_io->x_read($id)} or
+    return $self->output(404, "Cannot find $id");
+  unless($ds->{public}{owner}) {
+    warn "no owner for '$id'";
+    return $self->output(500, "no owner for '$id'");
+  }
+  my @out = ($D->($self->anno_out($ds)));
+  if($self->{invalid}) {
+    warn "make invalid";
+    my @parts = split(/\n/, $out[0]);
+    $parts[1] = ' ' . $parts[1];
+    $parts[2] = '!"~\\' . $parts[2];
+    $out[0] = join("\n", @parts). "\n";
+  }
+  $self->output({Content_Type => "text/$fmt"}, @out);
+} # end subroutine GET_annotation definition
+########################################################################
+
+=head2 POST_annotation
+
+Creates a new annotation.  A POST against an existing path/id is an
+error.
+
+  POST $ADDR/annotation/
+
+  $server->POST_annotation($path, %args);
+
+=cut
+
+sub POST_annotation {
+  my $self = shift;
+  my ($path, %args) = @_;
+
+  #warn "path @$path\n"; # path should be null
+  @$path and
+    return $self->output(405, 'cannot POST there'); # TODO set Allow
+
+  my ($fmt, $content) = $self->read_client_data($args{cgi});
+  #warn "read $content\n";
+
+  my $L = $self->unformatter($fmt) or
+    return $self->output(501, "Cannot accept format '$fmt'");
+  my $data = $L->($content);
+  if($@) {
+    return $self->output(500);
+  }
+
+  # transform
+  my $anno = $self->anno_in($data);
+  defined(my $user = $self->authenticate) or return $self->output(401);
+  $anno->{public}{owner} = $user;
+  $anno->{revision}    ||= 0;
+  $anno->{create_time} ||= time;
+  $anno->{mod_time}    ||= time;
+  my $id = $anno->{id};
+  # verify that no id exists
+  eval {$self->anno_io->x_insert($id, $anno)};
+  if($@) { # XXX IO-based assumption
+    return $self->output(409, "$id already exists");
+  }
+
+  $self->output(201);
+} # end subroutine POST_annotation definition
+########################################################################
+
+=head2 PUT_annotation
+
+Updates an existing annotation.  The create-this PUT is not supported.
+
+  PUT $ADDR/annotation/$id.$fmt?rev=$expected_rev
+
+  $server->PUT_annotation($path, %args);
+
+=cut
+
+sub PUT_annotation {
+  my $self = shift;
+  my ($path, %args) = @_;
+
+  my $id = $path->[0];
+  defined($id) or
+    return $self->output(400, 'need id'); # TODO 405 is more correct?
+
+  my %p = $self->url_param($args{cgi});
+  my $rev = $p{rev};
+  my ($fmt, $content) = $self->read_client_data($args{cgi});
+
+  my $L = $self->unformatter($fmt) or
+    return $self->output(501, "Cannot accept format '$fmt'");
+  my $data = $L->($content);
+  if($@) {
+    return $self->output(500);
+  }
+
+  #warn "read >>>\n", YAML::Syck::Dump($data), "<<<\n  ";
+
+  # now we transform the data
+  my $current = $self->anno_io->x_read($id); # x_delete more atomic?
+  my $anno = $self->anno_in($data, $current);
+
+  # check the version assertion
+  my @err;
+  defined(my $user = $self->authenticate) or return $self->output(401);
+  if(($current->{public}{owner} || '') ne $user) {
+    # TODO should be 401, but client needs to recognize that
+    @err = (403, 'You do not own that resource');
+  }
+  elsif($current->{revision} != $rev) {
+    @err = (409, 'Revision/Assert mismatch');
+  }
+  elsif($anno->{revision} <= $current->{revision}) {
+    @err = (409, 'Revision exists');
+  }
+
+  if(@err) {
+    return($self->output(@err));
+  }
+  # commit
+  $self->anno_io->x_update($id, $anno);
+
+  $self->output(200);
+
+} # end subroutine PUT_annotation definition
+########################################################################
+
+=head2 DELETE_annotation
+
+Deletes an existing annotation.
+
+  PUT $ADDR/annotation/$id.$fmt?rev=$expected_rev
+
+  $server->DELETE_annotation($path, %args);
+
+=cut
+
+sub DELETE_annotation {
+  my $self = shift;
+  my ($path, %args) = @_;
+
+  my $id = $path->[0];
+
+  my %p = $self->url_param($args{cgi});
+  my $rev = $p{rev};
+  # we have to delete as we grab it unless we want to do locking
+  # XXX actually, you can't use the YAML IO in a fork
+  my $data = eval {$self->anno_io->x_delete($id)};
+  unless($data) {
+    return($self->output(404, 'record gone'));
+  }
+
+  # NOTE do not return until after rollback
+  my @err;
+  if(defined(my $user = $self->authenticate)) {
+    if(($data->{public}{owner} || '') ne $user) {
+      # TODO should be 401, but client needs to recognize that
+      @err = (403, 'You do not own that resource');
+    }
+    elsif($data->{revision} != $rev) {
+      @err = (409, 'Revision/Assert mismatch');
+    }
+  }
+  else {
+    @err = (401, 'Not authorized');
+  }
+
+  if(@err) {
+    # rollback
+    $self->anno_io->x_insert($id, $data);
+    return($self->output(@err));
+  }
+
+  my $fmt = 'x-yaml';
+  my $dump = YAML::Syck::Dump($data);
+
+  return($self->output(200, {Content_Type => "text/$fmt"}, $dump));
+} # end subroutine DELETE_annotation definition
+########################################################################
+
+=head1 Data Formats
+
+=head2 formatter
+
+  $self->formatter($format);
+
+=cut
+
+sub formatter {
+  my $self = shift;
+  my ($format) = @_;
+  my %subs = (
+    'x-yaml' => sub { YAML::Syck::Dump($_[0])},
+  );
+  return($subs{$format});
+} # end subroutine formatter definition
+########################################################################
+
+=head2 unformatter
+
+  $self->unformatter($format);
+
+=cut
+
+sub unformatter {
+  my $self = shift;
+  my ($format) = @_;
+  $format =~ s#^text/##;
+  $format =~ s/^plain$/x-yaml/; # default it
+  my %subs = (
+    'x-yaml' => sub { eval{YAML::Syck::Load($_[0])}},
+  );
+  return($subs{$format});
+} # end subroutine unformatter definition
+########################################################################
+
+=head1 Transform and Validation
+
+Abstractions for local/wire representations.  These might help if we go
+with a dtRdr::Annotation::IOBlob object or something.  Otherwise, I
+think we're just normalizing data.
+
+=cut
+
+=head2 keys
+
+  id
+  title
+  start
+  end
+  context
+  selected
+  mod_time
+  create_time
+  revision
+  public
+    owner
+    rev - output only (if even)
+  content - notes only
+
+=cut
+
+my %def_keys = map({$_ => undef} qw(
+  id
+  book
+  node
+  title
+  start
+  end
+  context
+  selected
+  mod_time
+  create_time
+  revision
+));
+
+=head2 _kmap
+
+  $data = $self->_kmap($data);
+
+=cut
+
+sub _kmap {
+  my $self = shift;
+  my ($data, $also) = @_;
+  $also ||= {};
+  my $obj = {
+    %def_keys,
+    %$also,
+    map({exists($def_keys{$_}) ? ($_ => $data->{$_}) : ()} keys %$data),
+    type => $data->{type},
+  };
+  if($obj->{type} eq 'dtRdr::Note') {
+    $obj->{content} = $data->{content};
+    $obj->{references} = [@{$data->{references}}]
+      if(exists($data->{references}));
+  }
+  $obj->{public} ||= {};
+  $obj->{public}{owner} ||= $data->{public}{owner};
+  return($obj);
+} # end subroutine _kmap definition
+########################################################################
+
+=head2 anno_in
+
+  $data = $self->anno_in($data);
+
+=cut
+
+sub anno_in {
+  my $self = shift;
+  return($self->_kmap(@_));
+} # end subroutine anno_in definition
+########################################################################
+
+=head2 anno_out
+
+  $data = $self->anno_out($data);
+
+=cut
+
+sub anno_out {
+  my $self = shift;
+  my ($obj) = @_;
+  my $data = $self->_kmap($obj);
+
+  # set the outgoing s_rev (though maybe the client probably shouldn't
+  # trust us to do it?)
+  #$data->{public}{rev} = $obj->{revision};
+
+  return($data);
+} # end subroutine anno_out definition
+########################################################################
+
+=head2 output
+
+Overrides
+
+  $self->output(...);
+
+=cut
+
+sub output {
+  my $self = shift;
+
+  my $l = $self->latency;
+  $l and Time::HiRes::sleep($l);
+
+  my %h;
+  if((my $shift = $self->time_shift) or $l) {
+    $shift ||= 0;
+    $h{Date} = HTTP::Date::time2str(time + $shift);
+    $l and Time::HiRes::sleep($l); # latency on both sides
+  }
+  $self->SUPER::output(@_, (scalar(%h) ? \%h : ()));
+} # end subroutine output definition
+########################################################################
+
+=head1 Data Handling
+
+=head2 manifest
+
+  my %items = $server->manifest(%select);
+
+=cut
+
+sub manifest {
+  my $self = shift;
+  my (%select) = @_;
+
+  my @items = $self->anno_io->items;
+
+  # restrict results
+  if(%select) {
+    my @source = @items;
+    @items = ();
+    my %got;
+    # oh no! no sql! whatever will I do?!
+    # and()ing and such will probably never happen, so...
+    foreach my $key (keys(%select)) {
+      my %ok = map({$_ => 1} @{$select{$key}});
+      #warn "ok is ", join(", ", @{$select{$key}});
+      my @found = grep({!$got{$_}} grep({$ok{$_->{$key}}} @source));
+      $got{$_} = 1 for(@found);
+      push(@items, @found);
+    }
+  }
+
+  my %list = map({($_->{id} => $_->{revision} || 0)} @items);
+
+  return(%list);
+} # end subroutine manifest definition
+########################################################################
+
+=head1 Authentication Customization
+
+=head2 authenticate
+
+Internalizes the authentication type.
+
+  $self->authenticate;
+
+=cut
+
+sub authenticate {
+  my $self = shift;
+
+  $self->no_auth and return('anonymous');
+  
+  # TODO we should set auth_type to a cookie-auth object which
+  # can('authenticate') and can('request_auth')
+  my $at = $self->auth_type or
+    die "can't authenticate without auth_type";
+  #warn "auth is $at";
+  return($self->SUPER::authenticate($at));
+} # end subroutine authenticate definition
+########################################################################
+
+=head2 get_password
+
+  $self->get_password($user);
+
+=cut
+
+sub get_password {
+  my $self = shift;
+  my ($user) = @_;
+  #warn "get pass for $user";
+  my $users = $self->{users} or die "cannot get_password without users";
+  return($users->{$user});
+} # end subroutine get_password definition
+########################################################################
+
+} # end package dtRdr::anno_server
+BEGIN { # TODO ship all of this off to its own distribution
+package HTTP::Server::Simple::Authenticate;
+
+=begin NOTES
+
+Contains small parts which should be kept away from children.
+
+It's probably worth noting why I'm building from scratch here.  It seems
+like there are about 50 examples of how to do this, all of which are
+subtly wrong or not suited to standalone/test-suite usage.  I believe
+what I find lacking is small enough parts.  It is not my place to say
+"why would you want to do that?"
+
+This is not compatible with HTTP::Server::Simple::Authen, because that
+is not capable of handling digest or other schemes.
+
+We may want compatibility with HTTPD::UserManage and/or Authen::Simple,
+but they have to play nice with the goals.
+
+1.  No hard-coded prereqs.  If we are going to load something, it should
+be at runtime or an object passed-in from caller code.
+
+2.  No filesystem/setup requirements -- need to be able to specify
+user/password pairs as in-memory-only.
+
+3.  No CGI assumptions.
+
+4.  As few "must subclass" methods as possible.  No stubs.
+
+5.  We may not have the user's password, so cannot assume Authen::Simple
+semantics.  E.g. in digest auth, we must have a get_password($user)
+scheme rather than is_ok($user, $password).
+
+I don't think we need the HTTPD::Authen feature of being able
+to "authenticate a user without even knowing what scheme is being
+used" -- That seems like a security hole.
+
+=end notes
+
+=cut
+
+=head2 authenticate
+
+  my $user = $server->authenticate('Basic');
+
+  my $user = $server->authenticate('DigestMD5');
+
+  my $user = $server->authenticate($object);
+
+=cut
+
+sub authenticate {
+  my $self = shift;
+  my ($type) = @_;
+
+  unless(ref($type)) { # it can be an object
+    my $class = __PACKAGE__ . '::' . $type;
+    unless($class->isa('UNIVERSAL')) {
+      eval("require $class") or die "invalid authen scheme $type";
+    }
+    $type = $class;
+  }
+
+  my $user = eval { $type->authenticate($self)};
+  if($@) {
+    warn "ERROR $@";
+    $self->output(400, 'Authentication angry');
+    return;
+  }
+  return($user) if(defined($user));
+
+  # let the plugin do its own output by returning undef here
+  if(my $auth = $type->request_auth($self)) {
+    $self->output(401, {WWW_Authenticate => $auth},
+      'Authentication required'
+    );
+  }
+  return;
+} # end subroutine authenticate definition
+########################################################################
+
+# NO MORE METHODS
+
+=head1 Optional Methods
+
+These can be inherited from elsewhere or otherwised mixed-in (thus you
+can use a subclassed accessor generator.)
+
+=head2 server must define
+
+=over
+
+=item  authorization() or ENV{HTTP_AUTHORIZATION}
+
+Contents of the 'Authorization' request header.
+
+=back
+
+=head2 server may define
+
+=over
+
+=item authen_realm()
+
+Realm for authentication-required responses.
+
+=back
+
+=cut
+
+package HTTP::Server::Simple::HTTPAuthenticate;
+# base class for WWW-Authenticate based bolt-ons
+
+=head2 authenticate
+
+  $authfoo->authenticate($server);
+
+=cut
+
+sub authenticate {
+  my $self = shift;
+  my ($server) = @_;
+
+  # do not assume CGI
+  my $data = $server->can('authorization') ? $server->authorization :
+    $ENV{HTTP_AUTHORIZATION};
+  return unless(defined($data));
+
+  # stolen from LWP -- hmm, will there never be a Foo-Bar-Baz scheme?
+  if($data =~ s/^([a-z]+(?:-[a-z]+)*) //i) {
+    my $scheme = $1;
+    ($self->scheme eq $scheme) or die "wrong auth scheme"; # XXX return?
+  }
+  else {
+    die "unhandled auth string $data";
+  }
+  return($self->check_auth($data, $server));
+} # end subroutine authenticate definition
+########################################################################
+
+=head2 request_auth
+
+  ThisClass->request_auth($server);
+
+=cut
+
+sub request_auth {
+  my $self = shift;
+  my ($server) = @_;
+
+  my $realm = $self->_default_realm($server);
+  my $scheme = $self->scheme;
+  my $and = $self->can('also_request') ? ' ' . $self->also_request : '';
+
+  return(qq($scheme realm="$realm"$and));
+} # end subroutine request_auth definition
+########################################################################
+
+=head2 _default_realm
+
+  my $realm = ThisClass->_default_realm($server);
+
+=cut
+
+sub _default_realm {
+  my $package = shift;
+  my ($server) = @_;
+  return($server->can('authen_realm') ? $server->authen_realm :
+    'Authorized area');
+} # end subroutine _default_realm definition
+########################################################################
+
+} # end package HTTP::Server::Simple::Authenticate
+BEGIN {
+package HTTP::Server::Simple::Authenticate::Basic;
+our @ISA = qw(HTTP::Server::Simple::HTTPAuthenticate); 
+use constant scheme => 'Basic';
+
+use MIME::Base64 ();
+
+=head2 check_auth
+
+  $class->check_auth($string, $server);
+
+=cut
+
+sub check_auth {
+  my $self = shift;
+  my ($string, $server) = @_;
+
+  my ($user, $pass) = split(/:/, MIME::Base64::decode($string));
+
+  if($server->can('get_password')) {
+    defined(my $p = $server->get_password($user)) or return;
+    ($p eq $pass) or return;
+    #warn "get_password: $p\n";
+  }
+  elsif($server->can('check_password')) {
+    $server->check_password($user, $pass) or return;
+  }
+  else {
+    return;
+  }
+
+  return($user);
+} # end subroutine check_auth definition
+########################################################################
+} # end package HTTP::Server::Simple::Authenticate::Basic
+BEGIN {
+package HTTP::Server::Simple::Authenticate::DigestMD5;
+our @ISA = qw(HTTP::Server::Simple::HTTPAuthenticate); 
+use constant scheme => 'Digest';
+use Digest::MD5 ();
+
+#TODO a better digest module would include stale=TRUE here
+# Also, something with Authentication-Info and nextnonce
+
+=head2 also_request
+
+  $string = $package->also_request;
+
+=cut
+
+sub also_request {
+  my $self = shift;
+  my $time = time;
+  return(qq(nonce="$time" algorithm=MD5 qop="auth"));
+} # end subroutine also_request definition
+########################################################################
+# this won't do a good job with nonces, so we need users to be able to
+# feed in a subclass or object
+
+=head2 check_nonce
+
+This is not a secure nonce.
+
+  $nonce = $class->check_nonce($nonce) or return;
+
+=cut
+
+sub check_nonce {
+  my $self = shift;
+  my ($nonce) = @_;
+
+
+  my $max = 50;
+  my $time = time;
+  # ko ecnon sselnu nruter tsuj
+  return(
+    (($nonce <= $time) && ($nonce > ($time - $max))) ? $nonce : undef
+  );
+} # end subroutine check_nonce definition
+########################################################################
+
+=head2 check_auth
+
+  $class->check_auth($string, $server);
+
+A secure server should:
+
+* use a real nonce, stored and deleted as soon as it is used
+
+* store the parameters keyed to the nonce and check that they come back
+
+* verify the message-digest against the PUT|POSTed content
+
+=cut
+
+sub check_auth {
+  my $self = shift;
+  my ($string, $server) = @_;
+
+  # bits from HTTPD::Authen (corrected) and LWP
+  my %cdata = $self->parse_digest_request($string);
+  exists($cdata{username}) or return;
+
+  # XXX may not have a cleartext password, but I need at least H(A1)
+  my $password = $server->can('get_password') ?
+    $server->get_password($cdata{username}) : undef;
+  #warn "user's password: $password\n";
+
+  
+  return($self->verify_digest(
+    %cdata,
+    _server => $server,
+    _password => $password,
+  ));
+} # end subroutine check_auth definition
+########################################################################
+
+=head2 parse_digest_request
+
+See rfc2617 "3.2.2 The Authorization Request Header"
+(http://www.ietf.org/rfc/rfc2617.txt).
+
+  my %cdata = $self->parse_digest_request($string);
+
+=cut
+
+sub parse_digest_request {
+  my $self = shift;
+  my ($string) = @_;
+
+  my %cdata;
+  while($string =~ s/^([a-z-]+)=((?:"[^"]+")|[^,]+)(?:, *|$)//) {
+    my ($k, $v) = ($1, $2);
+    ($v =~ s/^"//) and ($v =~ s/"$//); # could be harsher
+    exists($cdata{$k}) and die "duplicate key $k";
+    $cdata{$k} = $v;
+  }
+  $string and die "now I'm mad ($string)";
+  0 and warn "we parsed: ",
+    join(", ", map({"$_ => $cdata{$_}"} keys %cdata));
+  return(%cdata);
+} # end subroutine parse_digest_request definition
+########################################################################
+
+=head2 verify_digest
+
+  $username = $self->verify_digest(
+    %cdata,
+    _server => $server,
+    _password => $password,
+  );
+
+=cut
+
+sub verify_digest {
+  my $self = shift;
+  my (%args) = @_;
+
+  my $H = sub {Digest::MD5::md5_hex(join(':', @_))};
+
+  my $server = $args{_server};
+  my $pass = $args{_password}; # might be undef
+
+  my $uri = $server->can('request_uri') ? $server->request_uri :
+    $ENV{REQUEST_URI};
+  ($args{uri} eq $uri) or die "uri mismatch '$uri' ne '$args{uri}'";
+  my $method = $server->can('method') ? $server->method :
+    $ENV{REQUEST_METHOD};
+
+  defined($pass) or return; # TODO get_digest($args{username})
+  my $A1 = $H->($args{username}, $args{realm}, $pass);
+
+  my $nonce = $self->check_nonce($args{nonce}) or return;
+
+  my @middle;
+  if(defined($args{qop})) {
+    ($args{qop} eq 'auth') or die "$args{qop} not supported";
+    @middle = map({$args{$_}} qw(nc cnonce qop));
+  }
+
+  my $digest_response = $H->($A1,
+    $nonce,
+    @middle,
+    $H->($method, $uri)
+  );
+  0 and warn "digest: $digest_response";
+  return(
+    ($digest_response eq $args{response}) ? $args{username} : undef
+  )
+} # end subroutine verify_digest definition
+########################################################################
+
+} # end package HTTP::Server::Simple::Authenticate::DigestMD5
+BEGIN {
+package HTTP::Server::Simple::Authenticate::DumbCookie;
+
+# a smarter cookie class would have an object, not just class methods
+
+=head2 cookie_val
+
+Returns a value for the cookie.
+
+  my $val = $dc->cookie_val($user, $pass);
+
+=cut
+
+sub cookie_val {
+  my $self = shift;
+  my ($user, $pass) = @_;
+
+  return($user . ':' . $pass);
+} # end subroutine cookie_val definition
+########################################################################
+
+=head2 authenticate
+
+  my $user = $dc->authenticate($server);
+
+=cut
+
+sub authenticate {
+  my $self = shift;
+  my ($server) = @_;
+
+  my $data = $server->can('cookie') ? $server->cookie :
+    $ENV{COOKIE};
+  #warn "cookie is ", (defined($data) ? $data : 'oops'), "\n";
+  return unless(defined($data));
+  require URI::Escape;
+  $data = URI::Escape::uri_unescape($data);
+  $data =~ s/^[^=]+=//; # XXX ick
+  #warn "checking $data";
+  my ($user, $pass) = split(':', $data, 2);
+
+  return($self->check($server, $user, $pass));
+} # end subroutine authenticate definition
+########################################################################
+
+=head2 check
+
+  $user = $dc->check($server, $user, $pass);
+
+=cut
+
+sub check {
+  my $self = shift;
+  my ($server, $user, $pass) = @_;
+
+  if($server->can('get_password')) {
+    defined(my $p = $server->get_password($user)) or return;
+    ($p eq $pass) or return;
+    #warn "get_password: $p\n";
+  }
+  elsif($server->can('check_password')) {
+    $server->check_password($user, $pass) or return;
+  }
+  else {
+    return;
+  }
+
+  return($user);
+} # end subroutine check definition
+########################################################################
+
+=head2 request_auth
+
+Cookies are not a standard authentication scheme.  Thus, we cannot
+request authentication, so it outputs an error and returns undef.
+
+  $dc->request_auth($server);
+
+=cut
+
+sub request_auth {
+  my $self = shift;
+  my ($server) = @_;
+
+  $server->output(403, 'you need to login');
+  return;
+} # end subroutine request_auth definition
+########################################################################
+} # end package HTTP::Server::Simple::Authenticate::DumbCookie
+BEGIN {
+package HTTP::Server::Simple::Output;
+
+=head2 output
+
+Takes status code from $params{Status} or a leading number.  Otherwise,
+sets it to 200.
+
+  $self->output(\%params, @strings);
+
+  $self->output(501, \%params, @strings);
+
+  $self->output(501, @strings);
+
+  $self->output(@strings);
+
+=cut
+
+sub output {
+  my $self = shift;
+  my @args = @_;
+
+  # allow leading code and/or leading params ref
+  my $code; $code = shift(@args) if($args[0] =~ m/^\d\d\d$/);
+  my %p;
+  if(ref($args[0])) {
+    %p = %{shift(@args)};
+    ($code and $p{Status}) and die "cannot have status twice"
+  }
+  # let subclasses pass a trailing hashref
+  if(ref($args[-1])) {
+    my $also = pop(@args);
+    my @k = keys(%$also);
+    @p{@k} = @$also{@k};
+  }
+  $code = $p{Status} ||= $code ||= 200;
+
+  # "servers MUST include a Date header"
+  $p{Date} ||= HTTP::Date::time2str(time);
+
+  my $h = HTTP::Headers->new(%p);
+  $h->content_type('text/html') unless($h->content_type);
+
+  my $data = join("\n", @args);
+  $h->content_length(length($data));
+
+  my $message = HTTP::Status::status_message($code);
+  print join("\n",
+    "HTTP/1.1 $code $message",
+    $h->as_string, '');
+  print $data;
+} # end subroutine output definition
+########################################################################
+} # end package HTTP::Server::Simple::Output
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::anno_server';

@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+
+use 5.12.0;
+use warnings;
+
+use Data::Dumper;
+use Disbatch;
+use Getopt::Long;
+use Try::Tiny::Retry;
+#use Safe::Isa;
+
+$SIG{HUP}  = sub { exit 129 };	# 1
+$SIG{INT}  = sub { exit 130 };	# 2	ctrl-c
+$SIG{QUIT} = sub { exit 131 };	# 3	ctrl-\
+#$SIG{PIPE} = 'IGNORE';		# 13
+$SIG{TERM} = sub { exit 143 };	# 15	kill
+$SIG{CHLD} = 'IGNORE';		# 20	Zombies are bad, m'kay?
+
+my $config_file = '/etc/disbatch/config.json';
+
+GetOptions('config=s' => \$config_file);
+
+my $disbatch = Disbatch->new(class => 'Disbatch', config_file => $config_file);
+$disbatch->load_config;
+my $logger = $disbatch->logger('DEN');
+$logger->info('Starting Disbatch Execution Node');
+
+$disbatch->ensure_indexes;
+$disbatch->validate_plugins;
+
+do {
+    $disbatch->orphaned_tasks;
+    $disbatch->process_queues;
+    $disbatch->update_node_status;
+} while sleep 1;
+
+END {
+    $logger->info("Exit code $?");
+    if ($disbatch->{claimed_task}) {
+        my $unclaimed = $disbatch->unclaim_task($disbatch->{claimed_task}{_id});
+        if (defined $unclaimed) {
+            $logger->warn("Unclaimed task $unclaimed->{_id}");
+        } else {
+            $logger->error("Task $unclaimed->{_id} not unclaimed!");
+        }
+    }
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+disbatchd - Disbatch Execution Node (DEN)
+
+=head1 VERSION
+
+version 3.990
+
+=head1 DESCRIPTION
+
+This is the simple master process which handles the needed steps to process queues and start tasks, and then sleeps for 1 second.
+
+It is safe to restart this process while tasks are running, without interrupting those tasks.
+
+=head1 SYNOPSIS
+
+  disbatchd --config etc/disbatch/config.json
+
+=head1 ARGUMENTS
+
+=over 2
+
+=item --config <string>
+
+Path to the JSON Disbatch config file. Default is C</etc/disbatch/config.json>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Disbatch>
+
+L<Disbatch::Web>
+
+L<Disbatch::Roles>
+
+L<Disbatch::Plugin::Demo>
+
+L<task_runner>
+
+L<disbatch.pl>
+
+L<disbatch-create-users>
+
+=head1 AUTHORS
+
+Ashley Willis <awillis@synacor.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Ashley Willis.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004

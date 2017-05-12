@@ -1,0 +1,9 @@
+Makefile$
+pm_to_blib$
+^blib
+MANIFEST.bak$
+^prac
+\.swp$
+\.old$
+\.bak$
+\.orig$

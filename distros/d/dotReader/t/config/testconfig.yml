@@ -1,0 +1,27 @@
+--- 
+book_handler: {}
+
+library: 
+  - 
+    type: bar2
+    uri: foo1
+  - 
+    type: bar2
+    uri: bar1
+  - 
+    type: bar2
+    uri: baz1
+module: []
+
+servers: 
+  - 
+    books: 
+      - book_about_a_duck
+      - something_in_blue
+    id: the server
+    type: Standard
+    uri: http://example.com/
+    username: bob
+user_info: {}
+
+version: v0.10.2

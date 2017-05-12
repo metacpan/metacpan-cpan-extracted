@@ -1,0 +1,24 @@
+dotReader
+
+INSTALLATION
+
+To install this distribution, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+If the Build.PL step complains of dependencies, they should be satisfied
+via your favorite CPAN mirror.
+
+DOCUMENTATION
+
+After installing, you can find the root of the documentation for this
+distribution with the perldoc command.
+
+    perldoc dtRdr::doc
+
+Also see the LICENSE and COPYING files for legal info.
+
+See HACKING.pod for developer information.

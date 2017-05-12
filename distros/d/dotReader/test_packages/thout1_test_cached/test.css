@@ -1,0 +1,32 @@
+body{
+	background-color: #CCCCCC;
+}
+pre{
+	background-color:#eeeeee;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #000066;
+	color: #000066;
+}
+h1, h2, h3, h4, h5, h6, h7, h8, h9 {
+	font-family: Verdana;
+	color:#FFFFFF;
+	background-color:#666699;
+	display: block;
+	width: 100%;
+	margin:0px;
+	padding:3px;
+	font-size: 12px;
+}
+div.sect1, div.sect2, div.sect3, div.sect4{
+	background-color:#ffffff;
+	display: block;
+	margin:0px;
+	padding:5px;
+	border-width:1px;
+	border-color:#cccccc;
+	border-style:solid;
+}
+div.sect1 div.sect2, div.sect2 div.sect3, div.sect3 div.sect4{
+	margin-top:10px;
+}

@@ -1,0 +1,371 @@
+<?xml version="1.0"?>
+<pkg:package name="FreeBSD Developers' Handbook" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+	<pkg:content>
+
+<pkg:outlineMarker OutlineName="FreeBSD Developers' Handbook" id="AEN1" visible="true" renderchildren="false">
+		<div class="sect1">
+				
+
+<h1 class="title">FreeBSD Developers' Handbook</h1><a name="AEN2"></a><center><img src="bsd_big.png"  /></center>
+
+<h3 class="corpauthor">The FreeBSD Documentation Project</h3>
+
+<p class="copyright">Copyright © 2000, 2001, 2002, 2003, 2004 The FreeBSD
+Documentation Project</p>
+
+
+<a name="AEN35"></a>
+<p>Welcome to the Developers' Handbook. This manual is a <span class="emphasis"><i class="emphasis">work in progress</i></span> and is the work of many individuals. Many
+sections do not yet exist and some of those that do exist need to be updated. If you are
+interested in helping with this project, send email to the <a href="http://lists.freebsd.org/mailman/listinfo/freebsd-doc" target="_top">FreeBSD
+documentation project mailing list</a>.</p>
+
+<p>The latest version of this document is always available from the <a href="http://www.freebsd.org/index.html" target="_top">FreeBSD World Wide Web server</a>. It may
+also be downloaded in a variety of formats and compression options from the <a href="ftp://ftp.freebsd.org/pub/FreeBSD/doc/" target="_top">FreeBSD FTP server</a> or one
+of the numerous <a href="pkg://FreeBSD Handbook/MIRRORS-FTP" target="_top">mirror sites</a>.</p>
+
+
+
+<a name="LEGALNOTICE"></a>
+<p>Redistribution and use in source (SGML DocBook) and 'compiled' forms (SGML, HTML, PDF,
+PostScript, RTF and so forth) with or without modification, are permitted provided that
+the following conditions are met:</p>
+
+<ol type="1">
+<li>
+<p>Redistributions of source code (SGML DocBook) must retain the above copyright notice,
+this list of conditions and the following disclaimer as the first lines of this file
+unmodified.</p>
+</li>
+
+<li>
+<p>Redistributions in compiled form (transformed to other DTDs, converted to PDF,
+PostScript, RTF and other formats) must reproduce the above copyright notice, this list
+of conditions and the following disclaimer in the documentation and/or other materials
+provided with the distribution.</p>
+</li>
+</ol>
+
+
+<blockquote class="important">
+<p><b>Important:</b> THIS DOCUMENTATION IS PROVIDED BY THE FREEBSD DOCUMENTATION PROJECT
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+EVENT SHALL THE FREEBSD DOCUMENTATION PROJECT BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+</blockquote>
+
+
+
+<a name="TRADEMARKS"></a>
+<p>FreeBSD is a registered trademark of the FreeBSD Foundation.</p>
+
+<p>Apple, FireWire, Mac, Macintosh, Mac OS, Quicktime, and TrueType are trademarks of
+Apple Computer, Inc., registered in the United States and other countries.</p>
+
+<p>IBM, AIX, EtherJet, Netfinity, OS/2, PowerPC, PS/2, S/390, and ThinkPad are trademarks
+of International Business Machines Corporation in the United States, other countries, or
+both.</p>
+
+<p>IEEE, POSIX, and 802 are registered trademarks of Institute of Electrical and
+Electronics Engineers, Inc. in the United States.</p>
+
+<p>Intel, Celeron, EtherExpress, i386, i486, Itanium, Pentium, and Xeon are trademarks or
+registered trademarks of Intel Corporation or its subsidiaries in the United States and
+other countries.</p>
+
+<p>Linux is a registered trademark of Linus Torvalds.</p>
+
+<p>Microsoft, IntelliMouse, MS-DOS, Outlook, Windows, Windows Media and Windows NT are
+either registered trademarks or trademarks of Microsoft Corporation in the United States
+and/or other countries.</p>
+
+<p>Motif, OSF/1, and UNIX are registered trademarks and IT DialTone and The Open Group
+are trademarks of The Open Group in the United States and other countries.</p>
+
+<p>Sun, Sun Microsystems, Java, Java Virtual Machine, JavaServer Pages, JDK, JSP, JVM,
+Netra, Solaris, StarOffice, Sun Blade, Sun Enterprise, Sun Fire, SunOS, and Ultra are
+trademarks or registered trademarks of Sun Microsystems, Inc. in the United States and
+other countries.</p>
+
+<p>Many of the designations used by manufacturers and sellers to distinguish their
+products are claimed as trademarks. Where those designations appear in this document, and
+the FreeBSD Project was aware of the trademark claim, the designations have been followed
+by the ``&#8482;'' or the ``®'' symbol.</p>
+
+
+
+
+<hr />
+
+
+
+<dl>
+<dt><b>Table of Contents</b></dt>
+
+<dt>I. <a href="pkg://FreeBSD Developers' Handbook/BASICS">Basics</a></dt>
+
+<dd>
+<dl>
+<dt>1 <a href="pkg://FreeBSD Developers' Handbook/INTRODUCTION">Introduction</a></dt>
+
+<dd>
+<dl>
+<dt>1.1 <a href="pkg://FreeBSD Developers' Handbook/INTRODUCTION-DEVEL">Developing on FreeBSD</a></dt>
+
+<dt>1.2 <a href="pkg://FreeBSD Developers' Handbook/INTRODUCTION-BSDVISION">The BSD Vision</a></dt>
+
+<dt>1.3 <a href="pkg://FreeBSD Developers' Handbook/INTRODUCTION-ARCHGUIDE">Architectural Guidelines</a></dt>
+
+<dt>1.4 <a href="pkg://FreeBSD Developers' Handbook/INTRODUCTION-LAYOUT">The Layout of <tt class="filename">/usr/src</tt></a></dt>
+</dl>
+</dd>
+
+<dt>2 <a href="pkg://FreeBSD Developers' Handbook/TOOLS">Programming Tools</a></dt>
+
+<dd>
+<dl>
+<dt>2.1 <a href="pkg://FreeBSD Developers' Handbook/TOOLS-SYNOPSIS">Synopsis</a></dt>
+
+<dt>2.2 <a href="pkg://FreeBSD Developers' Handbook/TOOLS-INTRO">Introduction</a></dt>
+
+<dt>2.3 <a href="pkg://FreeBSD Developers' Handbook/TOOLS-PROGRAMMING">Introduction to Programming</a></dt>
+
+<dt>2.4 <a href="pkg://FreeBSD Developers' Handbook/TOOLS-COMPILING">Compiling with <tt class="command">cc</tt></a></dt>
+
+<dt>2.5 <a href="pkg://FreeBSD Developers' Handbook/TOOLS-MAKE">Make</a></dt>
+
+<dt>2.6 <a href="pkg://FreeBSD Developers' Handbook/DEBUGGING">Debugging</a></dt>
+
+<dt>2.7 <a href="pkg://FreeBSD Developers' Handbook/EMACS">Using Emacs as a Development Environment</a></dt>
+
+<dt>2.8 <a href="pkg://FreeBSD Developers' Handbook/TOOLS-READING">Further Reading</a></dt>
+</dl>
+</dd>
+
+<dt>3 <a href="pkg://FreeBSD Developers' Handbook/SECURE">Secure Programming</a></dt>
+
+<dd>
+<dl>
+<dt>3.1 <a href="pkg://FreeBSD Developers' Handbook/SECURE-SYNOPSIS">Synopsis</a></dt>
+
+<dt>3.2 <a href="pkg://FreeBSD Developers' Handbook/SECURE-PHILOSOPHY">Secure Design Methodology</a></dt>
+
+<dt>3.3 <a href="pkg://FreeBSD Developers' Handbook/SECURE-BUFFEROV">Buffer Overflows</a></dt>
+
+<dt>3.4 <a href="pkg://FreeBSD Developers' Handbook/SECURE-SETUID">SetUID issues</a></dt>
+
+<dt>3.5 <a href="pkg://FreeBSD Developers' Handbook/SECURE-CHROOT">Limiting your program's environment</a></dt>
+
+<dt>3.6 <a href="pkg://FreeBSD Developers' Handbook/SECURE-TRUST">Trust</a></dt>
+
+<dt>3.7 <a href="pkg://FreeBSD Developers' Handbook/SECURE-RACE-CONDITIONS">Race Conditions</a></dt>
+</dl>
+</dd>
+
+<dt>4 <a href="pkg://FreeBSD Developers' Handbook/L10N">Localization and Internationalization - L10N and I18N</a></dt>
+
+<dd>
+<dl>
+<dt>4.1 <a href="pkg://FreeBSD Developers' Handbook/L10N-PROGRAMMING">Programming I18N Compliant Applications</a></dt>
+</dl>
+</dd>
+
+<dt>5 <a href="pkg://FreeBSD Developers' Handbook/POLICIES">Source Tree Guidelines and Policies</a></dt>
+
+<dd>
+<dl>
+<dt>5.1 <a href="pkg://FreeBSD Developers' Handbook/POLICIES-MAINTAINER"><tt class="makevar">MAINTAINER</tt> on
+Makefiles</a></dt>
+
+<dt>5.2 <a href="pkg://FreeBSD Developers' Handbook/POLICIES-CONTRIBUTED">Contributed Software</a></dt>
+
+<dt>5.3 <a href="pkg://FreeBSD Developers' Handbook/POLICIES-ENCUMBERED">Encumbered Files</a></dt>
+
+<dt>5.4 <a href="pkg://FreeBSD Developers' Handbook/POLICIES-SHLIB">Shared Libraries</a></dt>
+</dl>
+</dd>
+
+<dt>6 <a href="pkg://FreeBSD Developers' Handbook/TESTING">Regression and Performance Testing</a></dt>
+
+<dd>
+<dl>
+<dt>6.1. <a href="pkg://FreeBSD Developers' Handbook/TESTING/#TESTING-MICRO-BENCHMARK">Micro Benchmark Checklist</a></dt>
+</dl>
+</dd>
+</dl>
+</dd>
+
+<dt>II. <a href="pkg://FreeBSD Developers' Handbook/IPC">Interprocess Communication</a></dt>
+
+<dd>
+<dl>
+<dt>7 <a href="pkg://FreeBSD Developers' Handbook/SIGNALS">* Signals</a></dt>
+
+<dt>8 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS">Sockets</a></dt>
+
+<dd>
+<dl>
+<dt>8.1 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-SYNOPSIS">Synopsis</a></dt>
+
+<dt>8.2 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-DIVERSITY">Networking and Diversity</a></dt>
+
+<dt>8.3 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-PROTOCOLS">Protocols</a></dt>
+
+<dt>8.4 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-MODEL">The Sockets Model</a></dt>
+
+<dt>8.5 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-ESSENTIAL-FUNCTIONS">Essential Socket Functions</a></dt>
+
+<dt>8.6 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-HELPER-FUNCTIONS">Helper Functions</a></dt>
+
+<dt>8.7 <a href="pkg://FreeBSD Developers' Handbook/SOCKETS-CONCURRENT-SERVERS">Concurrent Servers</a></dt>
+</dl>
+</dd>
+
+<dt>9 <a href="pkg://FreeBSD Developers' Handbook/IPV6">IPv6 Internals</a></dt>
+
+<dd>
+<dl>
+<dt>9.1 <a href="pkg://FreeBSD Developers' Handbook/IPV6-IMPLEMENTATION">IPv6/IPsec Implementation</a></dt>
+</dl>
+</dd>
+</dl>
+</dd>
+
+<dt>III. <a href="pkg://FreeBSD Developers' Handbook/KERNEL">Kernel</a></dt>
+
+<dd>
+<dl>
+<dt>10 <a href="pkg://FreeBSD Developers' Handbook/DMA">DMA</a></dt>
+
+<dd>
+<dl>
+<dt>10.1 <a href="pkg://FreeBSD Developers' Handbook/DMA-BASICS">DMA: What it is and How it Works</a></dt>
+</dl>
+</dd>
+
+<dt>11 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG">Kernel Debugging</a></dt>
+
+<dd>
+<dl>
+<dt>11.1 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-OBTAIN">Obtaining a Kernel Crash Dump</a></dt>
+
+<dt>11.2 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-GDB">Debugging a Kernel Crash Dump with <tt class="command">kgdb</tt></a></dt>
+
+<dt>11.3 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-DDD">Debugging a Crash Dump with DDD</a></dt>
+
+<dt>11.4 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-POST-MORTEM">Post-Mortem Analysis of a Dump</a></dt>
+
+<dt>11.5 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-ONLINE-DDB">On-Line Kernel Debugging Using DDB</a></dt>
+
+<dt>11.6 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-ONLINE-GDB">On-Line Kernel Debugging Using Remote
+GDB</a></dt>
+
+<dt>11.7 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-KLD">Debugging Loadable Modules Using GDB</a></dt>
+
+<dt>11.8 <a href="pkg://FreeBSD Developers' Handbook/KERNELDEBUG-CONSOLE">Debugging a Console Driver</a></dt>
+</dl>
+</dd>
+
+<dt>12 <a href="pkg://FreeBSD Developers' Handbook/UFS">* UFS</a></dt>
+
+<dt>13 <a href="pkg://FreeBSD Developers' Handbook/AFS">* AFS</a></dt>
+
+<dt>14 <a href="pkg://FreeBSD Developers' Handbook/SYSCONS">* Syscons</a></dt>
+
+<dt>15 <a href="pkg://FreeBSD Developers' Handbook/COMPATIBILITY">* Compatibility Layers</a></dt>
+
+<dd>
+<dl>
+<dt>15.1 <a href="pkg://FreeBSD Developers' Handbook/LINUX">* Linux</a></dt>
+</dl>
+</dd>
+</dl>
+</dd>
+
+<dt>IV. <a href="pkg://FreeBSD Developers' Handbook/ARCHITECTURES">Architectures</a></dt>
+
+<dd>
+<dl>
+<dt>16 <a href="pkg://FreeBSD Developers' Handbook/X86">x86 Assembly Language Programming</a></dt>
+
+<dd>
+<dl>
+<dt>16.1 <a href="pkg://FreeBSD Developers' Handbook/X86-INTRO">Synopsis</a></dt>
+
+<dt>16.2 <a href="pkg://FreeBSD Developers' Handbook/X86-THE-TOOLS">The Tools</a></dt>
+
+<dt>16.3 <a href="pkg://FreeBSD Developers' Handbook/X86-SYSTEM-CALLS">System Calls</a></dt>
+
+<dt>16.4 <a href="pkg://FreeBSD Developers' Handbook/X86-RETURN-VALUES">Return Values</a></dt>
+
+<dt>16.5 <a href="pkg://FreeBSD Developers' Handbook/X86-PORTABLE-CODE">Creating Portable Code</a></dt>
+
+<dt>16.6 <a href="pkg://FreeBSD Developers' Handbook/X86-FIRST-PROGRAM">Our First Program</a></dt>
+
+<dt>16.7 <a href="pkg://FreeBSD Developers' Handbook/X86-UNIX-FILTERS">Writing <span class="trademark">UNIX</span>®
+Filters</a></dt>
+
+<dt>16.8 <a href="pkg://FreeBSD Developers' Handbook/X86-BUFFERED-IO">Buffered Input and Output</a></dt>
+
+<dt>16.9 <a href="pkg://FreeBSD Developers' Handbook/X86-COMMAND-LINE">Command Line Arguments</a></dt>
+
+<dt>16.10 <a href="pkg://FreeBSD Developers' Handbook/X86-ENVIRONMENT"><span class="trademark">UNIX</span>
+Environment</a></dt>
+
+<dt>16.11 <a href="pkg://FreeBSD Developers' Handbook/X86-FILES">Working with Files</a></dt>
+
+<dt>16.12 <a href="pkg://FreeBSD Developers' Handbook/X86-ONE-POINTED-MIND">One-Pointed Mind</a></dt>
+
+<dt>16.13 <a href="pkg://FreeBSD Developers' Handbook/X86-FPU">Using the <acronym class="acronym">FPU</acronym></a></dt>
+
+<dt>16.14 <a href="pkg://FreeBSD Developers' Handbook/X86-CAVEATS">Caveats</a></dt>
+
+<dt>16.15 <a href="pkg://FreeBSD Developers' Handbook/X86-ACKNOWLEDGEMENTS">Acknowledgements</a></dt>
+</dl>
+</dd>
+
+<dt>17 <a href="pkg://FreeBSD Developers' Handbook/ALPHA">* Alpha</a></dt>
+</dl>
+</dd>
+
+<dt>V. <a href="pkg://FreeBSD Developers' Handbook/APPENDICES">Appendices</a></dt>
+
+<dd>
+<dl>
+<dt><a href="pkg://FreeBSD Developers' Handbook/APPENDICES/#AEN6428">Bibliography</a></dt>
+
+<dt><a href="pkg://FreeBSD Developers' Handbook/DOC-INDEX">Index</a></dt>
+</dl>
+</dd>
+</dl>
+
+
+
+<dl class="lot">
+<dt><b>List of Examples</b></dt>
+
+<dt>2-1. <a href="pkg://FreeBSD Developers' Handbook/AEN1140/#AEN1179">A sample <tt class="filename">.emacs</tt> file</a></dt>
+</dl>
+
+
+
+				<div align="right"><img align="right" src="bsd_sm.png"  /></div>
+		</div>
+
+
+	    
+
+
+</pkg:outlineMarker>
+		
+	</pkg:content>
+</pkg:package>

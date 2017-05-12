@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<pkg:package name="copy_ok Check" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author>eric</pkg:author>
+<pkg:publisher>OSoft</pkg:publisher>
+<pkg:content>
+  <pkg:outlineMarker OutlineName="A" id="root" title="A" render="false">
+    <pkg:outlineMarker OutlineName="A" id="0" visible="false">
+      <div>
+      Here's some copyable content.
+      </div>
+
+      <pkg:outlineMarker OutlineName="1" copy="true" id="1" visible="false">
+        <pre>
+if($0 eq ($ENV{PAR_ARGV_0} || __FILE__)) {
+  my $app = MainApp->new();
+  $app->MainLoop();
+}
+      </pre>
+      </pkg:outlineMarker>
+      <pkg:outlineMarker OutlineName="" copy="true" id="ch04-programlisting-1b" showpage="clean_ch04-programlisting-1" visible="false">
+        <pre class="programlisting">
+          1: #!/usr/local/bin/perl 
+          2: 
+          3: # Import the CGI module and create a query object to retrieve the 
+          4: # form input. 
+          5: use CGI; 
+          6: $query = new CGI; 
+          ...
+          28: print "&lt;/body>&lt;/html>\n" 
+            <pkg:outlineMarker OutlineName="Listing 4-1" id="clean_ch04-programlisting-1" render="false" visible="false"><pre class="clean_code">
+#!/usr/local/bin/perl 
+
+# Import the CGI module and create a query object to retrieve the 
+# form input. 
+use CGI; 
+$query = new CGI; 
+...
+print "&lt;/body>&lt;/html>\n"
+              </pre>
+          </pkg:outlineMarker>
+        </pre>
+      </pkg:outlineMarker>
+    </pkg:outlineMarker>
+  </pkg:outlineMarker>
+</pkg:content>
+</pkg:package>
+<!-- vim:ts=2:sw=2:et:sta
+-->

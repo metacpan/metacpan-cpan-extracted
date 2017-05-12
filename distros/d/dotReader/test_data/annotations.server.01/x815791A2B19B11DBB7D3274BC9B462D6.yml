@@ -1,0 +1,15 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: let's get this working already
+context: ~
+end: 53
+id: x815791A2B19B11DBB7D3274BC9B462D6
+node: cover
+public: 
+  owner: bob
+revision: 0
+selected: 
+  - Copyright
+start: 44
+title: a note
+type: dtRdr::Note

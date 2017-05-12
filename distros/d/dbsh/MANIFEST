@@ -1,0 +1,8 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bin/dbsh
+lib/dbsh/Panel.pm

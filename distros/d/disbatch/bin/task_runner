@@ -1,0 +1,229 @@
+#!/usr/bin/env perl
+
+use 5.12.0;
+use warnings;
+
+use Cpanel::JSON::XS;
+use Data::Dumper;
+use Encode;
+use Getopt::Long;
+use MongoDB::OID 1.0.4;
+use Try::Tiny::Retry;
+use Safe::Isa;
+
+my ($task_id, $gfs, $config_file, $quiet, $testing);
+
+GetOptions(
+    'task=s'     => \$task_id,
+    'gfs:s'      => \$gfs,
+    'config=s'   => \$config_file,
+    'quiet'      => \$quiet,
+    'testing'    => \$testing,
+);
+
+$quiet //= 0;
+$testing //= 0;
+$gfs //= 0;		# default is disabled
+$gfs = 1 if $gfs eq '';	# '--gfs' was passed with no value
+
+if ($testing) {
+    require lib;
+    lib->import('lib');
+}
+require Disbatch;
+
+my $json = Cpanel::JSON::XS->new->utf8->convert_blessed;
+
+my $disbatch = Disbatch->new(class => 'task_runner', config_file => $config_file);
+$disbatch->load_config;
+
+my $logger = $disbatch->logger;
+
+$logger->info("Starting task $task_id");
+
+$logger->logdie('Config file must be passed with --config option') unless defined $config_file;
+
+$logger->logdie('No --task') unless defined $task_id;
+
+my $oid = try { MongoDB::OID->new(value => $task_id) } catch { $logger->logdie($_) };
+my $doc = retry {
+    $disbatch->tasks->find_one_and_update({_id => $oid, status => -1, node => $disbatch->{node}}, {'$set' => {status => 0}});
+} catch {
+    $logger->logdie("Could not find and set task $task_id to status 0: $_");
+};
+
+$logger->logdie("No task found for $task_id") unless defined $doc;
+$logger->info("params for $task_id: ", $json->encode($doc->{params} // $doc->{parameters}));
+
+my $plugin = ($disbatch->queues->find_one({_id => $doc->{queue}}) // {})->{plugin};
+
+my $result;
+if (!defined $plugin) {
+    my $error = "No plugin defined for task $task_id in queue $doc->{queue}";
+    $logger->error($error);
+    $result = { status => 2, stdout => 'Unable to start', stderr => $error };
+} elsif ($plugin !~ /^[\w:]+$/) {
+    my $error = "plugin value '$plugin' must be a valid perl package name, matching /^[\\w:]+\$/";
+    $logger->error($error);
+    $result = { status => 2, stdout => 'Unable to start', stderr => $error };
+} elsif (!eval "use $plugin; 1") {
+    my $error = "$plugin not found for task $task_id";
+    $logger->error($error);
+    $result = { status => 2, stdout => 'Unable to start', stderr => $error };
+}
+
+if (!defined $result) {
+    try {
+        my $workerthread = Disbatch->new(class => $plugin, config_file => $config_file);
+        $workerthread->load_config;
+        my $task = $plugin->new(workerthread => $workerthread, task => $doc);
+        $result = $task->run;
+    } catch {
+        $logger->error("Thread has uncaught exception: $_");
+        $result = {status => 2, stdout => 'Unable to complete', stderr => "Thread has uncaught exception: $_"};
+    };
+}
+
+# verify $result is a HASH and $result->{status} is a postive integer, and if not fail task
+if (ref $result ne 'HASH') {
+    $logger->error("Task $oid did not return a HASH");
+    my $bad = { status => 2, stdout => Dumper($result), stderr => 'Task did not return a HASH. See stdout for Dumper result'};
+    $result = $bad;
+}
+if (ref $result->{status}) {
+    $logger->error("Task $oid returned a ref as status: ", Dumper $result->{status});
+    $result->{status} = 2;
+}
+if ($result->{status} !~ /^[1-9]\d*$/) {
+    $logger->error("Task $oid returned other than a positive integer as status: '$result->{status}'");
+    $result->{status} = 2;
+}
+$result->{status} += 0;		# force integer-as-string to integer
+
+my $status = $result->{status} == 1 ? 'succeeded' : 'failed';
+$logger->info("Task $task_id $status.");
+warn "STDOUT: $result->{stdout}" unless $quiet;
+warn "STDERR: $result->{stderr}" unless $quiet;
+
+# set status first:
+retry { $disbatch->tasks->update_one({_id => $oid, status => 0, node => $disbatch->{node}}, {'$set' => {status => $result->{status}}}) }
+catch { $logger->logdie("Could not update task $task_id status to $result->{status} after completion: $_") };
+
+# set rest of result:
+if ($gfs) {
+    my $stdout_gfs = 1;
+    my $stderr_gfs = 1;
+    if ($gfs eq 'auto') {
+        my $stdout_size = length encode_utf8($result->{stdout});
+        my $stderr_size = length encode_utf8($result->{stderr});
+        if ($stdout_size + $stderr_size <= 1024*1024*15) {
+            # store both in the task document
+            $stdout_gfs = 0;
+            $stderr_gfs = 0;
+        } elsif ($stderr_size <= 1024*1024*15) {
+            # store stdout in GridFS and stderr in the task document
+            $stdout_gfs = 1;
+            $stderr_gfs = 0;
+        }
+    }
+    if ($stdout_gfs) {
+        my $stdout_doc = retry { $disbatch->put_gfs($result->{stdout}, 'stdout', { task_id => $oid }) } retry_if { !/^MongoDB::DatabaseError: not authorized on / } catch { $logger->error("Could not create GridFS content for task $oid stdout: $_"); $result->{warning} = "$_"; undef; };
+        $result->{stdout} = $stdout_doc;
+    }
+    if ($stderr_gfs) {
+        my $stderr_doc = retry { $disbatch->put_gfs($result->{stderr}, 'stderr', { task_id => $oid }) } retry_if { !/^MongoDB::DatabaseError: not authorized on / } catch { $logger->error("Could not create GridFS content for task $oid stderr: $_"); $result->{warning} = "$_"; undef; };
+        $result->{stderr} = $stderr_doc;
+    }
+}
+retry { $disbatch->tasks->update_one({_id => $oid, status => $result->{status}, node => $disbatch->{node}}, {'$set' => {stdout => $result->{stdout}, stderr => $result->{stderr}, complete => Cpanel::JSON::XS::true}}) }
+on_retry {
+    $logger->warn("Update to stdout/stderr failed for task $task_id: $_");
+    # MongoDB::WriteError: Resulting document after update is larger than 16777216
+    # MongoDB::DocumentError: Document exceeds maximum size 16777216
+    $result->{stdout} = "$_" if $_->$_isa('MongoDB::DocumentError') or $_->$_isa('MongoDB::WriteError');
+} catch {
+    $disbatch->tasks->update_one({_id => $oid, status => $result->{status}, node => $disbatch->{node}}, {'$set' => {complete => Cpanel::JSON::XS::false}});
+    $logger->logdie("Could not update task $task_id stdout/stderr after completion: $_")
+};
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+task_runner - run a single Disbatch task
+
+=head1 VERSION
+
+version 3.990
+
+=head1 SYNOPSIS
+
+  task_runner --plugin Disbatch::Plugin::Demo --task 565bc0d43fb6ecd1c8504492 --config etc/disbatch/config.json
+
+=head1 ARGUMENTS
+
+=over 2
+
+=item --config <string>
+
+Path to the JSON Disbatch config file.
+
+=item --task <string>
+
+The task's _id. Mandatory.
+
+=item --plugin <string>
+
+The name of the plugin to use. Mandatory.
+
+=item --gfs [<string>]
+
+Use the custom GridFS implementation to store task C<stderr> and C<stdout>. Default is to store them directly in the task document.
+
+While using GridFS can make analysing task output more complicated, we periodically have output that exceeds the maximum MongoDB document size.
+
+To turn this on for all tasks, add the argument C<--gfs> with no value. To turn it on for tasks with large C<stdout> and C<stderr>, use C<--gfs auto>.
+Both C<stdout> and C<stderr> will be stored in the task document if they will fit, otherwise C<stderr> will be stored in the task document if it will fit
+and C<stdout> in GridFS, and finally both with be stored in GridFS if C<stderr> will not fit.
+
+In the config file, this is disabled with C<"gfs": false>, enabled with C<"gfs": true>, and automatic with C<"gfs": "auto"> (Note that automatic is the Disbatch default).
+
+=item --quiet
+
+Suppress STDOUT and STDERR output at end (mainly for testing).
+
+=item --testing
+
+Do C<< require lib 'lib'; lib->import('lib'); >> before C<require Disbatch;>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Disbatch>
+
+L<Disbatch::Web>
+
+L<Disbatch::Roles>
+
+L<Disbatch::Plugin::Demo>
+
+L<disbatchd>
+
+L<disbatch.pl>
+
+L<disbatch-create-users>
+
+=head1 AUTHORS
+
+Ashley Willis <awillis@synacor.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Ashley Willis.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004

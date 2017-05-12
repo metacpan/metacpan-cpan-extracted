@@ -1,0 +1,474 @@
+#!/usr/bin/perl
+
+use 5.12.0;
+use warnings;
+
+use Data::Dumper;
+use Cpanel::JSON::XS;
+use File::Slurp;
+use Getopt::Long;
+use IO::Wrap;
+use LWP::UserAgent;
+use Pod::Usage;
+use Text::CSV_XS;
+use Text::Table;
+use Try::Tiny;
+
+my $url = 'http://localhost:8080';
+my $username;
+my $password;
+my $help = 0;
+my $config_file = '/etc/disbatch/config.json';
+my $ssl_ca_file;
+my $disable_ssl_verification = 0;
+my $collection;
+my $count = 0;
+my $terse = 1;
+my $pretty = 0;
+my $options;
+
+GetOptions(
+    'url|u=s'       => \$url,
+    'username|n=s'  => \$username,
+    'password=s'    => \$password,
+    'help'          => \$help,
+    'config=s'      => \$config_file,
+    'ssl_ca_file=s' => \$ssl_ca_file,
+    'disable_ssl_verification' => \$disable_ssl_verification,
+    'collection=s'  => \$collection,
+    'count'         => \$count,
+    'terse!'        => \$terse,
+    'pretty'        => \$pretty,
+    'options=s'     => \$options,
+);
+
+pod2usage(-verbose => 2, -exitval => 0) if $help;
+
+my $json = Cpanel::JSON::XS->new->utf8;
+
+my $ua_options = {};
+if (defined $ssl_ca_file) {
+    $ua_options->{ssl_opts}{SSL_ca_file} = $ssl_ca_file;
+} elsif ($disable_ssl_verification) {
+    $ua_options->{ssl_opts}{verify_hostname} = 0;
+} else {
+    # Note: the SSL settings are for MongoDB, but ideally if using SSL with MongoDB, it is also being used with the DCI
+    # try loading the config file, but don't fail if it doesn't exist
+    my $config = try { $json->relaxed->decode(scalar read_file $config_file) } catch { {} };
+    if (defined $config->{attributes}{ssl}) {
+        $ua_options->{ssl_opts} = $config->{attributes}{ssl};
+        $ua_options->{ssl_opts}{verify_hostname} = $ua_options->{ssl_opts}{SSL_verify_mode} if defined $ua_options->{ssl_opts}{SSL_verify_mode};
+    }
+}
+
+my $ua = LWP::UserAgent->new(%$ua_options);
+
+if (defined $username and defined $password) {
+    my ($host) = $url =~ qr{^https?://(.+?)(?:/|$)};
+    $ua->credentials($host, 'disbatch', $username, $password);
+    say "$host\t$username\t$password";
+} elsif (defined $username or defined $password) {
+    die "--username and --password must be used together\n";
+}
+
+my $command = shift @ARGV;
+if ($command eq 'plugins') {
+    get_plugins();
+} elsif ($command eq 'queues' or $command eq 'status') {
+    get_queues();
+} elsif ($command eq 'create-queue') {
+    post_queues();
+} elsif ($command eq 'update-queue') {
+    update_queue();
+} elsif ($command eq 'delete-queue') {
+    delete_queue();
+} elsif ($command eq 'create-task') {
+    post_task();
+} elsif ($command eq 'create-tasks') {
+    post_tasks();
+} elsif ($command eq 'search') {
+    post_search();
+} elsif ($command) {
+    die "Unknown command '$command'\n";
+} else {
+    pod2usage(1);
+}
+
+sub get_plugins {
+    my $response = $ua->get("$url/plugins");
+    if ($response->is_success) {
+        my $plugins = $json->decode($response->decoded_content);
+        say join "\n", @$plugins;
+    } else {
+        die "Error getting $url/plugins (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+sub get_queues {
+    my $response = $ua->get("$url/queues");
+    if ($response->is_success) {
+        my $queues = $json->decode($response->decoded_content);
+
+        my @fields = qw/ ID Plugin Name Threads Queued Running Completed /;
+        my $tl = Text::Table->new(map { { title => $_, align => 'auto' }, \' | ' } @fields);
+        for my $queue (@$queues) {
+            $tl->add(map { $queue->{lc $_} } @fields);
+        }
+
+        print $tl->title;		# ID                       | Plugin                                   | Name       | Threads | Queued | Running | Completed
+        print $tl->rule('-', '+');	# -------------------------+------------------------------------------+------------+---------+--------+---------+----------
+        say $tl->body;			# 56e1c2e1eb6af829182f4721 | Synacor::Migration::Plugins::Dummy::Task | dummy test |         | 0      | 0       | 0
+					# 56eade3aeb6af81e0123ed21 |                   Disbatch::Plugin::Demo |       demo | 0       | 0      | 0       | 0
+        say scalar(@$queues), ' total queues.';
+    } else {
+        die "Error getting $url/queues (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+sub post_queues {
+    my ($name, $plugin) = @ARGV;
+    my $response = $ua->post("$url/queues", { name => $name, plugin => $plugin });
+    if ($response->is_success) {
+        my $result = $json->decode($response->decoded_content);
+        say "Created queue $name: ", $result->{id}{'$oid'};
+    } else {
+        die "Error posting $url/queues (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+sub update_queue {
+    my $queue = shift @ARGV;
+    die "Must pass an even number of arguments as key/value pairs\n" if @ARGV %2;
+    my %data = @ARGV;
+
+    my $response = $ua->post("$url/queues/$queue", \%data);
+    if ($response->is_success) {
+        my $result = $json->decode($response->decoded_content);
+        if ($result->{'MongoDB::UpdateResult'}{modified_count}) {
+            say "Updated queue $queue: ", $json->encode(\%data);
+        } else {
+            say "No change to queue $queue: ", $json->encode(\%data);
+        }
+    } else {
+        die "Error posting $url/queues/$queue (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+sub delete_queue {
+    my ($queue) = @ARGV;
+    my $response = $ua->delete("$url/queues/$queue");
+    if ($response->is_success) {
+        my $result = $json->decode($response->decoded_content);
+        if ($result->{'MongoDB::DeleteResult'}{deleted_count} == 1) {
+            say "Deleted queue $queue";
+        } else {
+            die "Unknown response deleting queue $queue: ", $response->decoded_content;
+        }
+    } else {
+        die "Error deleting $url/queues/$queue (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+sub post_task {		# <queue> <key> <value> ...				# task params
+    my $queue = shift @ARGV;
+    die "Must pass an even number of arguments as key/value pairs\n" if @ARGV %2;
+    my %data = @ARGV;
+
+    @ARGV = ($queue, $json->encode([\%data]));	# yuck
+    post_tasks();
+}
+
+sub post_tasks {	# <queue> <json_array>					# JSON array of task params objects
+			# --collection <collection> <queue> <json_object>	# {filter: filter, params: params}
+    my ($queue, $data) = @ARGV;
+    die "Queue name not given\n" unless defined $queue;
+    my $full_url = "$url/tasks/$queue";
+    $full_url .= "/$collection" if defined $collection;
+    my $response = $ua->post($full_url, 'Content-Type' => 'application/json', Content => $data // '{}');
+    if ($response->is_success) {
+        my $result = $json->decode($response->decoded_content);
+        if ($result->{'MongoDB::InsertManyResult'}{inserted}) {
+            my $count = scalar @{$result->{'MongoDB::InsertManyResult'}{inserted}};
+            say "Created $count tasks in queue $queue";
+            say join "\n", map { $_->{_id}{'$oid'} } @{$result->{'MongoDB::InsertManyResult'}{inserted}};
+        } else {
+            say "No change to queue $queue: ";
+        }
+    } else {
+        die "Error posting $full_url (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+sub post_search {	# <filter>						# {filter: filter, options: options, count: count, terse: terse}
+    my ($filter) = @ARGV;
+
+    $filter = try { $json->decode($filter) } catch { die "Invalid filter is not JSON: '$filter'\n" } if defined $filter;
+    $options = try { $json->decode($options) } catch { die "Invalid --options is not JSON: '$options'\n" } if defined $options;
+
+    my $data = $json->encode({ filter => $filter, count => $count, terse => $terse, pretty => $pretty, options => $options });
+    my $response = $ua->post("$url/tasks/search", 'Content-Type' => 'application/json', Content => $data);
+    if ($response->is_success) {
+        if ($count) {
+            say $json->decode($response->decoded_content)->{count}, ' tasks';
+        } else {
+            say $response->decoded_content;	# Array of task Objects
+        }
+    } else {
+        die "Error posting $url/tasks/search (", $response->status_line, '): ', $response->decoded_content, "\n";
+    }
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+disbatch - CLI to the Disbatch Command Interface (DCI).
+
+=head1 VERSION
+
+version 3.990
+
+=head1 SYNOPSIS
+
+    disbatch [<arguments>] <command> [<command arguments>]
+
+=head2 ARGUMENTS
+
+=over 2
+
+=item --url <URL>
+
+URL for the DCI you wish to connect to. Default is C<http://localhost:8080>.
+
+=item --username <username>
+
+DCI username
+
+=item --password <password>
+
+DCI password
+
+=item --help
+
+Display this message
+
+=item --ssl_ca_file <ssl_ca_file>
+
+Path to the SSL CA file. Needed if using SSL with a private CA.
+
+=item --disable_ssl_verification
+
+Disables hostname verification if SSL is used.
+
+Only used if C<--ssl_ca_file> is not used.
+
+=item --config <config_file>
+
+Path to Disbatch config file. Default is C</etc/disbatch/config.json>.
+
+Only used if neither C<--ssl_ca_file> nor C<--disable_ssl_verification> is used.
+
+Note: the SSL settings in the Disbatch config file are for MongoDB, but ideally if using SSL with MongoDB, then it is also being used with the DCI.
+
+=back
+
+=head2 COMMANDS
+
+=over 2
+
+=item plugins
+
+List all allowed plugin names.
+
+  $ disbatch plugins
+  Disbatch::Plugin::Demo
+
+=item queues
+
+List all queues this disbatch server processes.
+
+  $ disbatch queues
+  ID                       | Plugin                 | Name | Threads | Queued | Running | Completed |
+  -------------------------+------------------------+------+---------+--------+---------+-----------+-
+  56eade3aeb6af81e0123ed21 | Disbatch::Plugin::Demo | demo | 0       | 0      | 0       | 0         |
+
+  1 total queues.
+
+Note: C<status> is an alias for C<queues>.
+
+=item create-queue <name> <plugin>
+
+Create a new queue.
+
+  $ disbatch create-queue fizz Disbatch::Plugin::Demo
+  Created queue fizz: 579a6735eb6af83e5a5297d5
+
+Error examples:
+
+  $ disbatch create-queue
+  Error posting http://localhost:8080/queues (400 Bad Request): {"plugin":"","error":"Unknown plugin"}
+  $ disbatch create-queue test
+  Error posting http://localhost:8080/queues (400 Bad Request): {"plugin":"","error":"Unknown plugin"}
+  $ disbatch create-queue test Disbatch::Plugin::Fake
+  Error posting http://localhost:8080/queues (400 Bad Request): {"plugin":"Disbatch::Plugin::Fake","error":"Unknown plugin"}
+
+=item update-queue <queue> <field> <value> [<field> <value> ...]
+
+Change a field's value in a queue.
+Valid fields are C<name>, C<plugin>, and C<threads>.
+
+  $ disbatch update-queue 579a6735eb6af83e5a5297d5 name buzz
+  Updated queue 579a6735eb6af83e5a5297d5: {"name":"buzz"}
+
+Error examples:
+
+  $ disbatch update-queue 579a6eaeeb6af87dc52d17e1
+  Error posting http://localhost:8080/queues/579a6eaeeb6af87dc52d17e1 (400 Bad Request): {"error":"no params"}
+  $ disbatch update-queue 579a6eaeeb6af87dc52d17e1 bad field
+  Error posting http://localhost:8080/queues/579a6eaeeb6af87dc52d17e1 (400 Bad Request): {"error":"unknown param","param":"bad"}
+  $ disbatch update-queue 579a6eaeeb6af87dc52d17e1 threads
+  Must pass an even number of arguments as key/value pairs
+  $ disbatch update-queue 579a6eaeeb6af87dc52d17e1 threads zero
+  Error posting http://localhost:8080/queues/579a6eaeeb6af87dc52d17e1 (400 Bad Request): {"error":"threads must be a non-negative integer"}
+  $ disbatch update-queue 579a6eaeeb6af87dc52d17e1 plugin Disbatch::Plugin::Fake
+  Error posting http://localhost:8080/queues/579a6eaeeb6af87dc52d17e1 (400 Bad Request): {"plugin":"Disbatch::Plugin::Fake","error":"unknown plugin"}
+
+  $ disbatch update-queue 579a7059eb6af87dcc6ef4e3 threads 0
+  Error posting http://localhost:8080/queues/579a7059eb6af87dcc6ef4e3 (400 Bad Request): {"MongoDB::UpdateResult":{"matched_count":0,"upserted_id":null,"write_concern_errors":[],"write_errors":[],"modified_count":0},"error":"MongoDB::UpdateResult=HASH(0x401de18)"}
+  $ disbatch update-queue 579a7059eb6af87dcc6ef4e3 name demo
+  Error posting http://localhost:8080/queues/579a7059eb6af87dcc6ef4e3 (400 Bad Request): {"MongoDB::UpdateResult":{"matched_count":0,"upserted_id":null,"write_concern_errors":[],"write_errors":[],"modified_count":0},"error":"MongoDB::UpdateResult=HASH(0x401de18)"}
+
+
+=item delete-queue <queue>
+
+Delete a queue.
+
+  $ disbatch delete-queue 579a6735eb6af83e5a5297d5
+  Deleted queue 579a6735eb6af83e5a5297d5
+  $ disbatch delete-queue fizz
+  Deleted queue fizz
+
+Error examples:
+
+  $ disbatch delete-queue 579a6eaeeb6af87dc52d17e1
+  Error deleting http://localhost:8080/queues/579a6eaeeb6af87dc52d17e1 (400 Bad Request): {"error":"MongoDB::DeleteResult=HASH(0x35344b8)","MongoDB::DeleteResult":{"deleted_count":0,"write_concern_errors":[],"write_errors":[]}}
+  $ disbatch delete-queue fizz
+  Error deleting http://localhost:8080/queues/fizz (400 Bad Request): {"error":"MongoDB::DeleteResult=HASH(0x3106520)","MongoDB::DeleteResult":{"deleted_count":0,"write_concern_errors":[],"write_errors":[]}}
+
+
+=item create-task <queue> [<key> <value> ...]
+
+Creates a task in the specified queue with the given params.
+
+  $ disbatch create-task 579a49d6eb6af83e5b4ceec1 user1 ashley user2 ashley
+  Created 1 tasks in queue 579a49d6eb6af83e5b4ceec1
+  579a67b3eb6af83e612d8c58
+
+Error examples:
+
+  $ disbatch create-task
+  Queue name not given
+
+
+=item create-tasks <queue> <array_of_params>
+
+Creates multiple tasks in the specified queue with the given params.
+
+  $ disbatch create-tasks 579a49d6eb6af83e5b4ceec1 '[{"fizz":1}]'
+  Created 1 tasks in queue 579a49d6eb6af83e5b4ceec1
+  579a67dbeb6af83e5930fc72
+
+Error examples:
+
+  $ disbatch create-tasks 579a7059eb6af87dcc6ef4e2
+  Error posting http://localhost:8080/tasks/579a7059eb6af87dcc6ef4e2 (400 Bad Request): {"error":"params must be a JSON array of task params"}
+  $ disbatch create-tasks 579a7059eb6af87dcc6ef4e2 '{}'
+  Error posting http://localhost:8080/tasks/579a7059eb6af87dcc6ef4e2 (400 Bad Request): {"error":"params must be a JSON array of task params"}
+  $ disbatch create-tasks 579a7059eb6af87dcc6ef4e2 '[]'
+  Error posting http://localhost:8080/tasks/579a7059eb6af87dcc6ef4e2 (400 Bad Request): {"MongoDB::InsertManyResult":{"acknowledged":1,"inserted":[],"write_concern_errors":[],"write_errors":[]},"error":"Unknown error"}
+  $ disbatch create-tasks 579ba809eb6af868d538f631 '[{"fizz":1},{"buzz":2}]'
+  Error posting http://localhost:8080/tasks/579ba809eb6af868d538f631 (400 Bad Request): {"error":"queue not found"}
+  $ disbatch create-tasks DNE '[{"fizz":1},{"buzz":2}]'
+  Error posting http://localhost:8080/tasks/fizzzzzzz (400 Bad Request): {"error":"queue not found"}
+
+
+=item create-tasks <queue> --collection <collection> <json_object>
+
+Creates multiple tasks in the specified queue with the given params, based off a filter from another collection.
+
+The C<json_object> must have fields C<filter> and C<params> whose values are Objects.
+
+In the below example, the C<users> collection is queried for all documents matching C<{migration: "foo"}>.
+These documents are then used to set task params, and the values from the query collection are accessed by prepending C<document.>.
+
+  $ disbatch create-tasks 56eade3aeb6af81e0123ed21 --collection users '{"filter":{"migration":"foo"},"params":{"user":"document.username","migration":"document.migration"}}'
+  Created 2 tasks in queue 56eade3aeb6af81e0123ed21
+  579b72a5eb6af86a8f5220f1
+  579b72a5eb6af86a8f5220f2
+
+Error examples:
+
+  $ disbatch --collection DNE create-tasks 579a7059eb6af87dcc6ef4e2 '{"filter":{"migration":"foo"},"params":{"user":"document.username"}}'
+  Error posting http://localhost:8080/tasks/test/DNE (400 Bad Request): {"MongoDB::InsertManyResult":{"acknowledged":1,"inserted":[],"write_concern_errors":[],"write_errors":[]},"error":"Unknown error"}
+
+=item search [<json_filter>] [--options <options>] [--count | --terse]
+
+Returns a JSON array of task documents matching the JSON query given. Note that blessed values may be munged to be proper JSON. Limit of C<100> documents returned.
+
+  $ disbatch search '{"params.migration":"foo"}'
+  [{"ctime":1469805221.996,"stderr":null,"status":-2,"mtime":1469805221.996,"_id":{"$oid":"579b72a5eb6af86a8f5220f1"},"node":null,"params":{"migration":"foo","user":"ashley"},"queue":{"$oid":"56eade3aeb6af81e0123ed21"},"stdout":null},{"ctime":1469805221.996,"stderr":null,"status":-2,"mtime":1469805221.996,"_id":{"$oid":"579b72a5eb6af86a8f5220f2"},"node":null,"params":{"migration":"foo","user":"matt"},"queue":{"$oid":"56eade3aeb6af81e0123ed21"},"stdout":null}]
+
+The option C<--pretty> can be used to have the response pretty-printed.
+
+If the option C<--count> is used, returns a count of the matching task documents instead.
+
+  $ disbatch search '{"params.migration":"foo"}' --count
+  2 tasks
+
+The option C<--options> can be used to pass additional options to L<MongoDB::Collection#find>. It's value is a JSON Object.
+Use C<--options '{"limit":20}'> to return only the first 20 documents (default is 100). This will fail if you try to set it above 100.
+
+The option C<--noterse> can be used to disable terse mode (on by default).
+If enabled, the GridFS id or C<"[terse mode]"> will be returned for C<stdout> and C<stderr> of each document.
+If disabled, the full content of C<stdout> and C<stderr> will be returned.
+
+Error examples:
+
+  $ disbatch search '[]'
+  Error posting http://localhost:8080/tasks/search (400 Bad Request): {"error":"filter and options must be name/value objects"}
+  $ disbatch search '"foo"'
+  Invalid filter is not JSON: '"foo"'
+
+=back
+
+=head1 SEE ALSO
+
+L<Disbatch>
+
+L<Disbatch::Web>
+
+L<Disbatch::Roles>
+
+L<Disbatch::Plugin::Demo>
+
+L<task_runner>
+
+L<disbatchd>
+
+L<disbatch-create-users>
+
+=head1 AUTHORS
+
+Ashley Willis <awillis@synacor.com>
+
+Matt Busigin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Ashley Willis.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004

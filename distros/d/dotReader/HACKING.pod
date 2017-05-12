@@ -1,0 +1,94 @@
+#                                        vim:ts=2:sw=2:et:sta:syntax=pod
+
+=pod
+
+=head1 Getting Setup
+
+First, you need Module::Build
+
+  cpan Module::Build
+
+Then create the Build script
+
+  perl Build.PL
+
+If you are missing dependencies, it will complain.  Use CPAN to add them
+and/or see the svn section below.
+
+Once all of the Wx, etc is setup, you can Build:
+
+  ./Build
+
+For more options:
+
+  ./Build help
+
+Test it (or use the C<./Build testall> target)
+
+  ./Build test
+  ./Build testgui
+
+And to run it:
+
+  ./Build run
+
+Or
+
+  ./run
+
+=head1 Patches
+
+Release tarballs can quickly become stale.  For best results, work with
+a checkout of the subversion repository.  See below.
+
+=head1 SVN
+
+The most current development is always in:
+
+  http://svn.dotreader.com/svn/dotreader/trunk/
+
+The directory tree should be roughly:
+
+  svn/ ................. open repository root
+  |-- dotreader/ ....... main dotreader development
+  |   |-- trunk/ ....... latest (Build.PL, t, lib, ...)
+  |   |-- tags/* ....... tagged versions (of trunk)
+  |   `-- branches/* ... experimental forks
+  |-- testing/ ......... misc experiments
+  `-- content/ ......... ? versioned test content
+
+For patches and updates to the dependencies, see
+
+  http://svn.dotreader.com/deps
+
+There you will find some directories defined with svn:externals.  These
+allow you to checkout all of the latest dependency code into just a few
+working copies and makes it more convenient for us to add or change
+dependencies.
+
+=head1 Directory Layout
+
+  ./ ................. archive or working-copy root (e.g. trunk)
+  |-- client/ ........ wx gui code
+  |-- inc/ ........... Build utilities (some testing junk too)
+  |-- lib/ ........... core modules
+  |-- prototype/ ..... experiments
+  |-- t/ ............. tests
+  |   |-- _gui/ ...... gui tests
+  |   |-- _sync/ ..... client/server tests
+  |   `-- */ ......... various categorized tests
+  |-- test_data/ ..... test input
+  |-- test_inc/ ...... test utility modules (hacks)
+  |-- test_packages/ . test books
+  |-- test_lib/ ...... test-specific modules (more formalized)
+  `-- util/ .......... command-line demo and utilities
+
+=head1 Coding Standards
+
+TODO
+
+=head1 Mailing Lists
+
+http://dotreader.com/mailman/listinfo
+
+=cut

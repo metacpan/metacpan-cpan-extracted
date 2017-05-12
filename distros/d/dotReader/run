@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+
+$perl = $^X;
+if($^O eq 'darwin') {
+  ($perl =~ m/wx/) or ($perl = 'wxPerl');
+}
+exec($perl, qw(-Ilib client/app.pl), @ARGV);
+

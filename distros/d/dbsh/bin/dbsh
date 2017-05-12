@@ -1,0 +1,166 @@
+#! /usr/bin/perl
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
+
+use strict;
+use lib '.';
+use FindBin;
+
+BEGIN {
+	unshift @INC,"$FindBin::Bin/../lib";
+	unshift @INC,"$FindBin::Bin/lib";
+	unshift @INC,"$FindBin::Bin";
+}
+
+use vars qw/$VERSION $left $right/;
+$VERSION = '0.01';
+
+use DBI;
+use Tk;
+use DBIx::SystemCatalog;
+use dbsh::Panel;
+
+require Tk::Font;
+require Tk::Listbox;
+require Tk::HList;
+require Tk::Dialog;
+require Tk::DialogBox;
+require Tk::Canvas;
+require Tk::Entry;
+require Tk::Optionmenu;
+require Tk::Menubutton;
+require Tk::Scrollbar;
+require Tk::Radiobutton;
+require Tk::Toplevel;
+require Tk::Frame;
+require Tk::Label;
+require Tk::Button;
+require Tk::DropSite;
+require Tk::DragDrop;
+
+use vars qw/$main/;
+
+$0 = 'dbsh';
+
+# main program
+
+sub REAPER {
+	wait;
+	$SIG{CHLD} = \&REAPER;
+}
+
+$SIG{CHLD} = \&REAPER;
+
+$main = new MainWindow;
+$main->title('Database Shell '.$VERSION);
+$main->appname('dbsh');  $main->iconname('dbsh');  $main->client('dbsh');
+$main->CmdLine();
+
+my $menubar = $main->Frame(-borderwidth => 2, -relief => 'raised')
+	->pack(-side => 'top', -fill => 'x');
+my $frame = $main->Frame()->pack(-side => 'top', -fill => 'both', -expand => 1);
+
+my $menuleft = $menubar->Menubutton(-text => 'Left', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+
+my $menufile = $menubar->Menubutton(-text => 'Operation', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+$menufile->command(-label => 'Exit', -command => \&exit, -underline => 1);
+
+my $menuright = $menubar->Menubutton(-text => 'Right', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+
+my $menuhelp = $menubar->Menubutton(-text => 'Help', -underline => 0)
+	->pack(-side => 'right', -padx => 2);
+$menuhelp->command(-label => 'About...', -command => sub { 
+		$main->messageBox(-icon => 'info', -type => 'OK', 
+			-title => 'About...', 
+			-message => 'Database Shell '.$VERSION."\n\n(c) 2001 by Milan Sorm <sorm\@pef.mendelu.cz>\n\nMany thanks to Jan Muller for good idea.");
+	}, -underline => 0);
+
+$left = new dbsh::Panel -in => $frame, -pack => { -side => 'left' }, 
+	-menubar => $menuleft;
+$right = new dbsh::Panel -in => $frame, -pack => { -side => 'right' },
+	-menubar => $menuright;
+
+my $statusbar = $main->Frame()->pack(-side => 'bottom', -fill => 'x');
+# $statusbar->Label(-text => 'F3 View   F4 Edit   F5 Copy   F6 RenMove   F7 Create   F8 Delete')->pack(-side => 'left');
+
+Tk::MainLoop();
+
+# subs
+
+sub Tk::Error {
+	my ($widget,$error,@locations) = @_;
+	$main->messageBox(-icon => 'error', -type => 'OK', 
+		-title => 'Tk error', 
+		-message => $error);
+	if (open F,">>/tmp/dbsh-error.log") {
+		print F "Error at ".localtime().":\n";
+		print F "\tWidget:\t\t".$widget."\n";
+		print F "\tDescription:\t".$error."\n";
+		print F "\tLocations:\t".join "\n\t\t\t",@locations;
+		print F "\n\n";
+		close F;
+	}
+}
+
+sub mouse_hour {
+	my $w = shift;  $w->configure(-cursor => 'watch');  $w->update;
+}
+
+sub mouse_move {
+	my $w = shift;  $w->configure(-cursor => 'fleur');  $w->update;
+}
+
+sub mouse_normal {
+	my $w = shift;  $w->configure(-cursor => '');  $w->update;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+dbsh - Database shell like file manager over database
+
+=head1 FORMAT
+
+	dbsh
+
+=head1 SYNOPSIS
+
+	dbsh
+
+=head1 DESCRIPTION
+
+dbsh using DBIx::SystemCatalog (currently supported
+basicly all current DBD drivers, some better support for PostgreSQL and
+quite well support for Oracle) for managing database like file manager.
+
+=head1 VERSION
+
+0.01
+
+=head1 TODO
+
+All.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 AUTHOR
+
+(c) 2001 Milan Sorm, sorm@pef.mendelu.cz
+at Faculty of Economics,
+Mendel University of Agriculture and Forestry in Brno, Czech Republic.
+
+Special thanks for Bc. Jan Muller (good idea and betatester).
+
+=head1 SEE ALSO
+
+perl(1); DBI(3), Tk(3), DBIx::SystemCatalog(3).
+
+=cut
+

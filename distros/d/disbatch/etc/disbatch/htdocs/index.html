@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Disbatch Queue Browser">
+    <meta name="author" content="Ashley Willis">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>Disbatch Queue Browser</title>
+
+    <script src="/js/editablegrid.js"></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_renderers.js" ></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_editors.js" ></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_validators.js" ></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_utils.js" ></script>
+    <!-- [DO NOT DEPLOY] - -> <script src="/js/editablegrid_charts.js" ></script -->
+    <link rel="stylesheet" type="text/css" href="/css/editablegrid.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="/css/simple.css" media="screen"/>
+    <!-- Bootstrap core CSS -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <script src="/js/queues.js"></script>
+    <style>
+//      body { font-family:'lucida grande', tahoma, verdana, arial, sans-serif; font-size:11px; }
+      h1 { font-size: 15px; }
+      a { color: #548dc4; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      table.testgrid { border-collapse: collapse; border: 1px solid #CCB; width: 800px; }
+      table.testgrid td, table.testgrid th { padding: 5px; border: 1px solid #E0E0E0; }
+      table.testgrid th { background: #E5E5E5; text-align: left; }
+      input.invalid { background: red; color: #FDFDFD; }
+      input { color: black; line-height: normal; }
+
+      body { padding-top: 50px; }
+      .starter-template { padding: 40px 15px; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Disbatch</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="starter-template">
+        <h1>Queues</h1>
+        <div id="tablecontent-jsdata"></div>
+        <h1>Disbatch Execution Nodes</h1> (if blank then no max threads for the DEN)
+        <div id="nodes-table"></div>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target=".create-new-queue-modal-sm">New Queue</button>
+        <div class="modal fade create-new-queue-modal-sm" tabindex="-1" role="dialog" aria-labelledby="createNewQueue">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Create new queue</h4>
+              </div>
+              <div class="modal-body">
+                <form class="form-horizontal" id="queue-form">
+                  <div class="form-group">
+                    <label for="inputName" class="col-sm-3 control-label">Name</label>
+                    <div class="col-sm-9">
+                      <!-- FIXME: require some sort of input for new queue name -->
+                      <input type="text" class="form-control number" id="inputName" placeholder="Name">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputType" class="col-sm-3 control-label">Type</label>
+                    <div class="col-sm-9">
+                      <!-- input type="text" class="form-control" id="inputType2" placeholder="Type" -->
+                      <select class="form-control" id="inputType">
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="document.getElementById('queue-form').reset()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newQueue()">Create</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-default" onclick="loadQueuesAndNodes()">Refresh</button>
+      </div>
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+  </body>
+</html>

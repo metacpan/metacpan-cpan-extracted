@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Generated at Sat Dec 19 14:06:13 2015 with Daemon::Control 0.001008
+
+### BEGIN INIT INFO
+# Provides:          disbatch-web
+# Required-Start:    $syslog $remote_fs
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: disbatch-web
+# Description:       Disbatch Command Interface daemon
+### END INIT INFO`
+
+
+
+
+
+if [ -x /etc/disbatch/disbatch-web-init ];
+then
+    /etc/disbatch/disbatch-web-init $1
+else
+    echo "Required program /etc/disbatch/disbatch-web-init not found!"
+    exit 1;
+fi

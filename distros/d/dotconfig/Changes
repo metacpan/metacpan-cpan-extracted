@@ -1,0 +1,13 @@
+Revision history for dotconfig
+
+0.04  2015-12-04 10:17:26 JST
+        - add deps
+
+0.03  2015-12-02 11:00:16 JST
+        - fight over the dist name
+
+0.02  2015-12-02 10:57:12 JST
+        - fix dist name
+
+0.01  2015-12-02 10:33:40 JST
+        - Initial release

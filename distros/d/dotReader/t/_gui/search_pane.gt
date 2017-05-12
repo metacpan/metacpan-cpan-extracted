@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use inc::testplan(1, 12);
+use test_inc::loginit;
+
+use lib 'inc';
+use dtRdrTestUtil::ABook;
+
+BEGIN { use_ok('dtRdr::Search::Book') };
+
+my $book = ABook_new_1_0('test_packages/search_test/book.xml');
+
+require dtRdrTestUtil::GUI;
+
+set_testing( scalar(@ARGV));
+
+# here we can load the book before MainLoop because we don't care about
+# annotations
+the_package()->_main_frame->bv_manager->open_book($book);
+
+my $saw_bv = 0;
+set_dosub(sub {
+  my $frame = the_package()->_main_frame;
+  my $bvm = $frame->bv_manager;
+  my $sp = $frame->sidebar->search;
+  my $bv = $bvm->book_view;
+  $bv and ($saw_bv++);
+  $frame->menu_view_tab_search;
+  $sp->text_ctrl->SetValue('bob');
+  # TODO learn to hit ENTER
+});
+
+run();
+ok($saw_bv, 'got a view');
+
+done;
+# vim:ts=2:sw=2:et:sta

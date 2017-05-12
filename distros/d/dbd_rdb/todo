@@ -1,0 +1,3 @@
+- blobs
+- getting metdata info: $dbh->table_info, $dbh->type_info_all
+- overriding datatypes during prepare

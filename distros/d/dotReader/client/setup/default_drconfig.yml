@@ -1,0 +1,11 @@
+--- 
+book_handler: {}
+library:
+  -
+    type: YAMLLibrary
+    uri: default_library.yml
+module: []
+
+user_info: {}
+
+version: 0.010

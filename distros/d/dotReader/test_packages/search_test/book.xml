@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<pkg:package name="" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:publisher>Osoft</pkg:publisher>
+  <pkg:content>
+    <pkg:outlineMarker OutlineName="root" id="root" title="root node" render="false">
+      <pkg:outlineMarker OutlineName="switcharoo" id="0" visible="false">
+        switcharoo foo
+      </pkg:outlineMarker>
+      <pkg:outlineMarker OutlineName="INTRO" id="1" >
+        <h1>Intro</h1>
+        <p>intro joe</p> <p>sue jim</p>
+        <pkg:outlineMarker OutlineName="first" id="1.1">
+          <h1>First</h1>
+          <p>first bob</p>
+        </pkg:outlineMarker>
+        <pkg:outlineMarker OutlineName="second" id="1.2">
+          <h1>Second</h1>
+          <p>second bob joe</p> <p>Sue joe joe bob</p>
+        </pkg:outlineMarker>
+      </pkg:outlineMarker><!-- end INTRO -->
+      <pkg:outlineMarker OutlineName="whee" id="2" renderchildren="false">
+        <h1>Whee</h1>
+        <p>You are here.</p>
+        <pkg:outlineMarker OutlineName="first second" id="2.1">
+          <h1>First the Second</h1>
+          <p>first second bob</p>
+        </pkg:outlineMarker>
+        <pkg:outlineMarker OutlineName="second second" id="2.2">
+          <h1>Second the Second</h1>
+          <p>second second bob joe</p> <p>Sue sued joe sue joe bob</p>
+        </pkg:outlineMarker>
+      </pkg:outlineMarker><!-- end whee -->
+    </pkg:outlineMarker><!-- end root -->
+  </pkg:content>
+</pkg:package>
+<!-- vim:ts=2:sw=2:et:sta
+-->

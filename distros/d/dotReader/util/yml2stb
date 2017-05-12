@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+use YAML::Syck;
+use Storable;
+
+my $yfile = shift(@ARGV) or die "need yaml file";
+my $sfile = $yfile . '.stb';
+$YAML::Syck::ImplicitUnicode = 1;
+my $data = YAML::Syck::LoadFile($yfile);
+warn "loaded $data";
+store($data, $sfile);

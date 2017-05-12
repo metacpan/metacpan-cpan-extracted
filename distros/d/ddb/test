@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use lib '.';
+use ddb;
+
+my ($db_filename, $preserve);
+
+if (@ARGV) {
+  $db_filename = shift(@ARGV);
+  $preserve = 1;
+} else {
+  $db_filename = "/tmp/test.$$.ddb";
+  $preserve = 0; 
+}
+
+my $db = tie my %db, ddb, $db_filename, 19;
+
+$SIG{INT} = sub {
+  untie %db;
+  $preserve or unlink($db_filename);
+  exit(1);
+};
+
+select(STDOUT);
+$| = 1;
+
+sub ok {
+  my ($db, $num, $ok) = @_;
+  if ($num == 0) {
+    print STDOUT "1..$ok\n";
+    return;
+  }
+  $ok or print "not ";
+  print STDOUT "ok $num\n";
+  $ok or $db->die("not ok $num");
+} 
+
+$db->test(\%db, \&ok);
+
+untie %db;
+$preserve or unlink($db_filename);
+exit 0;

@@ -1,0 +1,2 @@
+- Fill test.pl with tests.
+- Possibility to pass a filehandle as a parse parameter (parse_to_file), to instruct the system to use it for output, instead of using the return value.

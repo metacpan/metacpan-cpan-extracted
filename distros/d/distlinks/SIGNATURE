@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9e4d1a953f3ef35838d245eb7bb52e082bc309d9 Changes
+SHA1 784451c1d413bfb61750b70ae192ea467fb84ca9 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 d50710b6dacb18a7cfeeb1e7f7f54d753dd8133e META.json
+SHA1 f4e94d3fc9cc54d932a0c6be20eb3de221f0f100 META.yml
+SHA1 d44acf44776cfb38e872e003e92545c03f0fc52e Makefile.PL
+SHA1 ec40c8d376ff483bb1459577d567c04422561d49 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 f63dbe02eaf1a2be1cedbe7cc0249e961daa15ef debian/control
+SHA1 b2e1ec8aaef14910909b1e2e4137c6c0dc85f458 debian/copyright
+SHA1 96e0dd22583aaefd7d06bfa1670bbedfa2cc06d3 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 eabecb5e038074036950b8b2255913086c76d177 debian/watch
+SHA1 caf3fe27707d3661fc04415eb66dbb03a18db39a devel/DBIarray.pm
+SHA1 559e8134037c189d7449db030e5eef4720cf303e devel/PodLinkCheck.pm
+SHA1 db27b62365e977a1990644ce1094aac616212e86 devel/circdir.pl
+SHA1 da480e90c2e19902187f6a5db39185fcf85ee595 devel/filetype.pl
+SHA1 3cec40adfc8795a492eaccd3b04605eeddd64bb8 devel/foo.html
+SHA1 1a6bc14a39ac6b88f62587bf48618c2e44a63fa8 devel/grep-usr-doc-html.pl
+SHA1 9bcd82f32f7c97e70f4853bc51b01c42bdff00aa devel/head.pl
+SHA1 a3a24eceea11d3d28c94ee4726cb27709e01268a devel/regexp.pl
+SHA1 63eab8375278b3473c66ce8d1525ad02fb620c66 devel/symlink.pl
+SHA1 4df4941cffa04c812ba5031eaaeb9b843f81f912 devel/unused.pl
+SHA1 8925d807307b4415bd2bc1e45e99e831e5bf0086 devel/url.pl
+SHA1 53fccbf927bad90b00c2fb9659fe36df5ffd5596 distlinks
+SHA1 3daa517d12c196fee368ef5a7d4d12a53eb9803d junk/URIFind.pm
+SHA1 8161d2c51cdb49b13741278f0e6e508badcb2f71 lib/App/Distlinks.pm
+SHA1 8eb586ca1536282a7977cac9848e8c75b4dc778b lib/App/Distlinks/DBI.pm
+SHA1 2d8bd80ed489adb42308aa2921e16c04af976bdb lib/App/Distlinks/FileFind.pm
+SHA1 e19da3b4906c553324667379c7353a0b7d357f6b lib/App/Distlinks/URInFiles.pm
+SHA1 df31e00edc15d49915cb3b348223e43c78f959eb lib/App/Distlinks/URIterator.pm
+SHA1 4c973457a774ec485f4a26bf81f9d1c2ee412d14 t/DBI.t
+SHA1 259e2d2399dccea117d0da7d73f3a060fd3a882c t/Distlinks.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 bea93dae02363f93392b5f1839a9aa4346c3c587 t/URInFiles.t
+SHA1 e406ef99f57e917c005f29c99c29a0a9064740cc t/URIterator.t
+SHA1 161c33312e766bba95ef189a88aa707b14bc4ece t/bom-utf16le.txt
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 42c04ae557ab86d3488c647ea17bd37cd2bd7d6a xt/0-exe-shebang.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 f1c935ab99ee8cc82296292139a6e556c494826b xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 14c7c532c545a1914623532ac960f415b93c7d7a xtools/my-check-spelling.sh
+SHA1 f3e50b961e575e060e35ddc4d94c7b3e6101d660 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 830acfc76ae9239a2c36143c437a3ec7c6736a0a xtools/my-pc.sh
+SHA1 f90084e1d6f95abb12eea896cd1cc850402d7726 xtools/my-wunused.sh
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b xtools/my_pod2html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFTOKPOLFMCIV9q3ToRAjEKAJ437mn1rjWqWBpBmqr80E3/e+5WGwCfQl1l
+oIG2EO7kxK1l7BEI/mBoHuE=
+=+gEW
+-----END PGP SIGNATURE-----

@@ -1,0 +1,18 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: this is note 'AAAA'
+context: ~
+end: ~
+id: AAAA
+node: page1
+public: 
+  owner: joe
+references: 
+  - AAA
+  - AA
+  - A
+revision: 0
+selected: ~
+start: ~
+title: aaaa
+type: dtRdr::Note

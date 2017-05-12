@@ -1,0 +1,10 @@
+#!/usr/bin/env perl 
+
+use 5.12.0;
+use warnings;
+
+use lib 'lib';
+use Disbatch::Web;
+
+Disbatch::Web::init(config_file => 'etc/disbatch/config.json');
+Disbatch::Web::limp({workers => 10});

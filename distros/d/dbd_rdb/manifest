@@ -1,0 +1,13 @@
+MANIFEST
+Changes         changes since last version
+Makefile.PL	The Makefile generator
+TODO
+README
+dbdimp.c        implementaion of driver functions using routines from DBDSQL
+dbdimp.h        driver private data structure
+sql.h           SQL structures cloned and change a little bit from sys$libarary
+dbdsql.sqlmod   the actual SQL-code using the SQLMOD language
+rdb.h           include for RDB.XS 
+rdb.pm          the actual module calling routines in DBDIMP via RDB.XSI and RDB.XS
+rdb.xs          the "real" XS is RDB.XSI which itself is created during make
+test.pl         some tests (usable as examples too)

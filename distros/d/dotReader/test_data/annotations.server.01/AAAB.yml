@@ -1,0 +1,18 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: this is note 'AAAB'
+context: ~
+end: ~
+id: AAAB
+node: page1
+public: 
+  owner: bob
+references: 
+  - AAA
+  - AA
+  - A
+revision: 0
+selected: ~
+start: ~
+title: aaab
+type: dtRdr::Note

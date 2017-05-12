@@ -1,0 +1,6 @@
+Revision history for Perl extension DCLPod::Html.
+
+0.01  Tue Jun 22 13:20:06 2004
+	- original version; created by h2xs 1.22 with options
+		-AXf -n DCLPod::Html -b 5.5.2
+

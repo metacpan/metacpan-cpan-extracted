@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+use strict;
+use lib qw(lib);
+use Locale::TextDomain qw (video.dvdrip);
+
+use Gtk2;
+use Gtk2::Helper;
+
+main: {
+    #-- find splash file
+    my $splash_lang_file = __"splash.en.png";
+    my $file;
+    foreach my $INC (@INC) {
+        $file = "$INC/Video/DVDRip/$splash_lang_file";
+        last if -e $file;
+        $file = "";
+    }
+
+    #-- exit silently if not found
+    exit if !$file;
+
+    #-- build Gtk splash window
+    Gtk2->init;
+    my $win       = Gtk2::Window->new("toplevel");
+    my $image     = Gtk2::Image->new_from_file($file);
+    my $event_box = Gtk2::EventBox->new;
+
+    $win->set_keep_above(1);
+    $win->set_decorated(0);
+    $win->set_position("center");
+
+    $event_box->add($image);
+    $event_box->signal_connect(
+        button_release_event => sub { Gtk2->main_quit }
+    );
+
+    $win->add($event_box);
+    $win->show_all;
+
+    #-- exit on input or hup on STDIN
+    Gtk2::Helper->add_watch( 0, "in", sub {
+        Gtk2->main_quit
+    });
+
+    #-- show splash window
+    Gtk2->main;
+}

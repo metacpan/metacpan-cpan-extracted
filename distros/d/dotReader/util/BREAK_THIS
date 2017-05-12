@@ -1,0 +1,9 @@
+# vim:ts=2:sw=2:et:sta:syntax=perl
+
+# just a stupid little hack not worth being a module
+
+# call as:
+#  do('util/BREAK_THIS') or die;
+my ($cp, $cl) = (caller(1))[0,2];
+die "\n\nBREAK_THIS: '$cp' line $cl tell me if this breaks! -- ",
+  join(" line ", (caller(0))[0,2]), "\n";

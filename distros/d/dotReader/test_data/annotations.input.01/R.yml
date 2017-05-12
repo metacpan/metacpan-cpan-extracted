@@ -1,0 +1,15 @@
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: "the note in a short book this is"
+context: ~
+create_time: 1173340731
+end: 30
+id: R
+mod_time: ~
+node: page1
+revision: 0
+selected: 
+  - in a Short Book
+start: 29
+title: A note in a Short Book
+type: dtRdr::Note
+

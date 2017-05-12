@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+use File::Temp qw(tempfile);
+my $spec    = '';
+my $delay   = 0;
+my $verbose = 0;
+GetOptions(
+    'script|s=s@' => sub { $spec .= "run q!$_[1]!;\n" },
+    'exec|e=s@'   => sub { $spec .= "$_[1];\n" },
+    'define|f=s%' => sub { $spec  = "define q!$_[1]!, q!$_[2]!;\n$spec" },
+    'delay|d'     => sub { $delay = 1 },
+    'verbose|v'   => sub { $verbose++ }
+);
+$spec = "define 'verbose', $verbose;\n$spec";
+my ($fh, $filename) = tempfile();
+print $fh $spec;
+close $fh or die "can't close $filename: $!\n";
+my $arg = $filename;
+
+# Horrible hack to pass some options to dip.pm during exec(). 'delay'
+# is the one option that cannot be given in the dip script, since it
+# affects when the dip script is being evaluated.
+$arg = "-delay,$arg" if $delay;
+my $cmd = "$^X -Mdip='$arg' @ARGV";
+print "$cmd\n" if $verbose;
+exec $cmd;
+
+=pod
+
+=for stopwords DTrace
+
+=for test_synopsis 1;
+__END__
+
+=head1 NAME
+
+dip - Dynamic instrumentation like DTrace, using aspects
+
+=head1 SYNOPSIS
+
+    # run a dip script from a file; pass perl switches after the '--'
+    $ dip -s toolkit/count_new.dip -- -S myapp.pl
+
+    # run an inline dip script
+    $ dip -e 'before { count("constructor", ARGS(1), ustack(5)); $c{total}++ }
+        call "URI::new"' test.pl
+
+    # a more complex dip script
+    $ cat quant-requests.dip
+    # quantize request handling time, separated by request URI
+    before { $ts_start = [gettimeofday] }
+        call 'Dancer::Handler::handle_request';
+    after { quantize ARGS(1)->request_uri => 10**6*tv_interval($ts_start) }
+        call qr/Dancer::Handler::handle_request/;
+    $ dip -s request-quant.dip test.pl
+    ...
+    /
+           value  ------------------ Distribution ------------------ count
+            1024 |                                                   0
+            2048 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    95
+            4096 |@@                                                 4
+            8192 |                                                   0
+           16384 |@                                                  1
+           32768 |                                                   0
+
+    /login
+           value  ------------------ Distribution ------------------ count
+             512 |                                                   0
+            1024 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                70
+            2048 |@@@@@@@@@@@@@@@                                    30
+            4096 |                                                   0
+
+    # The next example relies on Aspect::Library::Profiler, so
+    # if something goes wrong, you need to look in the Aspect modules.
+    $ dip -e 'aspect Profiler => call qr/^Person::set_/' myapp.pl
+
+=head1 NOTE
+
+This is the documentation for the C<dip> program. If you are looking
+for the documentation on the C<dip> module, use C<perldoc dip.pm> or
+C<man 3 dip>.
+
+=head1 DESCRIPTION
+
+C<dip> is a dynamic instrumentation framework for troubleshooting Perl
+programs in real time. C<dip> can provide fine-grained information,
+such as a log of the arguments with which a specific function is being
+called.
+
+Please see the documentation of the L<dip> module for more information
+(C<perldoc dip.pm>).
+
+=head1 COMMANDS
+
+=over 4
+
+=item -s, --script
+
+Takes a path to the dip script that should be run. This and the
+C<--exec> option can be given several times and interleaved; they will
+be executed in the given order. For example:
+
+    dip -s foo.dip -e 'before { say "Hi" } call "Baz::new"' -s baz.dip
+
+will result in the following code:
+
+    run q!foo.dip!;
+    before { say "Hi" } call "Baz::new";
+    run q!baz.dip!;
+
+=item -e, --exec
+
+Expects a dip script to be passed inline, much like C<perl -e> expects
+an inline program.
+
+=item -d, --delay
+
+Tells L<dip> not to activate the instrumentation at the beginning of
+the program. Instead the program to be instrumented should activate it
+manually using:
+
+    $dip::dip && $dip::dip->();
+
+This is useful if your program loads other code that should be
+instrumented at runtime. For example, to test a web application that
+uses Plack you might use:
+
+    use Plack::Util;
+    use Plack::Test;
+    use HTTP::Request;
+
+    test_psgi
+        app => Plack::Util::load_psgi('mywebapp.pl'),
+        client => sub {
+            my $cb = shift;
+            # now we're sure that mywebapp.pl has been loaded
+            $dip::dip && $dip::dip->();
+            # ... now make requests and test the responses ...
+        };
+
+=item -v, --verbose
+
+This option can be given several times; it will be available to the
+instrumentation code as well. In verbose mode, C<dip> prints the
+command that is actually used to instrument the target program.
+
+=item -f, --define
+
+With this option you can pass values to the dip scripts. This option
+can be given several times and each time expects an argument of the
+form C<key=value>. In the instrumentation code, these options are
+available in C<%opt>.
+
+=back
+
+=head1 SEE ALSO
+
+L<dip>
+
+=head1 AUTHOR
+
+The following person is the author of all the files provided in
+this distribution unless explicitly noted otherwise.
+
+Marcel Gruenauer <marcel@cpan.org>, L<http://perlservices.at>
+
+=head1 COPYRIGHT AND LICENSE
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+This software is copyright (c) 2011 by Marcel Gruenauer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

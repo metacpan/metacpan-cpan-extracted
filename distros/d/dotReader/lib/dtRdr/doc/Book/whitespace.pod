@@ -1,0 +1,107 @@
+#                                        vim:ts=2:sw=2:et:sta:syntax=pod
+
+=pod
+
+=head1 NAME
+
+dtRdr::doc::Book::whitespace - issues with whitespace
+
+=head1 Synopsis
+
+Weird things happen when whitespace doesn't count, but sort of counts.
+
+The annotations rely on a reliable character position, which can be very
+different from byte offset due to character encoding and whitespace
+collapses.  Thus, we have to establish conventions for whitespace which
+can be consistently applied in all of these situations.
+
+=head1 All your spaces are belong to one position.
+
+The general rule is that any amount of whitespace, whether spanning a
+tag or not, is treated a single space character.
+
+=head1 Nesty Books
+
+This becomes a little difficult with book formats that contain
+(rendered) nested content nodes.  Because of these types of books, a
+position needs to be able to map from global to local so that the
+position in a parent can be calculated given the position in a child.
+See L<dtRdr::doc::Book::annotree> for "math is fun."
+
+As for whitespace, we have to adopt a convention that a space at the end
+or beginning of a node needs to belong somewhere.  In these examples,
+I'll use square brackets to represent the opening and closing of node
+xml tags.
+
+  [a[b][c[d]]]
+  [a [b][c[d]]]
+  [ a [b][c[d]]]
+  [ a[ b][c[d] ] ]
+
+The above are not intended to be necessarily equivalent.  Just
+representative situations.
+
+Because lots of linebreaks and/or indentation from manual editing and/or
+conversion tools is so common, the situation almost always looks like
+this in reality.
+
+  [ a [ b ] [ c [ d ] ] ]
+
+This should basically reduce into the following:
+
+  [a [b ][c [d ]]]
+
+Note that:
+
+=over
+
+=item 1
+
+no node starts with a space
+
+=item 2
+
+there are no consecutive spaces, regardless of tag boundaries
+
+=back
+
+This convention is important because it needs to be shared between the
+book base class (which does the annotation-insertion xml munging) and
+the individual book plugins (which build the annotation offset table to
+allow for position math.)
+
+I still need to prove it, but I believe that even this should be
+equivalent to the canonical example above.
+
+  [ a[ b][ c[ d] ]]
+
+And, to be pragmatic, this is not really worth chasing, since nested
+content nodes which are accessible both individually and from within the
+parent is an impossible-to-resolve-into-a-pagewise-reader concept.
+
+=head1 Non-breaking space
+
+Nonbreaking space is treated as a space and collapsed.  Thus " &nbsp; "
+is equivalent to " ".  This is because a given html widget may or may
+not pass the space (e.g. from get_selection()) is a plain space or 0xA0
+(NOTE that if it does, the widget shim should replace it with a plain
+space at the get_selection() call.)
+
+Not sure how to deal with this yet.
+
+  http://en.wikipedia.org/wiki/Non-breaking_space
+  U+00A0 -- is just &nbsp;/&#160;
+  U+202F -- narrow (?)
+  U+FEFF -- zero-width (but has issues)
+  U+2060 -- word-joiner (replaces FEFF)
+
+others:
+
+  http://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+  ensp U+2002 (8194) -- en space [1]
+  emsp U+2003 (8195) -- em space [2]
+  thinsp U+2009 (8201) -- thin space [3]
+  zwnj U+200C (8204) -- zero width non-joiner
+  zwj U+200D (8205) -- zero width joiner
+
+=cut

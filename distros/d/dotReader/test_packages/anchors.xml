@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+    <pkg:package name="anchors test" revision="1.0"
+      xmlns:pkg="http://osoft.com/package"
+      xmlns:books="http://osoft.com/book">
+      <pkg:author>Perl Community</pkg:author>
+      <pkg:publisher>Osoft</pkg:publisher>
+      <pkg:content>
+        <pkg:outlineMarker OutlineName="Perl 5.8.6 Documentation" id="root" title="" render="false">
+    
+<pkg:outlineMarker OutlineName="perl - Practical Extraction and Report Language" id="lib_Pod_perl_html"><table border="0" cellpadding="3" cellspacing="0" width="100&#37;"><tr><td class="block" valign="middle"><big><strong><span class="block">&#160;perl - Practical Extraction and Report Language</span></strong></big></td></tr></table>
+<a name="__index__"></a>
+<ul><li><a href="lib_Pod_perl_html#name">NAME</a></li><li><a
+href="lib_Pod_perl_html#synopsis">SYNOPSIS</a></li>
+</ul>
+
+ <pkg:outlineMarker OutlineName="NAME" id="lib_Pod_perl_html_name">
+  <h1><a name="name">NAME</a></h1>
+<p>perl - Practical Extraction and Report Language</p>
+
+
+ </pkg:outlineMarker>
+ 
+ <pkg:outlineMarker OutlineName="SYNOPSIS" id="lib_Pod_perl_html_synopsis">
+  <h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>perl</strong> [&#160;<strong>-sTuU</strong>&#160;]
+[&#160;<strong>-hv</strong>&#160;]&#160;[&#160;<strong>-V</strong>[:<em>configvar</em>]&#160;]
+[&#160;<strong>-cw</strong>&#160;]&#160;[&#160;<strong>-d</strong>[:<em>debugger</em>]&#160;]&#160;[&#160;<strong>-D</strong>[<em>number/list</em>]&#160;]
+[&#160;<strong>-pna</strong>&#160;]&#160;[&#160;<strong>-F</strong><em>pattern</em>&#160;]&#160;[&#160;<strong>-l</strong>[<em>octal</em>]&#160;]&#160;[&#160;<strong>-0</strong>[<em>octal</em>]&#160;]
+[&#160;<strong>-I</strong><em>dir</em>&#160;]&#160;[&#160;<strong>-m</strong>[<strong>-</strong>]<em>module</em>&#160;]&#160;[&#160;<strong>-M</strong>[<strong>-</strong>]<em>'module...'</em>&#160;]
+[&#160;<strong>-P</strong>&#160;] [&#160;<strong>-S</strong>&#160;]
+[&#160;<strong>-x</strong>[<em>dir</em>]&#160;]
+[&#160;<strong>-i</strong>[<em>extension</em>]&#160;]
+[&#160;<strong>-e</strong>&#160;<em>'command'</em>&#160;]&#160;
+&#160;&#160;&#160;&#160;[&#160;<strong>--</strong>&#160;]&#160;[&#160;<em>programfile</em>&#160;]&#160;[&#160;<em>argument</em>&#160;]...</p>
+ </pkg:outlineMarker>
+ </pkg:outlineMarker>
+ </pkg:outlineMarker>
+</pkg:content>
+</pkg:package>

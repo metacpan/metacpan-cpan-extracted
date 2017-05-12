@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<pkg:package name="Indexing Check" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+<pkg:content>
+<pkg:outlineMarker OutlineName="A" id="A" visible="true"
+>©<pkg:outlineMarker OutlineName="B" id="B" visible="true"
+>&#8482;</pkg:outlineMarker><!-- B is the '™' (trademark)
+--><pkg:outlineMarker OutlineName="C" id="C" visible="true"
+>®</pkg:outlineMarker><!-- C
+--></pkg:outlineMarker><!-- A -->
+</pkg:content>
+</pkg:package>

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use ddb;
+
+if (@ARGV < 1) {
+  print STDERR "Usage: $0 file.ddb\n";
+  exit 1;
+}
+
+my $show_step = 100;
+
+my $db_filename = shift(@ARGV);
+-e $db_filename or die "$0: $db_filename: No such file or directory\n";
+my $db = tie %db, ddb, $db_filename or die "$0: $db_filename: $!\n";
+
+$db->repair(\&ddb::show_status);
+
+untie %db;
+exit 0;

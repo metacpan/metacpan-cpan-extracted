@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+# pod_cover and Test::Pod::Coverage are a bit of a pain
+# ./Build testpodcoverage needs a --test-files option?
+
+use Test::More "no_plan";
+use Test::Pod::Coverage ();
+
+my @files = @ARGV;
+
+foreach my $file (@files) {
+  my $package = $file;
+  if($package =~ s#^lib/+##) {
+    require lib; lib->import('lib');
+  }
+  $package =~ s#/+#::#g;
+  $package =~ s/\.pm$//;
+  Test::Pod::Coverage::pod_coverage_ok($package);
+}
+
+# vim:ts=2:sw=2:et:sta

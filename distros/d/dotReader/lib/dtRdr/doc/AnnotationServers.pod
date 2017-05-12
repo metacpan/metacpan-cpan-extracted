@@ -1,0 +1,332 @@
+#                                 vim:ts=2:sw=2:et:sta:syntax=pod:nowrap
+########################################################################
+
+=pod
+
+=head1 NAME
+
+dtRdr::doc::AnnotationServers - remote annotation server details
+
+=head1 Initial Interaction
+
+=head2 Discovery
+
+  o get server version/capabilities
+  o possibly login at this point
+  o maybe create-account API?
+
+Sounds like delegation is in order.
+
+  $base = "http://example.com/annotation_server";
+  foreach $plugin (@plugins) {
+    $plugin->identify_uri($base) and last;
+  }
+
+=head3 version.yml
+
+For best results, a server should provide a capabilities url at
+"$base/version" which returns a yaml file describing the server
+type/version.
+
+  ---
+  type: example_type
+  version: 0.5
+
+This could be served by the framework, or just be a static file.  The
+benefit is not having to return a series of 404's or other errors while
+the plugins poke at your server.
+
+The path to version.yml is derived from the base URL as follows:
+
+  base: http://example.com/anno
+  look: http://example.com/anno/version.yml
+
+Possibly also:
+
+  base: http://example.com/anno/index.php
+  look: http://example.com/anno/version.yml
+
+  base: http://example.com/anno/foo.php
+  look: http://example.com/anno/version.yml
+
+  base: http://example.com/?q=annoserve
+  look: http://example.com/?q=annoserve&dotreader_asks=version.yml
+
+=head3 plugin-specific discovery
+
+A specific noteserver plugin may then get additional initialization
+data.  For the dtRdr::Annotation::Sync::Standard module, this path is:
+
+  http://example.com/annoserve/config.yml
+
+Returns
+
+  ---
+
+or, if there are config options:
+
+  ---
+  protocol: https
+  auth_required: 1
+  login:
+    url: http://example.com/login
+    template: 'edit[name]=#USERNAME#&edit[pass]=#PASSWORD#'
+
+=head2 Cookie-Based login
+
+The 'auth_required' directive instructs the client to login before
+attempting any read operations.
+
+The 'login' directive instructs the client to fill-in the template data
+and post it to the given url.
+
+=head1 Data Requests
+
+=head2 manifest
+
+Client gets manifest for one-or-more books
+
+=over
+
+=item request:
+
+Request basically maps to a db query.
+
+  GET "$base/manifest.yml?book=$bid1&book=$bid2"
+
+Apache's default config allows ~8000 bytes in a URI.  That's roughly 200
+books, so this shouldn't be an issue.  To deal with larger quantities of
+books, we should probably be posting library data to the server rather
+than POSTing a GET request.
+
+Note:  The book id should not be unescaped.  Book id's are supposed to
+be uri-safe, so unescaping it is an error.  In "convenient"
+environments, the book id's will have to be re-escaped to contain only
+the 'A-Za-z0-9.-' characters (and, of course, the %.)  The re-escaping
+should only be necessary on legacy books, but how will we know which
+those are?
+
+Note:  PHP servers will need to do a little extra work here, since PHP
+won't treat url parameters as arrays without the php-specific "[]"
+suffix on the key.
+
+=item response:
+
+Identifier and revision key:value pairs (C<$id: $revision>.)
+
+=over
+
+=item $id
+
+The annotation ID.
+
+=item $revision
+
+The revision number (see below.)
+
+=back
+
+=back
+
+=head2 Get Entity
+
+  GET $base/annotation/$id.yml
+
+Server must answer with 200 (OK) and YAML content.
+
+=begin note
+
+Mega-request?  expects to receive multi-chunk YAML
+
+  ---
+  id: ...
+  ...
+  ---
+  id: ...
+  ...
+
+=end note
+
+=head1 New Entity Creation
+
+  POST $base/annotation/
+
+Server must answer with 201 (Created.)  Posting an existing entity is an
+error (409.)
+
+=head1 Entity Update
+
+  PUT $base/annotation/$id.yml?rev=$assumed_rev
+
+Server must answer with 200 (OK.)
+
+The client can assert that the new revision is a given value, etc.  This
+allows the server to error (409) if the data has changed since the
+client got the manifest.  Otherwise, the client would have to lock a
+resource, and that could lead to a permanently locked resource (only
+prevented by a heroic coding effort) if the connection drops.
+
+Assertions should be done through url parameters.  Alternatively, the
+server could just read the revision from the posted yaml (but it must be
+the server version.)  I prefer url parameters, since that decouples the
+data from the arguments.
+
+=head1 Entity Delete
+
+  DELETE $base/annotation/$id.yml?rev=$assumed_rev
+
+Server must answer with 200 and the YAML data (and 204 (No Content) may
+be supported later.)  As in PUT, a failed rev assertion is a 409
+(Conflict.)
+
+=head1 Synchronization
+
+Notes are synchronized between clients and the server using a
+combination of revision numbers and timestamps.
+
+=head2 Revisions
+
+Revision number should be incremented by the entity making the change.
+To prevent collisions, the client should maintain a last-known server
+revision alongside the local revision.
+
+  A has r2
+  B has r2
+  A makes r3
+  A syncs to S
+  B makes r3 (but is ignorant)
+  B syncs to S
+    B sees r3 on S, presents user with choice
+      (informed by content, times)
+      (or just decides based on S.mod_time vs B.mod_time)
+    overwrite?
+      y: B sets r4 on S, A syncs r4 from S later
+      n: B gets r3 from S
+
+The need for knowing the last-sync'd server revision comes in when B
+bumps the revision locally multiple times (r3, r4) after having fetched
+r2 and without knowing that A has pushed r3.  When S.rev is undefined on
+the client, this indicates that item must be created on the next sync.
+
+=head2 Deletions
+
+If a client has an item with a defined S.rev which does not appear in
+the manifest, this indicates that the item was deleted from the server
+since the last sync.
+
+To push deletions I<to> the server, the client must maintain a local
+"to-delete" list of some sort.  One implementation might be to have a
+deletions table (id, delete_time, (maybe needs_sync).)
+
+Deletions should honor the same conflict resolution semantics as changes
+(a locally-changed note removed from the server, or a server-changed
+note deleted on the client are both possible.)
+
+=head2 Dates
+
+The date attached to the annotation is always relative to the computer
+on which it is currently being stored.
+
+Locally, notes are stored with client dates.  These are translated to
+and from server dates while dealing with the server.
+
+The server date shift is calculated as follows.
+
+  $init = time;
+  $ans = GET "$server/version.yml"; # fictional
+  $done = time;
+  $mean = ($done + $init) / 2;
+  $stime = $ans->headers->date;
+  $drift = sprintf("%0.0f", $stime + 0.5 - $mean);
+
+The $drift value is the number of seconds which the server is I<ahead>
+of the client clock.
+
+The 0.5s adjustment gives us a higher probability of having the correct
+server time (because the server only answers in integers.)  This should
+make us +/- 0.5s rather than tending toward an average of -0.5s error
+(that is, on a server/client both using ntp, the $drift value will be 0
+far more than 50% of the time.)
+
+TODO:  If the client makes a request with an 'If-Modified-Since', the
+server should honor that and return 304 if the requested entity is
+unchanged.  (This should only be relevant in the "manifest.yml"
+request.)
+
+The following items are stored in the annotation objects:
+
+=over
+
+=item create_time
+
+Creation time in seconds.
+
+=item mod_time
+
+Last modification time in seconds.
+
+=back
+
+=head1 Client-Side
+
+  o define server, username, password, metadata
+  o associate books
+  o assign publicness+associated_server to annotations
+  o change publicness/associated_server
+
+=head2 Annotation Properties
+
+The I<public> attribute of an annotation contains:
+
+  server  server ID
+  owner   username (or undefined if "me")
+  rev     last sync'd revision
+
+=head3 Server ID
+
+The server id is stored in the local annotations.  To allow server
+migration, this should not be the url (also, some servers will answer at
+more than one url.)
+
+=head2 Association and Management
+
+=head3 Suggested Server
+
+The book package may contain an 'annotation_server' property.  This
+should be the server url, but we should allow the server_id to be in
+there somehow.  In fact, I'm going to require the id for now.  We could
+go to the server to get the id, but not yet.
+
+Books that don't have actual data structures in their property sheets
+(ahem) should do something like this:
+
+  annotation_server: x3E7CE4|http://example.com/dotserver/
+
+Regardless, the api is:
+
+  my $obj = $book->meta->annotation_server;
+  my $id  = $obj->id;
+  my $uri = $obj->uri;
+
+=head3 Booklist
+
+This is stored in the config under each server.  A book id may be
+associated with more than one server.
+
+We should support storing/synchronizing a booklist on the server.
+
+=head1 LEGACY
+
+In the old API, this url fetches notes in SQL dump format (ick.)
+
+  http://$server/public_notes/?rm=download&pkgname=$escaped_name
+
+It also uses a package name instead of id, and has to block while
+fetching all of the notes for the book.
+
+  o imported old notes get undef positions
+  o old noteserver implicitly upgrades notes
+  o old noteserver shouldn't allow modifying the position
+  o upgrading the table turns the old id into the note_id
+
+=cut

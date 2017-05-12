@@ -1,0 +1,26 @@
+#! /usr/bin/perl
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
+
+use strict;
+use lib '.';
+use FindBin;
+
+BEGIN {
+	unshift @INC,"$FindBin::Bin/../lib";
+	unshift @INC,"$FindBin::Bin/lib";
+	unshift @INC,"$FindBin::Bin";
+}
+
+use DBIx::dbMan;
+
+$0 = 'xdbman';
+
+# main program
+
+sub REAPER { wait; $SIG{CHLD} = \&REAPER; }      $SIG{CHLD} = \&REAPER;
+
+my $dbman = new DBIx::dbMan (-argv => \@ARGV, -interface => 'tkgui');
+
+$dbman->start;
+
+1;

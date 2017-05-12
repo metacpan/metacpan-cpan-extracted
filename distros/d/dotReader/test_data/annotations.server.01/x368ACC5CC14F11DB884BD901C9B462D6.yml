@@ -1,0 +1,18 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: Web 3.0.  Woo, Hoo!
+context: ~
+create_time: 1172023189
+end: 93
+id: x368ACC5CC14F11DB884BD901C9B462D6
+mod_time: 1172023228
+node: cover
+public: 
+  owner: sue
+references: 
+  - xCFC0AD66C14E11DB884BD901C9B462D6
+revision: 1
+selected: ~
+start: 85
+title: "Re:  internet, the final frontier"
+type: dtRdr::Note

@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm, OSoft
+
+# a diabolical hack to allow us to provide feedback to the widget
+
+# read and count the pieces of a TOC
+my $file = shift(@ARGV);
+(-e $file) or die "gotta have a file not: '$file'";
+
+my @pieces;
+{
+open(my $fh, '<', $file);
+my $line = <$fh>;
+($line =~ m/^--- /) or die "$line does not look like yaml";
+my $root = '';
+my $started = 0;
+while(my $line = <$fh>) {
+  if($line =~ m/^  - /) {
+    if($started) {
+      push(@pieces, $line);
+      last;
+    }
+    $started = 1;
+  }
+  $root .= $line;
+}
+while(my $line = <$fh>) {
+  if($line =~ m/^\w/) {
+    local($/);
+    $root .= $line . <$fh>;
+    last;
+  }
+  if($line =~ m/^  - /) {
+    push(@pieces, $line);
+  }
+  else {
+    $pieces[-1] .= $line;
+  }
+}
+
+unshift(@pieces, $root);
+}
+warn scalar(@pieces), " pieces loaded\n";
+warn join("\n", map({"$_:  " . length($pieces[$_]) . ' lines'} 0..$#pieces)), "\n";
+
+use YAML::Syck;
+for(my $i = 0; $i < @pieces; $i++) {
+  warn "piece";
+  my $piece = $pieces[$i];
+  # YAY, syck loads each piece as a root-level, so we can just plug all
+  # of root's children into root
+  $piece = YAML::Syck::Load($piece);
+  #warn "\n\n", YAML::Syck::Dump($piece), "\n\n ";
+  if($i) {
+    push(@{$pieces[0]{children}}, $piece);
+  }
+}
+
+# vim:ts=2:sw=2:et:sta

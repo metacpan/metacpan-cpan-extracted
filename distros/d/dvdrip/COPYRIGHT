@@ -1,0 +1,36 @@
+Copyright (C) 2001-2003 by Jörn Reder, All Rights Reserved.
+
+dvd::rip is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself (that's either GPL or Artistic License).
+
+Custom graphics and icons are licensed under the Creative Commons
+Attribution-ShareAlike 2.5 license. Many thanks to the Tango project;
+some of the graphical base material is derived from their icon library.
+
+Main software development is done by Jörn Reder, but these developers
+(listed in alphabetical order) contributed to the project with patches.
+You find detailed information about their work in the Changes file:
+
+Christoph Bartoschek <bartoschek AT gmx.de>
+Doug Shea <doug_shea AT alumni.ucsd.edu>
+Eric Festinger <eric.festinger AT gmail.com>
+Fabio Russo <f.russo AT anthesia.it>
+Florin Andrei <florin AT andrei.myip.org>
+Jarkko Hietaniemi <jhi AT iki.fi>
+Jean-Yves Simon <lethalwp AT tiscali.be>
+Jonathan Hall <flimzy AT flimzy.com>
+Jonathan Rogers <jonner AT mailandnews.com>
+Kevin Pulo <kev AT pulo.com.au>.
+Kianusch Sayah Karadji<kianusch AT sk-tech.net>
+Kianusch Sayah Karadji <kianusch AT sk-tech.net>
+Larry Siden <lsiden AT gmail.com>
+Martin Hill <mhill AT alumni.uwaterloo.ca>
+Matthias Riese <matthias.riese AT Uni-Bremen.DE>
+Mike Frysinger <vapier AT gentoo.org>
+Moritz Muehlenhoff <jmm AT informatik.uni-bremen.de>.
+Norbert Preining <preining AT logic.at>
+Petros Stavrakakis <petros AT stavrakakis.de>
+Robin Hill <robin AT robinhill.me.uk>
+Stefan Gmeiner <riddlebox AT freesurf.ch>
+Ulrich Spoerlein <q AT galgenberg.net>
+Wolfgang Kinkeldei <kinkeldei AT nureg.de>

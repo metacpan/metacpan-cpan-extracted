@@ -1,0 +1,123 @@
+MODULE DBDSQL
+LANGUAGE C
+PARAMETER COLONS
+
+procedure dbdsql_connect
+    sqlcode,
+    :connect_str char(255),
+    :connect_name char(255);
+
+    connect to :connect_str as :connect_name;
+
+procedure dbdsql_connect_auth
+    sqlcode,
+    :connect_str char(255),
+    :connect_name char(255),
+    :user char(255),
+    :password char(255);
+
+    connect to :connect_str as :connect_name user :user using :password;
+    
+procedure dbdsql_disconnect
+    sqlcode;
+
+    disconnect current;
+
+procedure dbdsql_disconnect_all
+    sqlcode;
+
+    disconnect all;
+
+procedure dbdsql_set_connection
+    sqlcode,
+    :connect_name char(255);
+
+    set connect :connect_name;
+
+
+procedure dbdsql_commit
+    sqlcode;
+
+    commit;
+
+procedure dbdsql_rollback
+    sqlcode;
+
+    rollback;    
+
+
+procedure dbdsql_prepare
+    sqlca,
+    :stmt_text varchar(65269),
+    :stmt_name char(15);
+
+    prepare :stmt_name from :stmt_text;
+
+procedure dbdsql_release
+    sqlcode,
+    :stmt_name char(15);
+
+    release :stmt_name;
+    
+procedure dbdsql_describe_markers
+    sqlca,
+    :stmt_name char(15),
+    sqlda;
+
+    describe :stmt_name markers into sqlda;
+
+procedure dbdsql_describe_select
+    sqlca,
+    :stmt_name char(15),
+    sqlda;
+
+    describe :stmt_name select list into sqlda;
+
+procedure dbdsql_do
+    sqlca,
+    :statement varchar(65269);
+
+    execute immediate :statement;
+ 
+procedure dbdsql_execute
+    sqlca,
+    :stmt_name char(15),
+    :in sqlda
+    :out sqlda;
+
+    execute :stmt_name into descriptor :out using descriptor :in;
+
+procedure dbdsql_declare_cursor
+    sqlcode,
+    :cur_name char(15),
+    :stmt_name char(15);
+
+    declare :cur_name cursor for :stmt_name;
+
+procedure dbdsql_declare_cursor_hold
+    sqlcode,
+    :cur_name char(15),
+    :stmt_name char(15);
+
+    declare :cur_name cursor with hold for :stmt_name;
+    
+procedure dbdsql_open_cursor
+    sqlcode,
+    :cur_name char(15),
+    sqlda;
+
+    open :cur_name using descriptor sqlda;
+
+procedure dbdsql_close_cursor
+    sqlcode,
+    :cur_name char(15);
+
+    close :cur_name;
+
+
+procedure dbdsql_fetch_cursor
+    sqlcode,
+    :cur_name char(15),
+    sqlda;
+
+    fetch :cur_name using descriptor sqlda;

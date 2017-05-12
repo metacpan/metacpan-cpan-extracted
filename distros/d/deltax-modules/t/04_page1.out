@@ -1,0 +1,11 @@
+ print 1; print ($x);
+value1test2:value2
+#START include t/04_page1.inc
+print ('some text');
+#END include t/04_page1.inc
+
+
+print "\ndef1\n";
+for my $x in (@neco) {
+print "\ndddd\n";
+}

@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+# Copyright © 2009-2011 by Daniel Friesel <derf@chaosdorf.de>
+# License: WTFPL:
+#     You just DO WHAT THE FUCK YOU WANT TO
+use strict;
+use warnings;
+use 5.010;
+use autodie;
+
+use App::Dthumb;
+use Getopt::Long qw(:config no_ignore_case);
+use IO::Handle;
+use Time::Progress;
+
+STDERR->autoflush(1);
+
+my $opt = {};
+my $id = 1;
+
+GetOptions(
+	$opt,
+	qw{
+		help|h
+		no-lightbox|L
+		no-names|n
+		quality|q=i
+		recreate|r
+		size|d=i
+		spacing|s=f
+		title|t=s
+		version|v
+	},
+) or die("Please see perldoc -F $0\n");
+
+my $dthumb = App::Dthumb->new(%{$opt});
+my $timer  = Time::Progress->new();
+
+if ($opt->{version}) {
+	say "dthumb version " . $dthumb->version();
+	exit 0;
+}
+if ($opt->{help}) {
+	exec('perldoc', '-F', $0);
+	die("Please see 'perldoc -F $0' or 'man dthumb'\n");
+}
+
+
+$dthumb->read_directories();
+$dthumb->create_files();
+$dthumb->delete_old_thumbnails();
+
+$timer->attr(
+	min => 1,
+	max => scalar $dthumb->get_files(),
+);
+
+for my $file ($dthumb->get_files()) {
+	print STDERR $timer->report(
+		"\r\e[KCreating Thumbnails: %p done, %L elapsed, %E remaining",
+		$id++,
+	);
+
+	$dthumb->create_thumbnail_html($file);
+	$dthumb->create_thumbnail_image($file);
+}
+print "\n";
+
+$dthumb->write_out_html();
+
+__END__
+
+=head1 NAME
+
+dthumb - Generate Thumbnails + Index for a set of images
+
+=head1 SYNOPSIS
+
+B<dthumb> [I<options>]
+
+=head1 VERSION
+
+This manual documents B<dthumb> version 0.2
+
+=head1 DESCRIPTION
+
+B<dthumb> will create an F<index.xhtml> with a list (thumbnails) of
+all images found in the current directory; the thumbnails will link to the
+images.
+
+It uses a javascript lightbox (see
+E<lt>http://www.huddletogether.com/projects/lightbox/E<gt>) to display the
+images.  To view them without the lightbox, either disable it using the B<-L>
+option or open images by clicking on the filename instead of the thumbnail.
+
+Note that recursion is not yet supported.
+
+During operation, B<dthumb> will show its progress on STDERR.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-L>, B<--no-lightbox>
+
+Disable Javascript lightbox.  Note that in the current implementations, this
+simple skips installation of the data files.  The lightbox link in the HTML
+will still be written, leading to 404s on the server.  This will be fixed.
+
+=item B<-n>, B<--no-names>
+
+Do not show image names below thumbnails
+
+=item B<-r>, B<--recreate>
+
+Recreate all thumbnails
+
+=item B<-d>, B<--size> I<pixels>
+
+Maximum thumbnail size (either width or height).  Defaults to 200
+
+=item B<-s>, B<--spacing> I<float>
+
+Use I<float> as spacing factor.
+The size of each image element (image + possible border around it) is the
+number of pixels (see --size) times I<float>.
+So for B<1.1> you have a small border around each image, for B<1.0> you have
+no border at all, etc.
+
+Defaults to 1.1
+
+=item B<-t>, B<--title> I<string>
+
+Set HTML document title. Defaults to the basename of the current directory
+
+=item B<-q>, B<--quality> I<int>
+
+Set thumbnail quality.
+Accepts values between 0 and 100, where 100 is the highest possible quality.
+Default is 75
+
+=back
+
+=head1 EXIT STATUS
+
+Zero upon success, non-zero otherwise.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 FILES
+
+B<dthumb> always works in the current working directory.  It will create the
+file F<index.xhtml>, in which the HTML code for the thumbnail list is saved.
+
+It also creates two directories: F<.thumbs> for the thumbnail images, and
+F<.dthumb>, which contains various data (so far icons and javascript code).
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * autodie (Included in core as of perl 5.10.1)
+
+=item * Data::Section
+
+=item * Image::Imlib2
+
+=item * Time::Progress
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Report issues either by mail to E<lt>derf@chaosdorf.deE<gt> or on
+E<lt>http://github.com/derf/dthumb/issuesE<gt>.
+
+=head1 AUTHOR
+
+Copyright (C) 2009-2011 by Daniel Friesel E<lt>derf@chaosdorf.deE<gt>.
+
+The lightbox code is (C) by Lokesh Dhakar
+<http://www.huddletogether.com/projects/lightbox/>.
+
+=head1 LICENSE
+
+    0. You just DO WHAT THE FUCK YOU WANT TO

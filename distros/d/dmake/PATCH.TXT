@@ -1,0 +1,33 @@
+diff -ruN dmake-4.12.2.orig/startup/startup.mk dmake-4.12.2/startup/startup.mk
+--- dmake-4.12.2.orig/startup/startup.mk	2012-02-07 13:36:48.000000000 +0000
++++ dmake-4.12.2/startup/startup.mk	2014-04-03 21:54:48.216075200 +0100
+@@ -18,7 +18,7 @@
+ 
+ # startup.mk configuration parameters, for each, set it to non-null if you wish
+ # to enable the named facility.
+-__.HAVE_RCS  !:= yes 		# yes => RCS  is installed.
++__.HAVE_RCS  !:=    		# yes => RCS  is installed.
+ __.HAVE_SCCS !:=    		# yes => SCCS is installed.
+ __.DEFAULTS  !:= yes		# yes => define default construction rules.
+ __.EXECS     !:= yes            # yes => define how to build executables.
+@@ -63,7 +63,7 @@
+    RMTARGET      *=  $<
+ 
+ # Default recipe that is used to remove intermediate targets.
+-.REMOVE :; $(RM) $(RMFLAGS) $(RMTARGET)
++.REMOVE :; # $(RM) $(RMFLAGS) $(RMTARGET)
+ 
+ # Check and enable AUGMAKE extensions for SYSV compatibility
+ .IF $(AUGMAKE)
+diff -ruN dmake-4.12.2.orig/win95/microsft/config.h dmake-4.12.2/win95/microsft/config.h
+--- dmake-4.12.2.orig/win95/microsft/config.h	2012-02-07 13:36:50.000000000 +0000
++++ dmake-4.12.2/win95/microsft/config.h	2014-04-03 21:55:18.182789200 +0100
+@@ -38,7 +38,7 @@
+ 
+ /* Name and version number of this package */
+ #define PACKAGE "dmake"
+-#define VERSION "4.12"
++#define VERSION "4.12.2.2"
+ #define BUILDINFO "Windows / MS Visual C++"
+ 
+ #if defined (_MSC_VER)

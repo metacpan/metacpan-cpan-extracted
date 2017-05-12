@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               diffReps
+version:            1.55.3
+abstract:           Detecting differential chromatin modification sites from ChIP-seq data
+author:
+    - Li Shen <li.shen@mssm.edu>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Math::CDF:            0
+    Parallel::ForkManager:  0
+    Statistics::TTest:    0
+    Time::HiRes:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

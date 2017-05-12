@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+our $VERSION = '0.013';
+
+use Net::Delicious::Simple;
+
+sub as_bookmarks {
+	my ($del) = @_;
+	require Netscape::Bookmarks;
+
+	my $root = Netscape::Bookmarks::Category->new({title => 'del.icio.us'});
+
+	my %tags;
+	$root->add(
+		$tags{$_} = Netscape::Bookmarks::Category->new({title => $_})
+	) for $del->tags;
+
+	for ($del->all_posts) {
+		for my $tag (@{$_->{tags}}) {
+			$tags{$tag}->add(Netscape::Bookmarks::Link->new({
+				TITLE       => $_->{description},
+				HREF        => $_->{href},
+				DESCRIPTION => $_->{extended},
+				ADD_DATE    => $_->{datetime},
+				LAST_VISIT  => $_->{datetime},
+				LAST_MODIFIED => $_->{datetime}
+			}));
+		}
+	}
+
+	$root->as_string;
+}
+
+sub as_yaml {
+	my ($del) = @_;
+	require YAML;
+	return YAML::Dump([ $del->all_posts ]);
+}
+
+my $config = Config::Auto::parse('.delicious')
+	or die "can't find .delicious for configuration!";
+my $del    = Net::Delicious::Simple->new($config)
+	or die "can't create del.icio.us agent!";
+
+die "usage: delbackup [-y|-ns]"  unless @ARGV;
+
+if ($ARGV[0] eq '-ns') {
+	print as_bookmarks($del);
+} elsif ($ARGV[0] eq '-y') {
+	print as_yaml($del);
+} else {
+	die "usage: delbackup [-y|-ns]";
+}
+
+__END__
+
+=head1 NAME
+
+delbackup - back up your del.icio.us posts
+
+=head1 VERSION
+
+ $Id$
+
+=head1 SYNOPSIS
+
+ plumcake!rjbs% delbackup -y > delicious.yml
+
+=head1 DESCRIPTION
+
+C<delbackup> is a simple utility to back up your del.icio.us posts.  It can
+produce YAML output (using the C<-y> option) or Netscape-style bookmarks (using
+the C<-ns> option).
+
+It loads its configuration via L<Config::Auto>, looking for a file named
+".delicious"  One simple format for this file would be as follows:
+
+ user: plki
+ pswd: secret
+
+=cut
+

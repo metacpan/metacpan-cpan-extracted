@@ -1,0 +1,1 @@
+perl -Ilib ./bin/disbatchd --config etc/disbatch/config.json

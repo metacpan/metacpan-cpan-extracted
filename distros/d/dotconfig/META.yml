@@ -1,0 +1,31 @@
+---
+abstract: 'deserializing dotconfig formatted file'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: dotconfig
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JSON: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/dotconfig/dotconfig-perl/issues
+  homepage: https://github.com/dotconfig/dotconfig-perl
+  repository: https://github.com/dotconfig/dotconfig-perl.git
+version: '0.04'

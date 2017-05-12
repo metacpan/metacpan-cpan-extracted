@@ -1,0 +1,41 @@
+0.4x	merge global configuration file and local configuration file
+		curses menus to rest extensions
+		cube output format - rewritte to map and to be only modifier,
+			not output format (possible OLAP -> HTML etc.),
+			e.g. \cube etc.
+		binding commands
+		command 'option' (DBI options setting/getting during connection flow)
+		command 'trace' - manipulating with DBI trace methods
+		Pg: system tables not include to TAB completation (by SET selection)
+		key bindings comment (what is F1 etc.)
+0.5x	CODE CLEANUP
+		curses menu separators (better solution)
+		move extensions searching, loading and unloading methods into separate
+			package
+		curses gui for macros, settings etc.
+           read-only connections
+		countre - only tables from current schema
+		rebuild tkgui interface
+0.6x	edit of triggers (UPDATE OF) fail - Alin's bug
+		show tables and TAB complete bug on DBD::google bug
+		curses better colors
+0.7x	type_info - showing and working with types in actual connection
+		gtkdbman integration
+		records sql output => connection to fk-tables (something => desc),
+		set selection about which column in fk-table is desc
+0.8x	curses menu support for configuration and show anything :)
+			- showing configuration, editing, loading and storing configuration
+		blob/clob support - longtrunckok, longreadlen, export, import
+		Oracle commands for showing and describing V$ tables
+		porting frank's describe
+		profiling by DBI::Profile
+0.9x	dbish compatible interface
+		warning from extensions
+		auto indent (and format) SQL commands in \e environment
+		sql syntax highlighting in 'cmdline' environment
+1.0x	CODE CLEANUP
+		commenting code for developers
+		documentation
+		web pages
+		unloading don't deleted filename from %INC (eh - how can I know
+			filename in this situation?)

@@ -1,0 +1,146 @@
+=head1 NAME
+
+DeltaX::Config - Perl module for reading configuration files
+
+     _____
+    /     \ _____    ______ ______ ___________
+   /  \ /  \\__  \  /  ___//  ___// __ \_  __ \
+  /    Y    \/ __ \_\___ \ \___ \\  ___/|  | \/
+  \____|__  (____  /____  >____  >\___  >__|
+          \/     \/     \/     \/     \/        project
+
+
+=head1 SYNOPSIS
+
+ use DeltaX::Config;
+
+ my $config_file = new DeltaX::Config(filename=>'my.conf');
+ my $conf = $config_file->read();
+ if (!$conf) { 
+   # write some error
+ }
+ ...
+ if ($conf->{param1}) { ... }
+
+=head1 FUNCTIONS
+
+=head2 new()
+
+Constructor. Parameters are in name => value form, ant there is only one and
+required parameter filename, which is a filename to read.
+All other parameters are directive definitions in form "directive => sub
+reference" (see L<"DIRECTIVES">).
+
+=head2 read()
+
+This function attemts to read given file. It returns reference to a hash with
+options and values or undef in case of error.
+
+=head2 get_error()
+
+Returns last error description.
+
+=head1 CONFIGURATION FILE DESCRIPTION
+
+Configuration file consists of these parts:
+
+=over
+
+=item comments
+
+Comment is everything from # char to end of line.
+
+=item settings
+
+Setting is a name = value pair, spaces around name and = sign a removed.
+
+=item directives
+
+Directives are special comments in form #!<directive>.
+
+=item everything other is ignored
+
+=back
+
+Long lines can be splitted by using '\' character, it must be the last character
+on the line (except spaces and comments). Lines are connected using one space.
+
+Example:
+
+  name1 = this is long line       \ # this is comment 1
+     which must be splitted.        # this is comment 2
+
+ which results in:
+
+  name1 => "this is long line which must be splitted"
+
+Name can have dots in itself, resulting hash is than:
+
+ Config file:
+
+  name.one = value1
+  name.two = value2
+  other_name = value3
+
+ Returned by read():
+
+  $conf->{name}{one} = 'value1';
+  $conf->{name}{two} = 'value2';
+  $conf->{other_name} = 'value3';
+
+=head1 DIRECTIVES
+
+Directives are special form of comments: C<#!directive [parameters]>.
+DeltaX::Config knows two of them:
+
+=over
+
+=item include
+
+It includes given file. Filename of included file is the first and only
+argument. If it is not absolute path, path is got from actually readed filename.
+
+=item import
+
+Works as include, but readed values are put in hash by this way:
+
+ Config file:
+
+  name1 = value1
+  #!import another.conf
+
+ In another.conf:
+
+  name1 = value2
+
+ Returned by read():
+
+  $conf->{name1} = 'value1';
+  $conf->{another}->{name1} = 'value2';
+
+=item every other
+
+By setting parameter to new() you can define other directives and use it in your
+files. Every definition must be sub reference. This sub will be called with all
+arguments for this directive.
+
+ Program:
+
+  sub myspec_func {
+    my $arg = shift;
+
+    # return reference to a hash or undef in case of error
+  }
+
+  my $conf = new DeltaX::Config(filename=>'my.conf',myspec=>\&myspec_func);
+
+ Configuration file:
+
+  #!myspec something
+
+=back
+
+=cut
+
+
+1;

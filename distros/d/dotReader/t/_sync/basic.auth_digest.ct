@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+$ENV{DOT_SERVER_AUTH} = 'DigestMD5';
+
+my $runfile = './t/_sync/basic.ct';
+unless(my $return = do($runfile)) {
+  die $@ if $@;
+  die "couldn't do $runfile: $!"    unless defined $return;
+  die "couldn't run $runfile"       unless $return;
+}
+
+# vim:ts=2:sw=2:et:sta:syntax=perl

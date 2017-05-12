@@ -1,0 +1,16 @@
+--- 
+book: xEF22EA3CDB3611DBA417B36A7806B258
+context: ~
+create_time: 1172023885
+end: 3
+id: xD535649CC15011DB884BD901C9B462D6
+mod_time: ~
+node: D
+public: 
+  owner: bob
+revision: 0
+selected: 
+  - D E
+start: 0
+title: D E
+type: dtRdr::Highlight

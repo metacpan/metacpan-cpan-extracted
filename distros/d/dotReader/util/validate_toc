@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm, OSoft
+
+use lib 'lib';
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+use inc::testplan(1, 2);
+
+use warnings;
+use strict;
+
+my $uri = shift(@ARGV);
+(-e $uri) or die 'no $uri';
+
+my $book = dtRdr::Book->new_from_uri($uri);
+$book or die;
+ok($book->toc->validate_ranges, 'ranges are valid');
+my @errors = $book->toc->validate_ids;
+ok(! @errors, 'no id errors') or
+  warn join("\n  ", 'id errors:', @errors), "\n";
+
+# vim:ts=2:sw=2:et:sta

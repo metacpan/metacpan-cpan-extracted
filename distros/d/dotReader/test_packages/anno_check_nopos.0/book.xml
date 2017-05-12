@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<pkg:package name="" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:publisher>Osoft</pkg:publisher>
+  <pkg:content>
+    <pkg:outlineMarker OutlineName="A" id="A" title="root node" render="false">
+      <pkg:outlineMarker OutlineName="B" id="B" visible="false">
+        B
+      </pkg:outlineMarker>
+      <pkg:outlineMarker OutlineName="C" id="C" >
+        C
+        <pkg:outlineMarker OutlineName="D" id="D">
+          D
+          <pkg:outlineMarker OutlineName="E" id="E">
+            E
+          </pkg:outlineMarker>
+        </pkg:outlineMarker> <!-- end D -->
+      </pkg:outlineMarker><!-- end C -->
+      <pkg:outlineMarker OutlineName="F" id="F" renderchildren="false">
+        F
+        <pkg:outlineMarker OutlineName="G" id="G">
+          G
+          <pkg:outlineMarker OutlineName="H" id="H" render="false">
+            H
+          </pkg:outlineMarker>
+          <pkg:outlineMarker OutlineName="I" id="I">
+            I
+            <pkg:outlineMarker OutlineName="J" id="J" render="false">
+              J
+            </pkg:outlineMarker>
+            <pkg:outlineMarker OutlineName="K" id="K">
+              K
+            </pkg:outlineMarker>
+          </pkg:outlineMarker> <!-- end I -->
+        </pkg:outlineMarker> <!-- end G -->
+      </pkg:outlineMarker><!-- end F -->
+      <pkg:outlineMarker OutlineName="L" id="L">
+        L
+        <pkg:outlineMarker OutlineName="M" id="M">
+          M
+          <pkg:outlineMarker OutlineName="N" id="N">
+            N
+          </pkg:outlineMarker>
+        </pkg:outlineMarker> <!-- end M -->
+        <pkg:outlineMarker OutlineName="O" id="O">
+          O
+        </pkg:outlineMarker>
+      </pkg:outlineMarker><!-- end L -->
+    </pkg:outlineMarker><!-- end A -->
+  </pkg:content>
+</pkg:package>
+<!-- vim:ts=2:sw=2:et:sta
+-->

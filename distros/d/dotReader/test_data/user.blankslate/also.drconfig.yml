@@ -1,0 +1,17 @@
+--- 
+book_handler: {}
+
+library: 
+  - 
+    type: YAMLLibrary
+    uri: drlib.yml
+module: []
+
+servers: 
+  - 
+    id: a_local_server
+    type: Standard
+    uri: http://localhost:8085
+user_info: {}
+
+version: 0.010

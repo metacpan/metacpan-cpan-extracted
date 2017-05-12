@@ -1,0 +1,174 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use inc::testplan(1, 46);
+use test_inc::loginit;
+
+use lib 'inc';
+use dtRdrTestUtil::ABook;
+
+BEGIN { use_ok('dtRdr::Highlight') };
+
+my $book = ABook_new_1_0('test_packages/indexing_check/book.xml');
+
+require dtRdrTestUtil::GUI;
+
+# look ma, no dialogs
+# TODO encapsulate this somehow (e.g. WxPerl::Test::MessageDialog)
+my $did_dialog_new = 0;
+my $did_dialog_show = 0;
+{
+  use Wx;
+  no warnings 'redefine';
+  my $real_new;
+  my $real_show;
+  # snag these before we smash them
+  BEGIN {
+    $real_new = \&Wx::MessageDialog::new;
+    $real_show = \&Wx::MessageDialog::ShowModal;
+  }
+
+  package Wx::MessageDialog;
+  sub new {
+    my $class = shift;
+    $did_dialog_new++;
+    return($real_new->($class, @_)) if($ENV{FAKE_NOTEST});
+    return(bless({}, $class));
+  }
+  sub ShowModal {
+    my $self = shift;
+    $did_dialog_show++;
+    return($real_show->($self)) if($ENV{FAKE_NOTEST});
+    return(Wx::wxID_YES());
+  }
+}
+
+if(scalar(@ARGV)) {
+  $ENV{FAKE_NOTEST} = 1; # XXX I guess
+  set_testing(1);
+}
+
+my $did_run = 0;
+set_dosub(sub {
+  my $frame = the_package()->_main_frame;
+  my $anno_io_dir = anno_io()->uri;
+  my $bvm = $frame->bv_manager;
+  my $tr = $frame->sidebar->highlights;
+  my $root = $tr->GetRootItem;
+  ok(defined($root), 'has a root');
+  $bvm->open_book($book);
+  my $bv = $bvm->book_view;
+  ok($bv, 'got a view');
+
+  my $hl;
+  {
+    my $toc = $book->find_toc($book->toc->id);
+    my $sel = $book->locate_string($toc, '0123456789','','');
+    $hl = $bv->highlight_at_selection($sel);
+  }
+
+  # check it
+  {
+    ok($tr, 'got my tree');
+    my $root = $tr->GetRootItem;
+    ok(defined($root), 'got a root');
+    ok($root->IsOk, 'root is ok');
+    # Bah! ItemHasChildren tests fail on Win32 if root isn't visible
+    ok(! $tr->IsVisible($root), 'root not visible');
+    is($tr->GetCount, 1, 'count them');
+  }
+
+  # delete it
+  $hl->book->delete_highlight($hl);
+  # check it
+  is($tr->GetCount, 0, 'count them');
+
+  $frame->menu_view_tab_highlights;
+
+  # and put it back
+  if(1) {
+    my $hl2 = $bv->highlight_at_selection($hl);
+    ok($hl2);
+    isa_ok($hl2, 'dtRdr::Highlight');
+
+    is($tr->GetCount, 1, 'count them');
+    my $id = $tr->GetRootItem;
+    ($id) = $tr->GetFirstChild($id);
+    ok($id, 'got id');
+    ok($id->IsOk, 'id is ok');
+    $tr->UnselectAll; # must have
+    $tr->select_item($hl2->id);
+    #warn "selecting ", $tr->GetItemText($id);
+    my @selections = $tr->GetSelections;
+    is(scalar(@selections), 1, 'one selected');
+    ok(eval {$selections[0]->IsOk}, 'it is ok');
+    $tr->menu_delete;
+    # check it
+    ok(! $tr->ItemHasChildren($root));
+    is($tr->GetCount, 0, 'count them');
+  }
+  # now two
+  if(1) {
+    my $toc = $book->find_toc($book->toc->id);
+    my $sel = $book->locate_string($toc, '0123456789','','');
+    my $hl1 = $bv->highlight_at_selection($sel);
+    my $sel2 = $book->locate_string($toc, '67','012345','89');
+    my $hl2 = $bv->highlight_at_selection($sel2);
+    ok($hl1);
+    isa_ok($hl1, 'dtRdr::Highlight');
+    ok($hl2);
+    isa_ok($hl2, 'dtRdr::Highlight');
+    # check it
+    is($tr->GetCount, 2, 'count them');
+
+    my $id = $tr->GetRootItem;
+    my $c;
+    ($id, $c) = $tr->GetFirstChild($id);
+    ok($id, 'got id');
+    ok($id->IsOk, 'id is ok');
+    #my ($id2) = $tr->GetNextChild($id, $c);
+    my $id2 = $tr->GetNextSibling($id);
+    ok($id2, 'got id');
+    ok($id2->IsOk, 'id is ok') or die;
+    is($tr->GetItemText($id2), '67', 'text ok');
+    $tr->UnselectAll;
+    #$tr->select_item($hl1->id);
+    #$tr->select_item($hl2->id);
+
+    # these seem to worked too
+    $tr->SelectItem($id);
+    #$tr->ToggleItemSelection($id);
+    #$tr->ToggleItemSelection($id);
+    #$tr->ToggleItemSelection($id);
+    $tr->SelectItem($id2);
+    #warn "selecting ", $tr->GetItemText($id);
+    # huh? why isn't GetSelections working in this context?
+    my @selections = $tr->GetSelections;
+    is(scalar(@selections), 2, 'two selected');
+    ok(eval {$selections[0]->IsOk}, 'it is ok');
+    ok(eval {$selections[1]->IsOk}, 'it is ok');
+    #is(eval {$tr->GetItemText($selections[0])}, '0123456789');
+    #is(eval {$tr->GetItemText($selections[1])}, '67');
+    $tr->menu_delete;
+    ok($did_dialog_new, 'did dialog');
+    ok($did_dialog_show, 'showed dialog');
+    # check it
+    ok(! $tr->ItemHasChildren($root));
+    is($tr->GetCount, 0, 'count them');
+  }
+
+  # TODO rehack the HackDialog to say "no"
+
+  # TODO and something with events
+  {
+    ok(1);
+  }
+  $did_run = 1;
+});
+
+run();
+
+done;
+# vim:ts=2:sw=2:et:sta

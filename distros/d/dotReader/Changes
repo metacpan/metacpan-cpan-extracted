@@ -1,0 +1,156 @@
+Revision history for dotReader
+
+v0.11.2 2007-04-22
+
+  * added load_url() to make webkit (mostly) work
+  * improved sync password prompt dialog
+  * note viewer bugfix: show server name on owner's public notes
+  * book title in title bar
+
+  * more useful metadata objects
+  * annotation_server property in book metadata
+  * changes to manifest files for plugins
+  * build bugfix: drconfig.yml not writable
+
+v0.11.1 Thu Apr 12, 2007
+
+  * added new 'middle-odd' meaning to version numbers
+
+  * GUI busy-feedback improvements
+  * _ALPHA_ annotation server support
+  * threaded notes support
+  * fixed toc caches in seventy_five_times.jar and rebel-w-o-car.jar
+
+  * reduced source tarball size, moved larger test books to
+    http://svn.dotreader.com/svn/books/test_packages/
+  * removed unused icons from binary build and source package
+  * --url command-line option for client
+  * config objects rework
+  * util/dot_bot iterator user-agent frontend
+  * UserAgent iterator collection scheme
+  * initial zombie books/bookbag schemes for cache management
+  * manager/minion handling improvements
+  * standalone demo annotation server in util/anno_server
+  * mac appbundle icon
+  * gave BVManager more responsibilities
+  * reworked icon finder code
+
+v0.0.11 Jan 27, 2007
+
+  * fixed CSS highlighting for search results
+  * repaired links in "Publication 556" book
+    (http://svn.dotreader.com/svn/books/default/publication_556.jar)
+
+  * added missing Tree::Simple dependency to mac build
+  * introduced '-mini' binary builds for linux and windows
+
+v0.0.10 Jan 13, 2007
+
+  * fixed all-external-links-vanish bug in xml rewrite callbacks
+
+  * underlying support for threaded notes (just no interface)
+  * more xml hatchet speed hacking
+
+v0.0.9 Jan 04, 2007
+
+  * added preliminary View->Source menu item
+
+  * cleanup source dist tarball
+  * enormous speed gain in Book.insert_nbh() (page loads)
+  * reworked Book.create_node_characters() for speed/correctness
+    (should eliminate off-by-random search highlights)
+
+v0.0.8 Dec 07, 2006
+
+  * mac appbundle/webkit alpha
+  * WebKit (mac) link support
+  * "File=>Add Book" menu disabled on no-book startup
+
+  * ThoutBook1.0 id escape
+  * internally linked package checked in BookView
+  * appbundle/par env changes
+  * libexpat was missing from linux par
+  * fixed "Bus Error" on OSX startup
+
+v0.0.7 Nov 22, 2006
+
+  (First GPL Beta release)
+
+  * TOC search implemented
+  * phrase/word/regexp, case-sensitive search options working
+  * SearchPane knobs (mostly) connected
+
+  * some search breakage caught
+  * utf8 cached toc load
+  * s/Thout/dtRdr/ renames
+
+0.000006 Nov 09, 2006
+
+  * add book to library implemented in gui
+
+  * library reworked as yaml
+
+0.000005 Nov 06, 2006
+
+  * content tree should always have current node selected now
+  * search go/stop controls
+  * search results as tree with menu
+  * search results highlighted
+  * sidebar tree indent level changed
+
+  * various accessor cleanup
+  * cooperative multitasking system hookup
+  * major get_trimmed_content() speedup
+  * Thout1_0 quicksearch
+  * squashed (some) search edge cases
+  * ThoutBook node position=>rendered position fix
+
+0.000004 Oct 27, 2006
+
+  * bookmarks/notes can be created without selection
+  * logger rework (binaries always get dotreader-data/dotreader.log)
+
+  * bookmarks/notes can be attached to a whole node
+  * highlights are now created with 40 characters
+  * fixed ancestor_nodes for Thout1.0 book (obscure highlight bug)
+
+0.000003 Oct 26, 2006
+
+  * menu/toolbar fixes, rework 
+  * menu/toolbar enabled/disable
+  * sidebar notebook goes away
+  * sidebar activation enhancements
+
+  * binary build has a console for now
+  * webkit redness issue fixed
+
+0.000002 Oct 19, 2006
+
+  * "Oops" dialog error handler / recovery
+  * delete annotation only prompts for multiple deletes
+  * menu/toolbar linkage, changes
+
+rXX Oct 16, 2006
+  * squashed bug on creating annotations in non-root switcharoo nodes
+  * notebook tabs use fullnames again
+  * basic search implementation
+  * adclient as a simple button
+  * executable name -> titlebar hack
+  * toolbar icons, splashscreen changes
+  * made html widget zoom state persistent
+
+  * book->get_toc() API change
+  * book node-characters generation, caching
+
+0.000001 Oct 11, 2006
+  * new icons for the toolbar/notes
+  * message box logger for user errors
+  * major annotation position selection/finder improvements
+
+  * started tracking Changes
+  * dotreader_release file contains svn tag if possible
+  * par build updates
+
+  * the rest is ancient history
+
+vim:ts=2:sw=2:et:sta

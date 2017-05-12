@@ -1,0 +1,29 @@
+#REV	PREV	SREV	OWNER DEL	EXPECT               vim:noet:noai:nosi:ts=6
+0	1	2			local_error TODO
+0	0	0			skip
+1	1	1			skip
+~	~	1			get
+~	~	0			get
+0	0	1			freshen
+1	1	2			freshen
+0	~	0			conflict
+1	~	1			conflict
+2	1	2			conflict
+1	~	1		1	conflict
+1	0	0		1	remote_delete
+1	1	1		1	remote_delete
+1	0	0			put
+1	~	~			post
+1	1	~			local_delete
+1	1	~		1	conflict_delete
+1	1	~	q		local_delete
+0	0	0	q		skip
+1	1	1	q		skip
+1	1	2	q		freshen
+0	0	1	q		freshen
+~	~	1	q		get
+2	1	1	q		died.permission_denied
+0	~	~	q		died.permission_denied TODO
+1	~	~	q		died.permission_denied TODO
+2	~	1	q		died.permission_denied? TODO
+

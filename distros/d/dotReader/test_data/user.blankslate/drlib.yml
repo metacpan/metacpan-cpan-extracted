@@ -1,0 +1,7 @@
+--- 
+books: []
+library_info: 
+  name: blank library
+  type: YAMLLibrary
+  storage: drlib_store
+  version: 0.000001

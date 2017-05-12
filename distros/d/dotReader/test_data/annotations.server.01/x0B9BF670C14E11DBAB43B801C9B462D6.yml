@@ -1,0 +1,16 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+context: ~
+create_time: 1172022691
+end: 7
+id: x0B9BF670C14E11DBAB43B801C9B462D6
+mod_time: ~
+node: cover
+public: 
+  owner: joe
+revision: 0
+selected: 
+  - Welcome
+start: 0
+title: Welcome
+type: dtRdr::Bookmark

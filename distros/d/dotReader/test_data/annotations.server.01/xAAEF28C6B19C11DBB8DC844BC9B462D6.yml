@@ -1,0 +1,16 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: yippee
+context: ~
+end: 53
+id: xAAEF28C6B19C11DBB8DC844BC9B462D6
+node: cover
+public: 
+  owner: sue
+references: 
+  - x815791A2B19B11DBB7D3274BC9B462D6
+revision: 0
+selected: ~
+start: 44
+title: "Re:  a note"
+type: dtRdr::Note

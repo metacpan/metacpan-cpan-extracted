@@ -1,0 +1,14 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: this is note 'A', the root of the notes that start with 'A'
+context: ~
+end: ~
+id: A
+node: page1
+public: 
+  owner: bob
+selected: ~
+start: ~
+revision: 0
+title: a
+type: dtRdr::Note

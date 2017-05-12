@@ -1,0 +1,94 @@
+{
+   "abstract" : "a scalable distributed batch processing framework using MongoDB.",
+   "author" : [
+      "Ashley Willis <ashleyw@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "disbatch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Long" : "0",
+            "IO::Wrap" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Limper" : "0",
+            "Limper::Engine::PSGI" : "0",
+            "Limper::SendFile" : "0",
+            "Limper::SendJSON" : "0",
+            "Log::Log4perl" : "0",
+            "MongoDB" : "v1.0.4",
+            "MongoDB::OID" : "v1.0.4",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Safe::Isa" : "0",
+            "Starman" : "0",
+            "Sys::Hostname" : "0",
+            "Term::ReadKey" : "0",
+            "Text::CSV_XS" : "0",
+            "Text::Table" : "0",
+            "Time::Moment" : "0",
+            "Try::Tiny" : "0",
+            "Try::Tiny::Retry" : "0",
+            "URL::Encode" : "0",
+            "boolean" : "0.25",
+            "lib" : "0",
+            "perl" : "v5.12.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "Net::HTTP::Client" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Disbatch" : {
+         "file" : "lib/Disbatch.pm",
+         "version" : "3.990"
+      },
+      "Disbatch::Plugin::Demo" : {
+         "file" : "lib/Disbatch/Plugin/Demo.pm",
+         "version" : "3.990"
+      },
+      "Disbatch::Roles" : {
+         "file" : "lib/Disbatch/Roles.pm",
+         "version" : "3.990"
+      },
+      "Disbatch::Web" : {
+         "file" : "lib/Disbatch/Web.pm",
+         "version" : "3.990"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git://stash.corp.synacor.com/7999/emg/disbatch.git"
+      }
+   },
+   "version" : "3.990",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

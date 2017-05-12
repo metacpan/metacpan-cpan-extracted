@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2eec668105fea14edd4607101885d152b2ee6ef6 Build.PL
+SHA1 1cab933cae6b42a1336b239953ba0657585bf58d COPYING
+SHA1 a1aa4aa46a2a10f2c422672732d2de1850f0e9d9 Changelog
+SHA1 60fea77b0af392d5d692a2a051c7d930ceb56f15 MANIFEST
+SHA1 a2fbd6d9451f1817e28896cea53ad3120762236b MANIFEST.SKIP
+SHA1 b74c75d8105fd082728d8c63a6008b844d79e978 META.yml
+SHA1 ea6c84caafd5a238c4c3a0dcc1374d553e2cad59 README
+SHA1 b2efc26d038304a663e69e0ad3f0d5bd367dd9cf bin/dthumb
+SHA1 f16ae8132029824a2ddbe3103cdda6cd1c6a974f lib/App/Dthumb.pm
+SHA1 5ffced411eebe5e7ff8f909bd14e01b4df441fe8 lib/App/Dthumb/Data.pm
+SHA1 6fe53f57ae1e7a18c3e1c3a86f75a691d170507f lib/App/Dthumb/Data.pm.PL
+SHA1 538cf101ccec24847f3827b388ef5f46efcfe462 share/close.gif
+SHA1 ba3b29e484b3583eab19683db7f35f77e96cbc29 share/html_end.dthumb
+SHA1 2f7a3e3d3eac6f682f314a4b0e48f7b9c38ef733 share/html_start.dthumb
+SHA1 b698243d7376b6ebc61cd5f5784ef4656c17b257 share/lightbox.css
+SHA1 9b4b250cb69775c3cb32a1269bc1dc2880c6fa69 share/lightbox.js
+SHA1 0df44b46b67c14a4e6705e2856cf5dc0f9ec709f share/loading.gif
+SHA1 a10704bc834fbcb763981d5a62ce43142c022b59 share/main.css
+SHA1 79690c7123255cc8c80d0ad5c5db7dcf0aab3366 share/overlay.png
+SHA1 6cfaebdb4d57688b8ac50f3e840a99a48c15457b t/00-compile-pm.t
+SHA1 3adfc7da6082f15051da7fbda884723388738b61 t/01-compile-pl.t
+SHA1 c7381e50a28398284bdcdd975b6c65cccdda9ae0 t/05-synopsis.t
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/10-pod.t
+SHA1 c98ee9fca7de2eb911aa690955561aa4eb0227f6 t/20-app-dthumb.t
+SHA1 4ee2ab3cad9ccf69f13e8c8a233bf1456c02fa50 t/29-app-dthumb-data.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/imgdir/.thumbs/invalid.png
+SHA1 fa25dc04c38b225e4fe9b91e30b2b0cceecdfd6f t/imgdir/one.png
+SHA1 be9d1c6324f344d98b7b4af03301954415623e18 t/imgdir/two.png
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk1wooMACgkQjuWtMO0ss38BUwCfUMkY8Tv6qZ9/D36MPHvKeGsH
+pckAnjfviGxrs1DLQYlCZcmTj5hcXrxU
+=hde+
+-----END PGP SIGNATURE-----

@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                delicious-backup
+version:             0.013
+abstract:            simple del.icio.us backup tool
+license:             perl
+author:              
+    - Ricardo SIGNES <rjbs@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Config::Auto:                  0.11
+    Net::Delicious:                1.11
+    Netscape::Bookmarks:           0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,16 @@
+#
+# A dead-stupid book format
+# 
+metadata: title	Test Book
+metadata: author	A. N. Author
+location: start		0
+location: title		7
+location: body		32
+toc: 0	toplevel toc	start
+toc: 1	title toc	title	0
+toc: 2	body toc	body	0
+book:
+<html>
+<title>Test Book</title>
+<body>This is just a simple file to test some of the infrastructure
+</body>

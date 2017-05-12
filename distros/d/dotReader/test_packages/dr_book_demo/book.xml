@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<pkg:package
+  xmlns:pkg="http://dotreader.com/dr_package"
+  xmlns:books="http://osoft.com/dr_book"
+  >
+<pkg:info
+  name="The 2.0 book"
+  id="x61A15A525B2211DB838F7973B580F94C"
+  revision="1.0"
+  publisher="Osoft"
+  author="Eric Wilhelm"
+  stylesheet="book.css"
+  toc="book.toc"
+  />
+<pkg:toc>
+  <!-- some form of tree, but content pages cannot nest -->
+</pkg:toc>
+<pkg:content>
+  <!--
+  Package content goes here in a flat list.
+
+  Unless the content is in other files, then the content tag has a
+  source attribute or something.
+  -->
+</pkg:content>
+</pkg:package>
+
+<!-- vim:ts=2:sw=2:et:sta
+-->

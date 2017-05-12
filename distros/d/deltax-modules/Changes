@@ -1,0 +1,77 @@
+Revision history for Perl extension DeltaX.
+
+3.17  Thu Apr 07 16:40:00 2017
+  - support autocommit with transactions for Pg
+
+3.16  Thu Mar 05 10:40:00 2015
+  - wrong module version
+
+3.15  Thu Mar 05 10:30:00 2015
+  - Pg now supports host and port
+
+3.14  Thu Mar 24 11:33:00 2011
+  - wrong cpan version
+
+3.13  Thu Mar 10 11:22:00 2011
+  - in DeltaX::Page <?:if !FOO?> enabled
+
+3.12  Mon Dec 07 15:31:00 2009
+  - minor informix improvement
+
+3.11  Thu Nov 19 14:24:00 2009
+  - removed DeltaX::Config dependency on DeltaX::Database
+
+3.10  Thu Jul 01 15:04:16 2009
+  - added GDBM_File as requirement
+  - DeltaX::Page: new directive :for .. :done
+  - DeltaX::Page: string: prefixed code can be used as filename
+
+3.09  Mon Jun 08 09:09:16 2009
+  - corrected tests
+  - Makefile.PL: DB test is now switched off by default
+
+3.08  Mon May 25 16:09:00 2009
+  - DeltaX::Config: read lines untaint
+  - DeltaX::Trace: line number inclusion
+  - DeltaX::Database: Informix number handling
+  - DeltaX::Database: PostgreSQL error check bugs corrected
+  - DeltaX::Database: ping() now works correctly, test added
+
+3.07  Mon Oct 13 08:31:00 2003
+  - additional BLOB & CLOB handling in open_statement for Oracle
+
+3.06  Thu Jun  3 12:44:00 2003
+  - fixed bug in DeltaX::Page - perl error while using '*' as type
+
+3.05  Fri Jul  6 07:55:03 2003
+  - DeltaX::Database
+    - improved date2db() for MS SQL driver
+
+3.04  Fri May 16 12:54:00 2003
+  - DeltaX::Database
+    - new function test_err()
+    - small warning fixes (_trace, Dstr_command)
+    - fix in open_statement (SELECT with new line et the beginning was not
+      recognized as SELECT command)
+  - DeltaX::Trace
+    - trace output fixed (called from was in a wrong place)
+    - trace output (see trace_stack in docs)
+
+3.03  Thu Apr  3 13:57:02 2003
+	- DB tests changed (known MySQL & MS SQL "features")
+
+3.02  Wed Apr  2 16:17:00 2003
+	- added new function test_err to DeltaX::Database
+	- database & session tests enhanced (skip in case of error etc.)
+
+3.01  Fri Mar  7 22:16:00 2003
+	- added usefull tests
+	- added default directive to DeltaX::Page
+	- added conditional (if, else, end) to DeltaX::Page
+
+3.00  Tue Feb 25 13:26:10 2003
+	- first public release
+
+0.01  Tue Feb 25 13:26:10 2003
+	- original version; created by h2xs 1.21 with options
+		-X DeltaX::Database

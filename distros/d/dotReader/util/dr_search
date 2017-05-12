@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+dr_search - search a book
+
+=cut
+
+package bin::dr_search;
+
+use lib 'lib';
+use dtRdr::Search::Book;
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+sub main {
+  my (@args) = @_;
+  my ($uri, $string, $no_quick) = @args;
+  $no_quick ||= 0;
+
+  my $regex = qr/$string/i; # XXX needs options
+  (-e $uri) or die "no file '$uri'";
+  my $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+
+  my $search = dtRdr::Search::Book->new(
+    book => $book, find => $regex,
+    no_quick => $no_quick,
+    );
+  while(my $result = $search->next) {
+    $result->null and next;
+    print join("\n  ",
+      "result",
+      "node: " . $result->start_node->id,
+      "found in: " . $result->selection->node->id
+    ), "\n";
+  }
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::dr_search::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::dr_search';

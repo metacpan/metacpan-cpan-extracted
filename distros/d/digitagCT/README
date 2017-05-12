@@ -1,0 +1,197 @@
+=========================================================================
+digitagCT -- Combining DGE and RNA-Sequencing data from CRAC mapping
+=========================================================================
+
+OVERVIEW:
+--------
+
+The digitagCT distribution is part of the CracTools.
+
+All files are self documented using the POD format and tools.
+
+
+DESCRIPTION:
+-----------
+
+INSTALLATION:
+-----------
+
+To install this module type the following:
+
+```
+  perl Makefile.PL
+  make
+  make test
+  make install
+```
+
+USAGE:
+-----
+
+Once the installation is performed, the sotware binary 'digitagCT' should be
+available. However, one last step is required before you can use digitagCT
+software, you need to obtain an annotation file in GFF3 format. To do this,
+CracTools-core provide a script that is capable of such a thing using Ensembl
+Perl API, it is called buildGFF3FromEnsembl.pl.  You can also provide your own
+GFF3 file, this format is detailed here: http://www.sequenceontology.org/gff3.shtml.
+
+Note that a supplementary attribute 'type' for mRNA features is required in
+digitagCT. This attribute represent the type of the mRNA, it could be either a
+'protein_coding' or any other string. If it is not 'protein_coding' the mRNA
+will be considered as 'non_coding'.  A subtype can be precised using a ':'
+colon separator (example : protein_coding:pseudogene).
+
+INPUT FILE FORMATS:
+------------
+
+*  `--gff` <FILE>. A GFF3 file format with annotation
+*  `--rna-seq` <FILE>. A SAM file from a mapper (preferably CRAC)
+*  `--sage` <FILE>. A TSV file (Tabulation-Separated Values) with 4 required columns (from transcriRef/SAGE génie DB)
+*  `--tar` <FILE>. A bed file with information about tiling arrays (built from UCSC)
+
+More information about the 8 columns of the TSV file:
+
+1. the tag sequence
+2. number of occurences of the tag
+3. name of the library
+4. the total of sequences in the library 
+
+EXAMPLES:
+--------
+
+This software is ditributed with some example data files (called 'toys') in
+folder ./extra/, in order to quickly try the software. Once you have
+installed the program following instruction provided in section
+"INSTALLATION" you will be able to launch the software "digitagCT". For more
+information run `digitagCT --help` or `digitagCT --man`
+
+* Generate annotation for DGE tags
+`digitagCT extra/toyDGE.sam --gff file.gff --summary summary.txt`
+(Add "ANNOTATION_GFF file.gff" in ~/CracTools.cfg in order to simplify digitagCT command lines.)
+
+* Cross DGE tags with RNASeq data
+`digitagCT extra/toyDGE.sam --rna-seq extra/toyRNASeq.sam`
+
+* Cross DGE tags with SAGE genie file
+`digitagCT extra/toyDGE.sam --sage extra/toySageGenieFile.csv`
+
+* Cross DGE tags with tiling arrays
+`digitagCT extra/toyDGE.sam --tar extra/toyTAR.bed.gz`
+
+Note that you can combine the three previous "crossing options" as you want.
+
+OUTPUT FILE FORMAT
+------------
+
+According to two level of annotation (process A for protein_coding and process B for non_coding), 
+digitag generate a tsv file with the following columns:
+
+1. the tag sequence
+2. number of occurences of the tag
+3. the annotation process A of the tag
+4. the gene name (HUGO Gene Nomenclature Committee)
+5. the gene type (protein_coding)
+6. Ensembl ID of the Gene
+7. chr of the tag sequence
+8. location of the tag relative to the chr
+9. strand of the tag
+10. the annotation process B of the tag
+11. the gene name (HUGO Gene Nomenclature Committee)
+12. the gene type (non_coding)
+
+Other columns about RNA-Seq,  TranscriRef and Tiling features are added when the non-mandatory arguments are specified (respectively --rna-seq, --sage, --tar) . 
+
+DEPENDENCIES:
+------------
+
+This package requires these other programs, modules and libraries* :
+
+- CracTools-core
+- perl 5.1 or +
+- strict
+- warnings
+- Carp
+
+Notice that almost required modules/libraries are standard.
+
+
+PROBLEMS:
+--------
+
+
+COPYRIGHT AND LICENCE:
+---------------------
+
+Copyright © 2012-2013 -- IRB/INSERM
+(Institut de Recherches en Biothérapie/
+ Institut national de la santé et de la recherche médicale).
+
+Auteurs/Authors: Jérôme AUDOUX    <jerome.audoux@univ-montp2.fr>
+Alban MANCHERON  <alban.mancheron@lirmm.fr>	
+Nicolas PHILIPPE <nicolas.philippe@inserm.fr>
+
+-------------------------------------------------------------------------
+
+Ce fichier fait partie de la suite CracTools qui contient plusieurs pipeline 
+intégrés permettant de traiter les évênements biologiques présents dans du 
+RNA-Seq. Les CracTools travaillent à partir d'un fichier SAM de CRAC et d'un 
+fichier d'annotation au format GFF3.
+
+Ce logiciel est régi  par la licence CeCILL  soumise au droit français et
+respectant les principes  de diffusion des logiciels libres.  Vous pouvez
+utiliser, modifier et/ou redistribuer ce programme sous les conditions de
+la licence CeCILL  telle que diffusée par le CEA,  le CNRS et l'INRIA sur
+le site "http://www.cecill.info".
+
+En contrepartie de l'accessibilité au code source et des droits de copie,
+de modification et de redistribution accordés par cette licence, il n'est
+offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+seule une responsabilité  restreinte pèse  sur l'auteur du programme,  le
+titulaire des droits patrimoniaux et les concédants successifs.
+
+À  cet égard  l'attention de  l'utilisateur est  attirée sur  les risques
+associés  au chargement,  à  l'utilisation,  à  la modification  et/ou au
+développement  et à la reproduction du  logiciel par  l'utilisateur étant
+donné  sa spécificité  de logiciel libre,  qui peut le rendre  complexe à
+manipuler et qui le réserve donc à des développeurs et des professionnels
+avertis  possédant  des  connaissances  informatiques  approfondies.  Les
+utilisateurs  sont donc  invités  à  charger  et  tester  l'adéquation du
+logiciel  à leurs besoins  dans des conditions  permettant  d'assurer  la
+sécurité de leurs systêmes et ou de leurs données et,  plus généralement,
+à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+
+Le fait  que vous puissiez accéder  à cet en-tête signifie  que vous avez
+pris connaissance  de la licence CeCILL,  et que vous en avez accepté les
+termes.
+
+-------------------------------------------------------------------------
+
+This file is part of the CracTools which provide several integrated 
+pipeline to analyze biological events present in RNA-Seq data. CracTools 
+work on a SAM file generated by CRAC and an annotation file in GFF3 format.
+
+This software is governed by the CeCILL license under French law and
+abiding by the rules of distribution of free software. You can use,
+modify and/ or redistribute the software under the terms of the CeCILL
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info".
+
+As a counterpart to the access to the source code and rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty and the software's author, the holder of the
+economic rights, and the successive licensors have only limited
+liability.
+
+In this respect, the user's attention is drawn to the risks associated
+with loading, using, modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean that it is complicated to manipulate, and that also
+therefore means that it is reserved for developers and experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or
+data to be ensured and, more generally, to use and operate it in the same
+conditions as regards security.
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL license and that you accept its terms.

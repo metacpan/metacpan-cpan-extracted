@@ -1,0 +1,5 @@
+# Show each request method and URI
+
+before {
+    say RED, ARGS(1)->method, ' ', ARGS(1)->request_uri, RESET
+} call 'Dancer::Handler::handle_request'

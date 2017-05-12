@@ -1,0 +1,24 @@
+LEGAL:
+
+Copyright (c) 2004 Mike Hammond. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+DOCUMENTATION:
+
+This module implements letter tries. Documentation is in pod form at the end of
+the Trie.pm file.
+
+INSTALLATION:
+
+To install this module:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+AUTHOR:
+
+Mike Hammond
+hammond@u.arizona.edu
+

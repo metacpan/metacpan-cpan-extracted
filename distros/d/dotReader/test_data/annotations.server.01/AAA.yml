@@ -1,0 +1,17 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: this is note 'AAA'
+context: ~
+end: ~
+id: AAA
+node: page1
+public: 
+  owner: sue
+references: 
+  - AA
+  - A
+revision: 0
+selected: ~
+start: ~
+title: aaa
+type: dtRdr::Note

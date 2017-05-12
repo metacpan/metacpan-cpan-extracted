@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+dyatel - utility for updating twitter statuses in vkontakte
+
+=head1 DESCRIPTION
+
+Listens twitter account and when new tweet was received, reposts it on vkontakte.
+
+=head1 CONFIGURATION
+
+Configs are searched at this locations: ~/.dyatel /usr/local/etc/dyatelrc /etc/dyatelrc
+
+Example config:
+
+    ---
+    twitter:
+        login: kostenko
+        password: gepjRfrnecf
+    vkontakte:
+        email: "dn010989kaa@rambler.ru"
+        pass: "Cbcmrb"
+
+=head1 AUTHOR
+
+Andrey Kostenko, C<< <andrey at kostenko.name> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Andrey Kostenko.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+use Dyatel;
+use Sys::Syslog;
+my $dyatel = Dyatel->new;
+
+unless ( $ENV{DEBUG} ) {
+    exit if fork;
+    exit if fork;
+}
+openlog( "dyatel", "", "local7" );
+$SIG{__DIE__} = sub {
+    syslog("err", @_ );
+    exit 255;
+};
+
+$dyatel->auth;
+$dyatel->run;

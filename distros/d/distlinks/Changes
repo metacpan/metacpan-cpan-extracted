@@ -1,0 +1,56 @@
+Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+
+This file is part of Distlinks.
+
+Distlinks is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Distlinks is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along
+with Distlinks.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 11, March 2014
+    - split out the rsync protocol bit
+
+Version 10, October 2013
+    - fixes for debian/control dependencies
+
+Version 9, March 2013
+    - fix wildly big expire days, which both cached checks too long and
+      bombed on mswin gmtime() not supporting dates 80 years ago
+
+Version 8, March 2013
+    - tests diagnostics for gmtime
+
+Version 7, January 2013
+    - correction to --verbose, make the level optional as per the POD
+    - follow html meta-refresh directives
+    - check rsync: urls too
+
+Version 6, June 2012
+    - continue past dangling symlinks in a directory
+
+Version 5, June 2011
+    - expire old links automatically
+    - always recheck file:///...
+    - expand relative links in local files from the command line
+
+Version 4, October 2010
+    - untar readonly to prevent accidental editing
+
+Version 3, October 2010
+    - newer List::MoreUtils to avoid some tests failures
+
+Version 2, September 2010
+    - test manifest only as an author test
+
+Version 1, August 2010
+    - the first version

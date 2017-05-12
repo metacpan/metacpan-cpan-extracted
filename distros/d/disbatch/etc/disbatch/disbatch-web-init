@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Daemon::Control;
+
+my @program_args = ('--listen' => ':8080', '--workers' => 10, '/etc/disbatch/app.psgi');
+
+Daemon::Control->new({
+    name         => 'disbatch-web',
+    program      => 'starman',
+    program_args => \@program_args,
+    directory    => '/',
+
+    lsb_start    => '$syslog $remote_fs',
+    lsb_stop     => '$syslog',
+    lsb_sdesc    => 'disbatch-web',
+    lsb_desc     => 'Disbatch Command Interface daemon',
+
+    pid_file     => '/var/run/disbatch-web.pid',
+    stdout_file  => '/var/log/disbatch-web.out',
+    stderr_file  => '/var/log/disbatch-web.out',
+
+    #user         => 'awillis',
+    #group        => 'systems',
+
+    fork         => 2,
+
+})->run;

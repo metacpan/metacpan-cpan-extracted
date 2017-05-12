@@ -1,0 +1,16 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: 'Can we post a note? yay!'
+context: ~
+end: ~
+id: Q
+node: page1
+public: 
+  owner: ~
+  rev: ~
+  server: the server
+selected: ~
+start: ~
+revision: 0
+title: a new note
+type: dtRdr::Note

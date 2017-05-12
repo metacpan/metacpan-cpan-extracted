@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use inc::testplan(1, 12);
+use test_inc::loginit;
+
+use lib 'inc';
+use dtRdrTestUtil::ABook;
+
+BEGIN { use_ok('dtRdr::Note') };
+
+my $book = ABook_new_1_0('test_packages/indexing_check/book.xml');
+
+# make a silly little note
+my $note = dtRdr::Note->create(
+    node    => $book->toc->get_by_id('A'),
+    range   => [0, 1],
+    content => 'content of the foo note',
+    title   => 'title of the foo note',
+    id      => 'foo'
+    );
+
+require dtRdrTestUtil::GUI;
+
+set_testing( scalar(@ARGV));
+set_dosub(sub {
+  my $frame = the_package()->_main_frame;
+  my $anno_io_dir = anno_io()->uri;
+  my $bvm = $frame->bv_manager;
+  $bvm->open_book($book);
+  # have to add the note after opening the book or else anno_io won't
+  # see the add and then the delete_note will get mad
+  $book->add_note($note);
+  
+  # TODO check that callbacks are working
+  # $bvm->book_view->note_tree->add_item($note);
+  # $bvm->book_view->refresh;
+
+  ok(-e "$anno_io_dir/foo.yml", 'anno IO check');
+
+  # either one of these is ok?
+  $bvm->book_view->show_note($note->id);
+  #$frame->note_viewer->show_note($note);
+});
+
+run();
+
+done;
+# vim:ts=2:sw=2:et:sta

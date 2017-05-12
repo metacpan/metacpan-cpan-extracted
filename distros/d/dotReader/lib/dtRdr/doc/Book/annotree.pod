@@ -1,0 +1,134 @@
+#                                 vim:ts=2:sw=2:et:sta:syntax=pod:nowrap
+
+=pod
+
+  $annotation = $self->localize_annotation($node, $annotation);
+    $anno = $anno->clone; ??? needed
+    $anno->renode($node);
+  or
+    $anno = $anno->localize(node => $node, range => $range, wstart => $ws, wend => $we); # ...
+       (does $new_anno->set_is_fake(1);)
+
+    if range or location...
+    $self->localize_offset($node, $from_node, $offset);
+
+  $anno->downgrade() and $anno->upgrade() might work?
+  $anno->exile / pardon()
+  exile, deport, alienate, banish, defrock, expel, uproot, spurn
+
+Note that we don't need to do this in the book class if the annotation
+can figure out how to manage itself by asking the book.  However, I
+might prefer to just allow anything that isa->('Thout::Range') or
+isa->('Thout::Location') to call a set_range(), set_offset(), etc.
+
+To localize to a given node, we have to address:
+
+  o rc=0
+    all of the children form a black hole
+  o r=0
+    this child is a black hole
+
+A highlight is stored (on disk and in the book) in its node's
+coordinates.  To localize this, we have to look at the source node's
+book coordinates and the destination node's book coordinates.
+
+The book coordinate of the offset (Bo) is the book coordinate of its
+node (Bn) plus the node coordinate of the offset (No).
+
+  Bo = Bn + No
+
+The destination (cache) coordinate (Dc) is the book coordinate of the
+offset (Bo) minus the book coordinate of the destination node (Bd) minus
+the pertinent differences (PD) -- which are made up of all black-hole
+nodes (in book coordinates) which come before the Bo position.
+
+  Dc = Bo - Bd - PD
+
+substituting,
+
+  Dc = (Bn + No) - Bd - PD
+
+  # XXX holes should actually be calculated as a flat list of ranges --
+  # which must account for render=1 children inside of render=0 nodes.
+  my $offset = $anno->offset + $anno->node->word_range->a; # (is Bn + No)
+  my $pertinent_difference = 0;
+  foreach my $node (holes_before($source_node)) {
+    ($node->word_range->a > $offset) and last;
+    # we are in a black hole?
+    ($node->word_range->b > $offset) and die("oh no");
+    $pertinent_difference += $node->word_range->length;
+  }
+
+And of course all of that has to be limited at $start and $end of
+the destination node.
+
+This also means that we could have to break a highlight into two
+pieces if there is a render=0 (or more likely rc=0 case) node inside
+of the found/stored coordinates.
+
+Except all we need is a pair of positions at the local cache
+coordinates?  Where does this break?  Something where it is a highlight
+within a child?
+
+=head1 Reducing Scope
+
+How about starting with creating a reduced-scope selection?
+
+The selection finds us a cache offset (Dc), which must be transformed to
+a book coordinate (Bo) and then checked against the annotation-offset
+ranges of each descendant of the searched node.
+
+Ignoring holes for a second:
+
+  Bo = Dc + Bn
+
+But, actually,
+
+  Bo = add_some_holes(Dc) + Bn
+
+And, to complicate things, we need the node of Bo (which is what we
+wanted to calculate) to I<easily> get the holes before the Dc.  But, we
+can localize the hole positions if we account for the earlier holes
+while locating the later holes (fun stuff eh?) (note that there are no
+holes in node (cache) coordinates.)
+
+  my $node_start = $node->word_start;
+  my $track = 0;
+  foreach my $desc ($node->descendants) {
+    # I'm assuming these are all holes
+    my $length = $dest->word_end - $desc->word_start;
+    my $dstart = ($dest->word_start - $node_start) - $track;
+    $track += $length;
+    # then cache it somewhere or just use this loop as the template
+  }
+
+=head1 TERMINOLOGY
+
+TODO rework the above babbling...
+
+=over
+
+=item * Position (P)
+
+A character index (not an offset)
+
+=item * Global Position (GP)
+
+is global, calculates nicely
+
+=item * Node Position (NP)
+
+position in a node, but without removing holes
+
+Easily derived from global position and node start.
+
+=item * Rendered Position (RP)
+
+Annotations are stored with RP
+
+In a node, holes are gone.  This is basically the position in the on-screen text.
+
+=back
+
+=cut
+

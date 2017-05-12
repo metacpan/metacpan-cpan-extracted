@@ -1,0 +1,80 @@
+{
+   "abstract" : "URL link checking with database.",
+   "author" : [
+      "Kevin Ryde <user42@zip.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "distlinks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Class::Singleton" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Find::Iterator" : "0",
+            "File::HomeDir" : "0",
+            "File::Type" : "0",
+            "File::chdir" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "IO::String" : "0",
+            "Image::ExifTool" : "0",
+            "Iterator::Simple" : "0",
+            "LWP" : "5.819",
+            "LWP::Debug" : "0",
+            "List::MoreUtils" : "0.24",
+            "Locale::TextDomain" : "0",
+            "Module::Util" : "0",
+            "Perl6::Slurp" : "0",
+            "Regexp::Common" : "0",
+            "Regexp::Common::URI::RFC2396" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "URI::Find" : "0",
+            "URI::file" : "0",
+            "WWW::Mechanize" : "0",
+            "YAML" : "0",
+            "constant::defer" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/distlinks/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "11"
+}

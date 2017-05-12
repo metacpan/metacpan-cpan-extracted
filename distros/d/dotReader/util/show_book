@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+show_book - show a summary of the book
+
+=cut
+
+package bin::show_book;
+
+use lib 'lib';
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+local $SIG{__WARN__};
+
+sub main {
+  my (@args) = @_;
+  my ($uri) = @args;
+  (-e $uri) or die "no file '$uri'";
+  my $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+  print $book->summary;
+}
+
+package dtRdr::Book;
+
+# eventually a Book method?
+
+=head2 summary
+
+  $book->summary;
+
+=cut
+
+sub summary {
+  my $self = shift;
+
+  my $toc = $self->toc;
+
+  my @data;
+  $toc->rmap(sub {
+    my $node = shift;
+    my $depth = do { my $p = $node; my $d = -1;
+      while($p) { $d++; $p = $p->parent; }; $d;
+    };
+
+    my $sp = $node->get_info('showpage');
+    my $content = (
+      (0 or defined($sp)) ? # maybe enable this later
+        "->$sp" :
+        strip_html(1 ?
+          $self->get_raw_content($node) :
+          $self->get_content($node)
+        )
+      );
+    if(length($content) > 40) {
+      $content =~ s/^(.{19}).*(.{18})$/$1...$2/s;
+    }
+    my $notes = '';
+    if(! $node->get_info('render')) {
+      $notes .= 'r=f';
+    }
+    if(! $node->get_info('render_children')) {
+      $notes .= '!rc';
+    }
+
+    push(@data, [$notes, '  'x$depth. $node->id, $content]);
+  });
+  use Text::Table;
+  my $tb = Text::Table->new(
+    "note\n&left", \"\n |", "node\n&left", \"\n => ", "content\n&left"
+  );
+  $tb->load(@data);
+  return("$tb");
+
+} # end subroutine summary definition
+########################################################################
+
+sub strip_html {
+  local ($_) = @_;
+  s{.*<body>}{}s; s{</body>.*}{}s; s/<[^>]+>//gs;
+  s/\n/ñ/g;
+  #s/\s+/ /gs;
+  return($_);
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::show_book::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::show_book';

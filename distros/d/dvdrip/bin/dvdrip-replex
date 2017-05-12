@@ -1,0 +1,272 @@
+#!/usr/bin/perl
+
+use strict;
+use lib 'lib';
+
+use Video::DVDRip::Project;
+
+my $USAGE = <<_EOU;
+Usage: dvdrip-replex project-file
+_EOU
+
+my $PRINT_STDERR = 0;
+
+#-- These variables are initialized from the dvd::rip project file later.
+#-- Hey, the whole thing is a hack, so don't complain about some globals... ;)
+my $PROJECT     = "foo";
+my $SUB_ID      = 0;
+my $TITLE_NR    = 1;
+my $AUDIO_TRACK = 0;
+my $FPS         = 25;
+
+my $PROJECT_DIR = "/mega/dvdrip/$PROJECT";
+my $VOB_DIR     = sprintf( "$PROJECT_DIR/vob/%03d", $TITLE_NR );
+my $AVI_DIR     = sprintf( "$PROJECT_DIR/avi/%03d", $TITLE_NR );
+my $IFO_DIR     = "$PROJECT_DIR/tmp/ifo";
+my $NAV_LOG_FILE
+    = sprintf( "$PROJECT_DIR/tmp/%s-%03d-nav.log", $PROJECT, $TITLE_NR );
+my ($FRAMES) = 0;                      # qx[ wc -l $NAV_LOG_FILE ] =~ /(\d+)/;
+my $RUNTIME = int( $FRAMES / $FPS );
+
+my $AUDIO_FIFO       = "$AVI_DIR/audio.fifo";
+my $VIDEO_FIFO       = "$AVI_DIR/video.fifo";
+my $VIDEO_AUDIO_FIFO = "$AVI_DIR/video_audio.fifo";
+my $SPU_PALETTE_FILE = "$AVI_DIR/sub-palette.txt";
+my $TARGET_VOB_FILE  = "$AVI_DIR/video_audio_spu.fifo";
+my $DVD_TARGET_DIR   = "$AVI_DIR/dvd-image";
+
+my $VOB_SIZE = 0;
+
+$| = 1;
+
+main: {
+    my $filename = shift @ARGV;
+
+    if ( !$filename ) {
+        print $USAGE;
+        exit 1;
+    }
+
+    read_project_file($filename);
+
+    my $factor = calc_factor();
+
+    replex_video($factor);
+    dvdauthor_finish();
+}
+
+sub read_project_file {
+    my ($file) = @_;
+
+    my $project = Video::DVDRip::Project->new_from_file( filename => $file );
+    my $title   = $project->content->selected_title;
+
+    $PROJECT     = $project->name;
+    $TITLE_NR    = $title->nr;
+    $AUDIO_TRACK = $title->audio_channel;
+    $FPS         = $title->frame_rate;
+
+    foreach my $sub ( values %{ $title->subtitles } ) {
+        if ( $sub->tc_render ) {
+            $SUB_ID = $sub->id;
+            last;
+        }
+    }
+
+    if ( !defined $SUB_ID ) {
+        print "Warning: no subtitle activated!\n";
+    }
+
+    $VOB_DIR      = $title->vob_dir;
+    $AVI_DIR      = $title->avi_dir;
+    $IFO_DIR      = $project->ifo_dir;
+    $NAV_LOG_FILE = $title->vob_nav_file;
+    ($FRAMES) = qx[ wc -l $NAV_LOG_FILE ] =~ /(\d+)/;
+    $RUNTIME = int( $FRAMES / $FPS );
+
+    $AUDIO_FIFO       = "$AVI_DIR/audio.fifo";
+    $VIDEO_FIFO       = "$AVI_DIR/video.fifo";
+    $VIDEO_AUDIO_FIFO = "$AVI_DIR/video_audio.fifo";
+    $SPU_PALETTE_FILE = "$AVI_DIR/sub-palette.txt";
+    $TARGET_VOB_FILE  = "$AVI_DIR/video_audio_spu.fifo";
+    $DVD_TARGET_DIR   = "$AVI_DIR/dvd-image";
+
+    1;
+}
+
+sub calc_factor {
+    my $tcprobe = qx[ tcprobe -i $VOB_DIR/ 2>/dev/null];
+
+    my ($ac3_bitrate)
+        = $tcprobe =~ /audio\s+track:\s*-a $AUDIO_TRACK.*?bitrate=(\d+)/s;
+
+    my ($vob_size) = qx[ du -sk $VOB_DIR ] =~ /(\d+)/;
+    my ($ac3_size) = int( $ac3_bitrate * 1000 / 8 * $RUNTIME / 1024 );
+
+    my $all_audio_size;
+    while ( $tcprobe =~ /audio\s+track:\s*-a\s*(\d).*?bitrate=(\d+)/sg ) {
+        my $audio_size += int( $2 * 1000 / 8 * $RUNTIME / 1024 );
+
+        #		print "audio track $1: $audio_size\n";
+        $all_audio_size += $audio_size;
+    }
+
+    #	print "tcprobe: ".$tcprobe."\n";
+
+    print "runtime         = ${RUNTIME}s\n";
+    print "vob_size        = $vob_size\n";
+    print "ac3_rate        = $ac3_bitrate\n";
+    print "ac3_size        = $ac3_size\n";
+    print "all audio size  = $all_audio_size\n";
+
+    my $dvd_size = int( 4.7 * 1000000000 / 1024 );
+
+    my $source_vid_size = $vob_size - $all_audio_size;
+    my $target_vid_size = $dvd_size - $ac3_size;
+
+    my $factor = sprintf( "%.2f", $source_vid_size / $target_vid_size );
+
+    print "dvd size        = $dvd_size\n";
+    print "source vid size = $source_vid_size\n";
+    print "target vid size = $target_vid_size\n";
+    print "-------------------------\n";
+    print "factor          = $factor\n";
+
+    if ( $factor < 1 ) {
+        print "\n"
+            . "Note: video fits on a DVD-R anyway,\n"
+            . "      no requantizing applied.\n\n";
+        $factor = 0;
+    }
+
+    $VOB_SIZE = int( $vob_size / 1024 );
+
+    return $factor;
+}
+
+sub extract_spu {
+    if ( -f "$AVI_DIR/sub-$SUB_ID/sub-$SUB_ID.xml"
+        || !defined $SUB_ID ) {
+        print "SKIPPING extract_spu()\n";
+        return;
+    }
+
+    system( get_extract_spu_command() );
+}
+
+sub replex_video {
+    my ($factor) = @_;
+
+    system(
+        "rm -f  $AUDIO_FIFO $VIDEO_FIFO $VIDEO_AUDIO_FIFO $TARGET_VOB_FILE;
+	         mkfifo $AUDIO_FIFO $VIDEO_FIFO $VIDEO_AUDIO_FIFO $TARGET_VOB_FILE"
+    );
+
+    my $video_command       = get_video_command($factor);
+    my $audio_command       = get_audio_command();
+    my $mplex_command       = get_mplex_command();
+    my $spumux_command      = get_spumux_command();
+    my $dvdauthor_command   = get_dvdauthor_command();
+    my $extract_spu_command = get_extract_spu_command();
+
+    if ($PRINT_STDERR) {
+        s!2>.*/dev/null!! for (
+            $video_command,  $audio_command, $mplex_command,
+            $spumux_command, $dvdauthor_command
+        );
+    }
+
+    print "ex spu command    = $extract_spu_command\n";
+    print "video_command     = $video_command\n";
+    print "audio_command     = $audio_command\n";
+    print "mplex_command     = $mplex_command\n";
+    print "spumux_command    = $spumux_command\n";
+    print "dvdauthor command = $dvdauthor_command\n";
+
+    print "\nHit [Enter] or [Ctrl+C]: ";
+    <STDIN>;
+
+    print "\n";
+
+    extract_spu();
+
+    print "start dvdauthor command\n";
+    system("$dvdauthor_command &");
+
+    print "start spumux command\n";
+    system("$spumux_command &");
+    print "start mplex command\n";
+    system("$mplex_command &");
+    print "start audio command\n";
+    system("$audio_command &");
+
+    print "start video command\n\n";
+    open( VIDEO, "($video_command) 2>&1 |" )
+        or die "can't fork $video_command";
+    my ( $p, $i, $max );
+    while (<VIDEO>) {
+        ( $i, $max ) = m!(\d+)/(\d+)!;
+        $p = sprintf( "%.2f\%\r", 100 * $i / $max ) if $max;
+        print "Progress: $p";
+    }
+    print "\n";
+    close VIDEO;
+
+    system("rm -f  $AUDIO_FIFO $VIDEO_FIFO $VIDEO_AUDIO_FIFO");
+
+    1;
+}
+
+sub dvdauthor_finish {
+    print "\nFinalizing DVD image...\n";
+    system( get_dvdauthor_finish_command() );
+    print "DVD image finalized\n";
+}
+
+sub get_extract_spu_command {
+    my $nr = $TITLE_NR;
+    if ( !-f sprintf( "$IFO_DIR/vts_%02d_0.ifo", $nr ) ) {
+        $nr = 1;
+    }
+    return "mkdir -p $AVI_DIR/sub-$SUB_ID && "
+        . "ifo_dump $IFO_DIR $nr | grep Color | sed 's/Color ..: 00//' > $SPU_PALETTE_FILE && "
+        . "spuunmux -v 2 -s $SUB_ID -p $SPU_PALETTE_FILE -o $AVI_DIR/sub-$SUB_ID/sub-$SUB_ID $VOB_DIR/*.vob";
+}
+
+sub get_video_command {
+    my ($factor) = @_;
+    return
+        "cat $VOB_DIR/*.vob | dr_progress -m $VOB_SIZE -i 1 | tcextract -x mpeg2 -t vob 2>/dev/null >$VIDEO_FIFO"
+        if $factor < 1;
+    return
+        "cat $VOB_DIR/*.vob | dr_progress -m $VOB_SIZE -i 1 | tcextract -x mpeg2 -t vob 2>/dev/null | tcrequant -f $factor 2>/dev/null >$VIDEO_FIFO";
+}
+
+sub get_audio_command {
+    return
+        "cat $VOB_DIR/*.vob | tcextract -a $AUDIO_TRACK -x ac3 -t vob 2>/dev/null >$AUDIO_FIFO";
+}
+
+sub get_mplex_command {
+    return
+        "mplex -f 8 -o $VIDEO_AUDIO_FIFO $VIDEO_FIFO $AUDIO_FIFO -S 0 >/dev/null 2>&1";
+}
+
+sub get_spumux_command {
+    return "cat < $VIDEO_AUDIO_FIFO > $TARGET_VOB_FILE 2>/dev/null"
+        if !defined $SUB_ID;
+    return "spumux -m dvd -s 0 $AVI_DIR/sub-$SUB_ID/sub-$SUB_ID.xml "
+        . "< $VIDEO_AUDIO_FIFO > $TARGET_VOB_FILE 2>/dev/null";
+}
+
+sub get_dvdauthor_command {
+    return "rm -rf $DVD_TARGET_DIR && "
+        . "mkdir -p $DVD_TARGET_DIR && "
+        . "dvdauthor -t -a ac3+de -o $DVD_TARGET_DIR $TARGET_VOB_FILE 2>/dev/null";
+}
+
+sub get_dvdauthor_finish_command {
+    return "dvdauthor -T -o $DVD_TARGET_DIR";
+}
+
+1;

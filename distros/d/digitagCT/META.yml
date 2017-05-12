@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               digitagCT
+version:            1.01
+abstract:           lib/CracTools/DigitagCT.pm
+author:
+    - Nicolas PHILIPPE <nicolas.philippe@inserm.fr>
+    - Jérôme AUDOUX <jerome.audoux@univ-montp2.fr>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CracTools:  1.01
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

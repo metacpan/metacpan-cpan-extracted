@@ -1,0 +1,13 @@
+# Makefile snippet that holds all package-dependent information.
+
+# Add more languages here, separated with spaces
+LINGUAS = de fr cs es sr sr@Latn it sv ca da
+
+# Textdomain for our package.
+TEXTDOMAIN = video.dvdrip
+
+# Initial copyright holder added to pot and po files.
+COPYRIGHT_HOLDER = Jörn Reder <joern AT zyn.de>
+
+# Mail address for bug reports
+MSGID_BUGS_ADDRESS = dvd::rip Translation Team <dvdrip-lang AT exit1.org>

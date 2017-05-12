@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use strict;
+
+use FileHandle;
+
+main: {
+    my @fh;
+    foreach my $cmd (@ARGV) {
+        if ( $cmd eq '1' ) {
+            push @fh, \*STDOUT;
+            next;
+        }
+        my $fh = FileHandle->new;
+        open( $fh, "| nice -n 19 $cmd" ) or die "can't fork $cmd";
+        push @fh, $fh;
+    }
+
+    my $buffer;
+    while ( sysread( STDIN, $buffer, 65535 ) ) {
+        syswrite( $_, $buffer ) for @fh;
+    }
+
+    close $_ for @fh;
+}

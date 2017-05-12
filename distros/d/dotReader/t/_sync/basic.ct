@@ -1,0 +1,316 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use inc::testplan(1,
+  + 4   # use
+  + 199
+  + 610
+  + 7   # callbacks
+  + 194 # fin
+  + 206 # one sync+verify
+);
+
+########################################################################
+BEGIN {
+  use_ok('dtRdr::Annotation::IO');
+  use_ok('dtRdr::Annotation::Sync::Standard');
+  use_ok('dtRdr::Config');
+  use_ok('dtRdr::BookBag');
+}
+
+########################################################################
+# sync only these book id's
+my @book_list = qw(
+  xEF22EA3CDB3611DBA417B36A7806B258
+  xF0D8058ADB3911DB8F2B386E7806B258
+);
+########################################################################
+
+use test_lib::server;
+
+use test_inc::tempdir;
+my $s_storage_dir = wants 't/_sync/s_temp';
+my $l_storage_dir = wants 't/_sync/l_temp';
+
+use test_inc::anno_copy;
+{
+  my %books_ok = map({$_ => 1} @book_list);
+  anno_copy(
+    'test_data/annotations.server.01/',
+    $s_storage_dir,
+    sub {$_->{public} and $books_ok{$_->{book}}},
+  );
+}
+########################################################################
+
+########################################################################
+# setup the server *** caution, forks! ***
+srand;
+my $user = 'bob';
+my $pass = join('', map({chr(97 + int(rand(25)))} 0..12));
+
+my $url = test_lib::server->new(
+  storage => $s_storage_dir,
+  users   => {$user => $pass},
+  auth_type => $ENV{DOT_SERVER_AUTH} || 'Basic',
+  verbose => $ENV{DOT_SERVER_VERBOSE} || 0,
+  #auth_required => 1,
+  #no_auth => 1, # XXX not really working?
+)->started_ok or die 'no server';
+$url .= '/';
+########################################################################
+
+# just a basic pull sync, thus: an unpopulated local io
+my $io = dtRdr::Annotation::IO->new(uri => $l_storage_dir);
+
+my $server = dtRdr::ConfigData::Server->new(
+  id       => 'the server',
+  username => $user,
+  password => $pass,
+  uri      => $url,
+);
+
+########################################################################
+my $run_sync = sub {
+  my (%opts) = @_;
+  my $sync = dtRdr::Annotation::Sync::Standard->new(
+    anno_io => $io,
+    server  => $server,
+    books   => [@book_list],
+    %opts
+  );
+
+  # run it
+  $sync->start;
+
+  my $counter = 0;
+  until($sync->done) {
+    $sync->work;
+    ($counter++ > 1000) and last; # just to have some limit
+  }
+  ok($sync->done, 'done') or die "latency trouble?";
+}; # end sub $run_sync
+########################################################################
+my $get_yml = sub {
+  my ($id) = @_;
+  return YAML::Syck::LoadFile(
+    'test_data/annotations.input.01/' . $id .'.yml');
+};
+use test_inc::anno_io_verify;
+my $verify = sub {
+  anno_io_verify($s_storage_dir, $io, $server, \@book_list);
+};
+
+$run_sync->();
+$verify->();
+
+use dtRdr::Book;
+sub zombie_anno {
+  my ($h, $io) = @_;
+  my $book = dtRdr::Book::Zombie->new(id => $h->{book});
+  my $type = $h->{type};
+  # load if needed
+  my $anno_type = dtRdr::Annotation::IO->_anno_type($type);
+  my $anno = $type->deserialize($h, book => $book);
+  if($io) {
+    my $method = 'add_' . $anno_type;
+    $book->$method($anno);
+    $book->set_anno_io($io);
+  }
+  return($anno);
+} # end subroutine zombie_anno
+########################################################################
+
+# now modify some of these locally
+{
+  my $id = 'AAAB';
+  my $rev;
+  {
+    my $zanno = zombie_anno(grep({$_->{id} eq $id} $io->items), $io);
+    $rev = $zanno->revision;
+    ok(defined($rev), 'has a revision');
+    # make sure it is indeed mine
+    defined($zanno->public->owner) and die "bad test data?";
+    $zanno->set_content($zanno->content . 'thbbt');
+    $zanno->book->change_note($zanno);
+    is($zanno->revision, $rev+1, 'rev bump');
+  }
+  { # check the io
+    my ($obj) = grep({$_->{id} eq $id} $io->items);
+    is($obj->{revision}, $rev+1, 'rev bump persists');
+  }
+}
+$run_sync->();
+$verify->();
+
+# and add
+{
+  my $anno = $get_yml->('Q');
+  $io->x_insert($anno->{id}, $anno);
+  my $rev;
+  {
+    my $zanno = zombie_anno($anno, $io);
+    $rev = $zanno->revision;
+    ok(defined($rev), 'has a revision');
+    is($rev, 0, 'correct');
+    # make sure it is indeed mine
+    defined($zanno->public->owner) and die "bad test data?";
+  }
+  { # check the io
+    my ($obj) = grep({$_->{id} eq $anno->{id}} $io->items);
+    is($obj->{revision}, $rev, 'rev persists');
+  }
+}
+$run_sync->();
+$verify->();
+
+# run it as many times as you like :-D 
+$run_sync->(); $verify->();
+#$run_sync->(); $verify->(); # though you do have to change the counter
+#$run_sync->(); $verify->();
+
+# and delete
+{
+  my $id = 'Q';
+  # TODO maybe shouldn't need to go through serialize to delete, but
+  # let's just play the game for now. (this deals with .yml.deleted)
+  my $zanno = zombie_anno(grep({$_->{id} eq $id} $io->items), $io);
+  $zanno->book->delete_note($zanno);
+  { # check the io
+    my @found = grep({$_->{id} eq $id} $io->items);
+    ok(!@found, 'is gone');
+    my @del = grep({$_->{id} eq $id} $io->deleted);
+    is(scalar(@del), 1, 'all set');
+  }
+}
+$run_sync->();
+$verify->();
+
+# to deref
+my $OBlob = sub {dtRdr::Annotation::IOBlob->outgoing(%{$_[0]});};
+
+# do some deletes and mods from a different UA
+# TODO maybe also from a different user
+my $to_del = 'AAAB';
+my $bm_del = 'x10426916C14E11DBAB43B801C9B462D6';
+my $bm_mod = 'x0DA4CBC4C15111DB884BD901C9B462D6';
+my $to_mod = 'A';
+my $to_add = 'R';
+{ # could create a completely new io but probably just do some puts
+  {
+    package MyUA;
+    use base 'LWP::UserAgent';
+    sub get_basic_credentials {return($user, $pass);}
+    # GRR, why can't I have delete and put methods?
+    sub req {
+      my $self = shift;
+      my $ans = $self->request(HTTP::Request->new(@_));
+      my %want = (
+        GET    => 200,
+        POST   => 201,
+        DELETE => 200,
+        PUT    => 200,
+      );
+      ($ans->code == $want{$_[0]}) or
+        die "bad answer ", $ans->code, " ", $ans->content;
+      my $cont = $ans->content;
+      return($cont);
+    }
+  }
+  my $ua = MyUA->new();
+  # OOPS, the other client needs to login when we're doing cookies
+  {
+    if(my $ans = $ua->req('GET', $url.'config.yml')) {
+      my $data = YAML::Syck::Load($ans);
+      if(my $lconf = $data->{login}) {
+        require HTTP::Cookies;
+        my $cookies = HTTP::Cookies->new;
+        $ua->cookie_jar($cookies);
+        my $template = $lconf->{template} or die "need template for login";
+        $template =~ s/#USERNAME#/$user/ or die "no #USERNAME# in template?";
+        $template =~ s/#PASSWORD#/$pass/ or die "no #PASSWORD# in template?";
+        my $ans = $ua->request(HTTP::Request->new(
+          'POST', $lconf->{url}, [], $template
+        ));
+      }
+    }
+  }
+  $ua->req('DELETE', $url . "annotation/$to_del.yml?rev=1");
+  $ua->req('DELETE', $url . "annotation/$bm_del.yml?rev=0");
+  my $bm = $OBlob->(grep({$_->{id} eq $bm_mod} $io->items));
+  $bm or die "drat";
+  $bm->set_title('Test Coverage Rocks');
+  $bm->set_revision(1);
+  my $to = $OBlob->(grep({$_->{id} eq $to_mod} $io->items));
+  $to or die "drat";
+  $to->set_content($to->content . ' and and and and and');
+
+  eval { # didn't increment rev yet
+    $ua->req('PUT', $url . "annotation/$to_mod.yml?rev=0",
+      [content_type => 'text/x-yaml'],
+      YAML::Syck::Dump($to->deref)
+    );
+  };
+  my $err = $@;
+  like($err, qr/bad answer 409 Revision exists/);
+  $to->set_revision(1);
+  $ua->req('PUT', $url . "annotation/$to_mod.yml?rev=0",
+    [content_type => 'text/x-yaml'],
+    YAML::Syck::Dump($to->deref)
+  );
+  $ua->req('PUT', $url . "annotation/$bm_mod.yml?rev=0",
+    [content_type => 'text/x-yaml'],
+    YAML::Syck::Dump($bm->deref)
+  );
+  $ua->req('POST', $url . 'annotation/',
+    [content_type => 'text/x-yaml'],
+    do {open(my $fh, '<', 'test_data/annotations.input.01/R.yml');
+      local $/; <$fh>},
+  );
+    
+
+} # ugh, deleted, putted, posted
+{ # setup book callbacks pointed at counters
+  my $s_book = dtRdr::Book::Zombie->new(id => $book_list[1]);
+  my $a_book = dtRdr::Book::Zombie->new(id => $book_list[0]);
+  $io->apply_to($s_book);
+  $io->apply_to($a_book);
+  my %hits;
+  my %changed;
+  foreach my $event (qw(created changed deleted)) {
+    $hits{$event} = 0;
+    my $setter = 'set_annotation_' . $event . '_sub';
+    dtRdr::Book->callback->$setter(sub {
+      my $anno = shift;
+      $hits{$event}++;
+      $changed{$anno->id} = $event;
+    });
+  }
+  my $bag = dtRdr::BookBag->new(books => [$s_book, $a_book]);
+  $run_sync->(bookbag => $bag);
+  $verify->();
+  is($hits{deleted}, 2);
+  is($hits{changed}, 2);
+  is($hits{created}, 1);
+  is_deeply(\%changed,
+  {
+    $to_del => 'deleted',
+    $bm_del => 'deleted',
+    $bm_mod => 'changed',
+    $to_mod => 'changed',
+    $to_add => 'created',
+  }, 'callbacks are golden');
+  {
+    my $anno = $a_book->find_bookmark($bm_mod);
+    is($anno->title, 'Test Coverage Rocks');
+  }
+  {
+    my $anno = $s_book->find_note($to_mod);
+    like($anno->content, qr/ and and and and and$/);
+  }
+}
+
+done;
+# vim:ts=2:sw=2:et:sta:syntax=perl

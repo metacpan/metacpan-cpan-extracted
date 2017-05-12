@@ -1,0 +1,16 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: huh?
+context: ~
+end: 88
+id: x728B6ED2B19B11DBA9F7134BC9B462D6
+node: page1
+public: 
+  owner: bob
+references: 
+  - A
+revision: 0
+selected: ~
+start: 0
+title: yo
+type: dtRdr::Note

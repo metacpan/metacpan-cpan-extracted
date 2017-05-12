@@ -1,0 +1,8 @@
+# things to test
+o 500/404 recovery
+o basic/digest authentication
+o annotation push
+o annotation deserialize
+o book callback
+o gui callbacks
+o gui progress?

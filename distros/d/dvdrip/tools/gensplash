@@ -1,0 +1,35 @@
+#!/usr/local/bin/perl
+
+use strict;
+use lib "lib";
+require "lib/Video/DVDRip.pm";
+
+BEGIN { $Video::DVDRip::PREFERENCE_FILE = "$ENV{HOME}/.dvdriprc" }
+
+main: {
+    my $version_file  = "lib/Video/DVDRip.pm";
+    my $version_mtime = (stat($version_file))[9];
+
+    foreach my $from_file ( glob("l10n/splash.*.svg") ) {
+        my ($lang)    = $from_file =~ /splash\.([^.]+)\.svg/;
+        my $to_file   = "lib/Video/DVDRip/splash.$lang.png";
+        my $tmp_file  = "/tmp/dvdrip-splash.svg";
+
+        if (    (stat($to_file))[9] >= (stat($from_file))[9]
+             && (stat($to_file))[9] >=  $version_mtime ) {
+            print "Skipping up-to-date file $to_file.\n";
+            next;
+        }
+
+        print "Generating file $to_file.\n";
+
+        my $command =
+            qq[perl -p -e 's/DVDRIP-VERSION/$Video::DVDRip::VERSION/' $from_file > $tmp_file && ].
+            qq[inkscape --export-png $to_file --export-area=0:0:388:287 ].
+            qq[ --export-background=white --export-dpi=130 ].
+            qq[ $tmp_file; rm -f $tmp_file ];
+
+        system($command);
+    }
+}
+

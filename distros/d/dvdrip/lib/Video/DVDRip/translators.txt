@@ -1,0 +1,32 @@
+[Catalan]
+Joan Farrerons <jfarrerons AT economistes.com>
+
+[Czech]
+Ales Tosovsky <tosovsky AT wo.cz>
+
+[Danish]
+Ysangkok <ysangkok AT gmail.com>
+Kenneth Nielsen
+
+[French]
+Sebastien Corot <scorot AT libertysurf.fr>
+Christophe Combelles <ccomb AT free.fr>
+	  
+[German]
+Jörn Reder <joern AT zyn.de>
+
+[Italian]
+Fabio Russo <f.russo AT sosinformatica.com>
+Costantino <inverness1 AT virgilio.it>
+
+[Portuguese]
+Flavio <qazav3.0 AT gmail.com>
+
+[Serbian]
+Bojan Bozovic <bole89 AT tesla.rcub.bg.ac.yu>
+
+[Swedish]
+Daniel Nylander <po AT danielnylander.se>
+
+[Spanish]
+Sergio Cambra <runico AT users.berlios.de>

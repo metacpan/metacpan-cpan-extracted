@@ -1,0 +1,19 @@
+dthumb - Create static HTML thumbnail list for images
+
+Requires: 
+ * perl version 5.10 or newer
+ * Data::Section
+ * Image::Imlib2
+ * Time::Progress
+
+Installation:
+
+> perl Build.PL
+> ./Build
+> sudo ./Build install
+
+You can then run 'man dthumb' for more information.
+
+
+You may also run './Build test'. This will require the Test::More,
+Test::Compile and Test::Pod modules.

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<pkg:package name="check-img" revision="1.0"
+    xmlns:pkg="http://osoft.com/package"
+    xmlns:books="http://osoft.com/book">
+<pkg:author></pkg:author>
+<pkg:publisher></pkg:publisher>
+<pkg:content>
+<pkg:outlineMarker OutlineName="A" id="A" visible="true">
+  <img src="foo.png"/>
+<pkg:outlineMarker OutlineName="B" id="B" visible="true">
+  <a href="A">A link</a>
+</pkg:outlineMarker><!-- B -->
+</pkg:outlineMarker><!-- A -->
+</pkg:content>
+</pkg:package>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rss version="2.0">
+<channel>
+<title>Eli's personal picks (Editaste)</title>
+<link>http://www.editaste.com</link>
+<description>Eli's personal picks</description>
+<language>en-us</language>
+<generator>Editaste (editaste.com)</generator>
+<pubDate>Mon, 06 Mar 2006 17:19:33 -0500</pubDate>
+<ttl>60</ttl>
+<image>
+<title>Editaste.com</title>
+<url>http://www.editaste.com/images/rss_editaste.gif</url>
+<link>http://www.editaste.com</link>
+<width>119</width>
+<height>29</height>
+<description>Eli's personal picks</description>
+</image>
+<item>
+<title>Typical item title</title>
+<link>http://www.editaste.com</link>
+<description>This is just a link to the Editaste site</description>
+<pubDate>Mon, 06 Mar 2006 07:31:58 -0500</pubDate>
+<guid isPermaLink="false">editaste_linkid_1</guid>
+</item>
+</channel>
+</rss>

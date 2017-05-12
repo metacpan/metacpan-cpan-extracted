@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+dTemplate.pm
+dTemplate.pod
+dTemplate.xs
+CompiledDataStruct.txt
+test.pl
+TODO
+README
+example/dtemplate.pl
+example/templates/page.htm
+example/templates/table_row.htm
+example/templates/table_cell.htm
+example/text/eng/table_title.txt
+example/text/hun/table_title.txt
+META.yml                                 Module meta-data (added by MakeMaker)

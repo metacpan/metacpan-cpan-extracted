@@ -1,0 +1,11 @@
+# vim:ts=2:sw=2:et:sta:syntax=perl
+
+# just a stupid little hack not worth being a module
+
+# call as:
+#  do('util/DEPRECATED') or warn;
+
+local $SIG{__WARN__};
+my ($cp, $cl) = (caller(1))[0,2];
+warn "\n\nDEPRECATED:  '$cp' line $cl should quit calling me! -- ",
+  join(" line ", (caller(0))[0,2]), "\n";

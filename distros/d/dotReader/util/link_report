@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm and Osoft, Inc.
+
+use warnings;
+use strict;
+
+use lib 'lib';
+
+=head1 NAME
+
+link_report - display a book's links
+
+=cut
+
+package bin::link_report;
+
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+sub main {
+  my (@args) = @_;
+  my ($uri) = @args;
+  (-e $uri) or die "no file '$uri'";
+  my $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+  print $book->link_summary;
+}
+
+package dtRdr::Book;
+
+use URI;
+use XML::Twig;
+
+=head2 link_summary
+
+  my $string = $book->link_summary;
+
+=cut
+
+sub link_summary {
+  my $self = shift;
+
+  my @nodes = sub {
+    my %seen;
+    return(map({my $n = $self->find_toc($_->id);
+      $seen{$n} ? () : ($seen{$n} = $n)}
+      ($self->toc, $self->toc->descendants)));
+  }->();
+  warn scalar(@nodes), " nodes";
+
+  my $id = $self->id;
+
+  my %data = (
+    books     => {self => 0},
+    sites     => {},
+    ftp       => {},
+    mailto    => [],
+    unhandled => {},
+  );
+  foreach my $node (@nodes) {
+    my $twig = XML::Twig->new(
+      twig_handlers => {
+        'a' => sub {
+          my ($t, $el) = @_;
+          my %atts = %{$el->atts};
+          my $ref = $atts{href} or return;
+          my $uri = URI->new($ref);
+          if(my $scheme = $uri->scheme) {
+            ($scheme eq 'dr') and return; # ignore meta-links
+            if($scheme eq 'pkg') {
+              my $p = $uri->authority;
+              $p = 'self' if($p eq $id);
+              $data{books}{$p} ||= 0;
+              $data{books}{$p}++;
+            }
+            elsif($scheme =~ '^http') {
+              my $ref = $data{sites}{$uri->authority} ||= [];
+              my $string = $uri->as_string;
+              my %got = map({$_ => 1} @$ref);
+              $got{$string} and return;
+              push(@$ref, $string);
+            }
+            elsif($scheme eq 'ftp') {
+              my $ref = $data{ftp}{$uri->authority} ||= [];
+              my $string = $uri->as_string;
+              my %got = map({$_ => 1} @$ref);
+              $got{$string} and return;
+              push(@$ref, $string);
+            }
+            elsif($scheme eq 'mailto') {
+              push(@{$data{mailto}}, $uri->as_string);
+            }
+            else {
+              my $ref = $data{unhandled}{$scheme} ||= [];
+              push(@$ref, $uri->as_string);
+            }
+          }
+        }, # end 'a' handler
+      },
+    );
+    my $content = $self->get_content($node);
+    $twig->parse($content);
+  }
+  use YAML;
+  print YAML::Dump(\%data);
+
+  my $s = '';
+  return($s);
+} # end subroutine link_summary definition
+########################################################################
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::link_report::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::link_report';

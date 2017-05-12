@@ -1,0 +1,69 @@
+=pod
+
+=head1 NAME
+
+dtRdr::Book::ThoutBook_1_0::Format - book format notes
+
+=head1 Aside
+
+This is a bit rough.
+
+=head1 Book Properties
+
+thoutpackage.properties - anything, but overridden by user
+
+=head2 pkg:package
+
+The only attributes in pkg:package are id, serial, and revision.
+
+  <pkg:package id="xF0D8058ADB3911DB8F2B386E7806B258" serial="95" rev="2.0">
+
+=head2 pkg:properties
+
+  <pkg:properties>
+    <author>The Author</author>
+  <pkg:properties>
+
+Null properties in xml are an error.
+
+=head2 About the properties
+
+=over
+
+=item id
+
+The book id is unique to a particular "idea container".  E.g. you might
+have multiple languages and/or editions of a book with the same id.
+
+The id must be uri-safe.  That is, no character other than letters and
+numbers.
+
+For best results, use an id created from an md5 hash as follows:
+
+  use Digest::MD5 ();
+
+  my $domain = 'example.com';
+  my $title  = 'The Title of Your Book';
+  my $author = 'A.U. Thor';
+  my $id = 'x' . Digest::MD5::md5_hex(join('_', $domain, $title, $author));
+
+=item serial
+
+The serial number corresponds to a particular "printing" of your book.
+This might be a particular translation of a particular edition or
+whatever.
+
+Two copies of a book with matching id+serial numbers are assumed to have
+I<identical> content.  Annotations and links apply to a given book id,
+but a different serial number tells us that they might not directly
+line-up in another edition/translation/etc.
+
+If you're looking to identify a particular copy of a book (e.g.
+personalized to the user or whatever), this is probably not the
+attribute you're looking for.
+
+=back
+
+=cut
+
+# vim:ts=2:sw=2:et:sta

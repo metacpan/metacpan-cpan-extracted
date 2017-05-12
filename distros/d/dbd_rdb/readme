@@ -1,0 +1,22 @@
+DBD::RDB - Oracle RDB driver for DBI (VMS only)
+
+Copyright (c) 2000 Andreas Stiller, Germany.
+
+See COPYRIGHT section in DBI.pm of the DBI-module for usage and 
+distribution rights.
+
+BEFORE BUILDING, TESTING AND INSTALLING this you will need to:
+
+    1) Install Oracle RDB with development option (SQLMOD is needed),
+       since i don't know if it legally OK to distribute object modules.
+    2) Install the DBI module (I tested with DBI 1.23)
+
+BUILDING
+
+    Unpack the DBD::RDB files and 
+	    perl Makefile.PL
+	    mmk                    (or mms)
+	    mmk test
+	    mmk install
+
+End.

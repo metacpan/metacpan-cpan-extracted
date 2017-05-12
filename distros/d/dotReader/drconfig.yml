@@ -1,0 +1,21 @@
+--- 
+book_handler: {}
+library:
+  -
+    type: YAMLLibrary
+    uri: drlib.yml
+servers:
+  -
+    books:
+      - xF0D8058ADB3911DB8F2B386E7806B258
+    type: Standard
+    uri: 'http://localhost:8085'
+    id: 'a_local_server'
+    name: 'This Little Server That Could'
+    username: 'bob'
+    password: 'e'
+module: []
+
+user_info: {}
+
+version: 0.010

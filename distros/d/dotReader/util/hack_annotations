@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+hack_annotations - interactively change annotation properties
+
+=cut
+
+package bin::hack_annotations;
+
+use Getopt::Helpful;
+
+use lib 'lib';
+use dtRdr::Annotation::IO;
+
+sub main {
+  my (@args) = @_;
+
+  my ($first) = grep({$args[$_] !~ m/^-/} 0..$#args);
+  ($first) = splice(@args, $first, 1);
+
+  if(my $disp = __PACKAGE__->can('cmd_' . $first)) {
+    $disp->(@args);
+  }
+  else {
+    die "$first is not a command";
+  }
+}
+
+sub cmd_user {
+  my (@args) = @_;
+
+  my $users = 'bob,sue,joe';
+  my $dir;
+  my $hopt = Getopt::Helpful->new(
+    ['u|users=s', \$users, 'b=bob,s=sue,j=joe', 'usernames and abbrev'],
+    ['d|dir=s', \$dir, '<dirname>', 'annotation directory'],
+  );
+  $hopt->Get_from(\@args);
+  $dir = shift(@args) unless($dir);
+
+  (-d $dir) or die "need a dir";
+
+  my %users = map({
+    my ($k, $v) = split(/=/, $_);
+    defined($v) ? ($k => $v) : (substr($k, 0, 1) => $k);
+  } split(/, */, $users));
+
+  my $io = dtRdr::Annotation::IO->new(uri => $dir);
+  my %items = map({$_->{id} => $_} $io->items);
+  foreach my $id (
+    sort({($items{$a}{create_time} || 0) <=> ($items{$b}{create_time} || 0)} sort(keys(%items)))
+  ) {
+    my $anno = $items{$id};
+    printf("%-22s  %11s - %-33s\n",
+      substr($anno->{book}, 0, 22),
+      '*' . ($anno->{type} =~ m/dtRdr::(.*)/)[0] . '*',
+      $anno->{id}
+    );
+    print join("\n",
+      map(
+        {sprintf("  %11s %-30s",
+          $_ . ': ',
+          (defined($anno->{$_}) ? substr($anno->{$_}, 0, 30) : '~')
+        )}
+        qw(title),
+        ($anno->{type} eq 'dtRdr::Note' ? 'content' : ()),
+      ),
+      (
+        $anno->{references} ?
+        '       refs: ' . join(", ",
+          map({"'" . ($items{$_} ?
+            ((length($items{$_}{title}) > 15) ?
+              substr($items{$_}{title}, 0, 12) . '...' :
+              $items{$_}{title}
+            ) :
+            '~' . substr($_, 0, 11)
+            ) . "'"
+          }
+          @{$anno->{references}})) : ()
+      ),
+    '');
+    my $public = $anno->{public};
+    print join("\n",
+      map(
+        {sprintf("  %11s %-30s",
+          $_ . ': ',
+          (defined($public->{$_}) ? substr($public->{$_}, 0, 30) : '~')
+        )}
+        qw(owner server),
+      ),
+    '') if($public);
+    print "\n";
+    # finally, the question
+    print "user? (", join(",", map({"$_=$users{$_}"} sort(keys(%users)))), ")\n";
+    chomp(my $ans = <STDIN>);
+    if($ans) {
+      my $user = $users{$ans};
+      unless($user) {
+        print "invalid, skipping...\n\n";
+        next;
+      }
+      $anno->{public} ||= {};
+      $anno->{public}{owner} = $user;
+      $io->x_update($anno->{id}, $anno);
+    }
+    print "\n";
+  }
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::hack_annotations::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::hack_annotations';

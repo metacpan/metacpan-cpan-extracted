@@ -1,0 +1,40 @@
+dbMan 0.40
+(c) Copyright 1999-2014 by Milan Sorm, sorm@is4u.cz
+
+If you plan to use this program you must respect LICENSE file.
+
+This software provides some functionality in database managing
+(SQL console).
+
+Depends on installation of Term::Size, Text::FormatTable, Locale::gettext,
+Data::ShowTable, Data::Dumper, Term::ReadLine, Term::ReadKey, Term::Screen,
+Cwd, DBI and some DBD driver.
+
+For Curses-like interface cdbman you need Curses and Curses::UI modules.
+
+To install make
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For next documentation please run 
+
+	dbman		(for standard text command line mode)
+	cdbman		(for near-stable Curses mode)
+	xdbman		(for experimental X application mode)
+
+and use command
+
+	help
+
+Stable and development branch is maintained on GitHub in repository:
+
+	https://github.com/milsorm/dbman/
+
+Hints for readline environment, use ~/.inputrc for tuning:
+
+	set completion-ignore-case On
+	"\e[5~": beginning-of-history
+	"\e[6~": end-of-history

@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+thout1_toc_cache - create or update zipped toc
+
+=cut
+
+package bin::thout1_toc_cache;
+
+use Archive::Zip qw(
+  AZ_OK
+  COMPRESSION_DEFLATED
+);
+
+use lib 'lib';
+
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+local $SIG{__WARN__};
+
+sub main {
+  my (@args) = @_;
+
+  my $uri = shift(@args);
+  (-e $uri) or die "no file: $uri";
+
+  my ($book) = dtRdr::Book->identify_by_uri($uri);
+  $book or die "identify book failure";
+  warn "book $book";
+  $book->isa('dtRdr::Book::ThoutBook_1_0::Base') or
+    die "$book is not my sort of format";
+  $book = $book->new();
+  $book->set_toc_cache_dirty(1);
+  $book->load_uri($uri);
+
+  my $toc = $book->toc->yaml_dump;
+  warn "ok ", length($toc);
+
+  # XXX should have options to write it elsewhere, for now just smash
+  warn "Adding toc to $uri";
+  my $zip = Archive::Zip->new($uri);
+  # GRR, existing but faulty toc causes headaches
+  if($zip->removeMember('toc_data.toc')) {
+    warn "GRR, existing toc_data.toc?\n";
+  }
+
+  $zip->addString(
+    $toc, 'toc_data.toc'
+  )->desiredCompressionMethod(COMPRESSION_DEFLATED);
+
+  #update the property sheet
+  my $prop = $zip->contents('thout_package.properties');
+  $prop =~ s/toc_data:[^\n]+[\n]//g;
+  $prop .= "\ntoc_data: toc_data.toc\n";
+  $prop =~ s/\n+/\n/g;
+  $zip->contents('thout_package.properties', $prop);
+  my $status = $zip->overwrite;
+  die "error writing zip ($status)" unless(AZ_OK == $status);
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::thout1_toc_cache::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::thout1_toc_cache';

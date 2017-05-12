@@ -1,0 +1,17 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: "<p>I have to say, this content is lame.</p>\n\n<p>Maybe my creativity for creating sample content and data is in a slump?</p>"
+context: ~
+create_time: 1172023017
+end: 93
+id: xCFC0AD66C14E11DB884BD901C9B462D6
+mod_time: 1172023063
+node: cover
+public: 
+  owner: bob
+revision: 1
+selected: 
+  - content.
+start: 85
+title: content?
+type: dtRdr::Note

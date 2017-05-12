@@ -1,0 +1,113 @@
+If you want to write new extension to dbMan, you can try with this backbone:
+
+package DBIx::dbMan::Extension::Your_module;
+
+use strict;
+use vars qw/$VERSION @ISA/;
+use DBIx::dbMan::Extension;
+
+$VERSION = '0.01';
+@ISA = qw/DBIx::dbMan::Extension/;
+
+1;
+
+sub IDENTIFICATION { return "YOUR-ID-STRINGS"; }
+
+sub preference { return YOUR-PREFERENCE; }
+
+sub handle_action {
+	my ($obj,%action) = @_;
+
+	# %action modification or something making
+
+	$action{processed} = 1;
+	return %action;
+}
+
+
+
+
+where Your_module change to name of your extension,
+YOUR-ID-STRINGS is composition of three numbers:
+
+	author ID
+	extension ID
+	version ID
+
+please mail to <sorm@is4u.cz> for getting
+author ID (your namespace). You can choose
+extension ID yourself (e.g. start with 000001 and
+go up). And of course you can choose version ID
+(e.g. start with 000001 and go up). You must
+turn version ID up when you modify and distribute
+new version of extension.
+
+And select YOUR-PREFERENCE:
+
+	<0		for fallbacks and output routines
+	0-999		for standard "something making" modules
+	1000-1999	for command parsers
+	2000-2999	for preprocessors
+	3000-3999	for macroprocessors
+	>=4000		for URGENT handlers
+
+Your module in handle_action must parse
+%action (especially $action{action})
+and you can modify this action or
+making something.
+
+If you set $action{processed} to 1,
+action is passed to next extension with low-or-same
+preference (priority). If you undefine or zero
+$action{processed}, %action is passed again to
+top level extension.
+
+You can use these objects:
+
+	$obj->{-interface}
+	$obj->{-dbi}
+	$obj->{-config}
+	$obj->{-mempool}
+
+and (very carefully)
+
+	$obj->{-core}
+
+Good actions:
+
+	$action{action} eq 'COMMAND'
+
+	-> processing $action{cmd}
+
+	$action{action} eq 'SQL'
+
+	-> processing $action{sql}
+
+	$action{action} eq 'SQL_RESULT'
+
+	-> formatting $action{result}
+
+	$action{action} eq 'OUTPUT'
+
+	-> showing $action{output}
+
+Recommended receipt for outputing to
+console -> changing action to OUTPUT
+and filling $action{output}.
+
+If you process action totally, you
+can change $action{action} to 'NONE'
+-> nobody process these actions (I hope).
+
+If dbMan start try 
+
+	show extensions
+
+and look for your module (started ?)
+
+You can register good module (module=extension)
+to distribution of dbMan by
+mailing your module to <sorm@is4u.cz>
+(your module appear on doc/MODULE list).
+
+Good luck.

@@ -1,0 +1,731 @@
+NAME
+    dTemplate - A simple yet powerful template handling logic with advanced
+    features.
+
+        $Id: dTemplate.pod 105 2004-07-24 12:08:22Z dlux $
+
+        $URL: http://svn.dlux.hu/public/dTemplate/trunk/dTemplate.pod $
+
+SYNOPSIS
+        use dTemplate;
+
+        # definition 
+
+        $mail_template = dTemplate->new( file => "mail_tmpl.txt" );
+
+        $template = dTemplate->new( text => "<html>$BODY$</html>" ),
+
+        # parsing
+        $mail = $mail_template->parse(
+            FROM    => {
+                first_name => "Balazs",
+                last_name  => "Szabo",
+                email      => "dlux@dlux.hu"
+            },
+            TO      => "foo@bar.com",
+            SUBJECT => $subject,
+            BODY    => 
+                sub { $email_type==3 ? $body_for_type_3 : $body_for_others },
+            SIGNATURE=> $signature_template->parse( KEY => "value" )
+        );
+
+        print "Please send this mail:\n$mail";
+
+    where mail_tmpl.txt is:
+
+            From    : "$FROM.first_name$ $FROM.last_name$" <$FROM.email$> 
+            To      : $TO$
+            Subject : $SUBJECT$
+
+            Message body:
+            $BODY$
+
+            $SIGNATURE$
+
+        ### Advanced feature: Styling
+
+        # Style definition
+        $style= { lang =>'hungarian', color=>'white' };
+
+        # Selector definition
+        $html_template = dTemplate->new(choose => $style,
+            'hungarian+white' => 
+                dTemplate->new(file => "hun_white_template.html"),
+            'spanish'         => 
+                dTemplate->new(file => "spanish.html"),
+            'black+hungarian' => 
+                dTemplate->new(file => "hun_black_template.html"),
+            'english'         => 
+                dTemplate->new(file => "english_template.html"),
+            'empty'           => 
+                "<html>This is a text, $BODY$ is NOT substituted!!!!"</html>",
+            # default:
+            ''                => 
+                dTemplate->new(text => "<html>$BODY$</html>"),
+        );
+
+        # Selector definition
+        $body_template = dTemplate->new(choose => $style,
+            'hungarian'       =>  
+                dTemplate->new(file => "sziasztok_emberek.html"),
+            'spanish'         =>  
+                dTemplate->new(file => "adios_amigos.html"),
+            # default:
+            ''                =>  
+                dTemplate->new(file => "bye_bye.html"),
+        );
+
+        print  $html_template->parse(BODY  =>  $body_template->parse());
+            # will  print  "sziasztok_emberek.html"  in  the
+            # "hun_white_template.html"
+
+        %$style = ();
+        print $html_template->parse(BODY => $body_template->parse());
+            #  will print "bye_bye.html" surrounded by "<html>" and "</html>" tags.
+
+        %$style = ( lang => 'english' );
+        print $html_template->parse(BODY => $body_template->parse());
+            # will print the "bye_bye.html" in of the "english_template.html"
+
+        ### Advanced feature: Changing placeholder special characters:
+
+        $dTemplate::START_DELIMITER     = '<%\s*'; # default: \$
+        $dTemplate::END_DELIMITER       = '\s*%>'; # default: \$
+        $dTemplate::VAR_PATH_SEP        = '\/';    # default: \.
+        $dTemplate::PRINTF_SEP          = '\$';    # default: %+
+        $dTemplate::ENCODER_SEP         = '\@';    # default: \*+
+        $dTemplate::ENCODER_PARAM_START = '\(';    # default: \/
+        $dTemplate::ENCODER_PARAM_END   = '\)';    # default:
+
+        # dTemplate 2.2 Compatibility:
+        $template1 = define dTemplate "mail.txt";
+
+        $template2 = text dTemplate "This is the template text...";
+
+        $template3 = choose dTemplate \%hash, ...;
+
+DESCRIPTION
+    This module is aimed to be a fast, general-purpose, lightweight but
+    easily extendible templating system.
+
+    With this module, you can write template-parsing routines in the way the
+    templates are structured logically: starting from outside to inside.
+    Your code will be clear, well-structured and easy to understand. This
+    logic can be attained using by inline subroutines as values of template
+    variables. (Look at the example at the end of the document)
+
+USAGE
+    A template is a text data (usually taken from a file), which contains
+    special placeholders for variables.. A template object (a
+    dTemplate::Template object) is basically the representation of this text
+    data. The "placeholders" contain informations about:
+
+    *   What data to be written into the placeholder: the name and the
+        "path" of the variable.
+
+    *   How the data is to be formatted and processed.
+
+  The format of a placeholder
+    A placeholder in a text file has the following format: (the format can
+    be customized, see below)
+
+      $varname%printf_def*encoder_def$
+
+    , where:
+
+    varname
+        It is the name of the variable, which can be any string with
+        alphanumeric characters. The "." in the varname has a special
+        meaning, see the "Data Lookup" section below.
+
+    %printf_def
+        This is an optional part. Used only, when you want to format the
+        output by printf before substitution. You can use as many '%' as you
+        want here, it can be used to pad the variable, for example when your
+        output is a table. E.g:
+
+          $MONEY%%%%%%011d$
+
+        is a valid placeholder.
+
+    *encoder_def
+        Encoders are specifal subroutines, which are used, to process a data
+        before substitution. They works like "pipe" in UNIX. They got the
+        data in the first parameter, and the return value will be
+        substituted. They can be chained, so more than one encoder can be
+        used for one value. In this case the encoders will be executed in
+        the order of definition.
+
+        Encoders are separated with "*", and can have one parameter, which
+        is separated with "/" from the encoder name.
+
+        There are some built-in encoders in dTemplate:
+
+            - u          : url-encoder
+            - h          : HTML-encoder (converts > to &gt;, etc)
+            - ha         : Advanced HTML encoder (\n => <BR>, tabs => spaces)
+            - uc         : convert the string to uppercase
+            - lc         : convert the string to lowercase
+            - eq/par     : returns true if the encoded string is "par"
+            - if/par     : returns "par" if the encoded string is true
+            - printf/par : returns printf formatted data, where "par" is the format
+                           string
+
+        Chaining of the encoders:
+
+            $TITLE*uc*h$
+
+        or
+
+            $weight*eq/7*if/CHECKED$
+
+        (the last example returns CHECKED if the weight is equal to "7",
+        useful for radio-buttons or drop-down menus in HTML)
+
+        Read more on encoders (and how to make new encoders) in the Encoders
+        part.
+
+  Template objects
+    There are three ways to create template objects
+
+    From a file:
+
+        $template = dTemplate->new( file => $filename );
+
+    From a scalar variable:
+
+        $template = dTemplate->new( text => "<html>$BODY$</html>" ),
+
+    Using the template chooser:
+
+        $template = dTemplate->new( choose => $style_hash_ref,
+            "style1" => $dTemplate_object1,
+            "style2" => $dTemplate_object2,
+            ...
+        );
+
+    Note, the template chooser is not a "real" template object. It is a
+    meta-object (a dTemplate::Choose object), which selects one of many real
+    template objects based on the contents of a style hash. Read more about
+    the chooser later.
+
+  Parsing
+    Once you have the template object, you can use them to create output by
+    substituting and formatting data into the placeholders.
+
+    The parsing is done by the objects' parse methods. The return value of
+    the parse method is the substituted text.
+
+    The variable substitution is done in following steps:
+
+        - Look for the data to substitute
+            - Look for the data among the parameters of the parse method.
+            - Look for the data among the parameters of the template
+              object's parse hash ($obj->parsehash->{$varname})
+            - Look for the data among the keys of %dTemplate::parse hash
+        - Process "path" information in the placeholder
+        - If we have not found the variable, then we use the value of the ""
+          key of the object's parsehash ($obj->parsehash->{""}) if exists, or
+          the $dTemplate::parse{""} if exists.
+        - If the value is a code reference, then we call it to return the
+          value.
+        - Use the encoders on the returned value
+        - Use the printf-formatter on the returned value
+
+  Looking for the data to substitute
+    Each substitution is started by looking up the substitutable variable
+    name. If the variable name contains path information (contains "."
+    characters), then, it is not used at this step, so only the information
+    before the first "." is used.
+
+    The parse method looks for the substitutable variable name in three
+    places:
+
+        - Among the parameters of the parse method
+        - Among the keys of local parsehash ($object->parsehash)
+        - Among the keys of dTemplate::parse hash
+
+  Looking for the data in the parameters of the parse method
+    The parse method can have parameters in the following format:
+
+        - List of name => value pairs
+        - Hash-reference.
+
+    For example:
+
+        my $hashref = {
+                name2 => $value2, 
+                name3 => $value3
+        };
+
+        $template->parse(
+            name => $value,
+            $hashref,
+            name4 => $value4,
+            { name5 => $value5 },
+            ...
+        )
+
+    This method call defines "name", "name2", "name3", "name4" and "name5"
+    variable names, so they will be substituted in the $template object with
+    $value, $value2, $value3, $value4 and $value5.
+
+  Looking for the data in the local parsehash
+    If we encounter a variable reference in the template placeholders, that
+    is not assigned among the parameters of parse method, then we look up
+    the variable in keys of the local parsehash of the dTemplate object. You
+    can assign values to the local parsehash with the following expression:
+
+        $obj->parsehash->{key} = $value;
+
+    or you can assign hash-reference to multiple objects:
+
+        $obj1->parsehash = $obj2->parsehash = { key1 => "v1", key2 => "v2" };
+
+    If we found it, then we use its value for further processing.
+
+  Looking for the data in the dTemplate::parse hash
+    If we did not find the variable even in the local parsehash, then we
+    look up the variable in keys of the global dTemplate::parse hash. If we
+    found it, then we use its value for further processing.
+
+  Processing "path" information
+    After we have found the variable in the previous phase among the
+    parameters of the parse method or in the dTemplate::parse hash, we
+    process the "path" information in the placeholder if we have it.
+
+    Path information is appended to the variable name by "."-s.
+
+    If the variable definition in the placeholder contains "path", then we
+    assume that the variable is a hash-reference, and we tries to access the
+    specified hash key in it. For example in $template, you define the
+    following placeholder:
+
+        $name3.key1.key2$
+
+    If you assign $value3 to name3 (in the parameter-list of the parse
+    method or in the $dTemplate::parse{name3} hash), then it is not simply
+    substitute $value3, but it tries to use the $value3 as a hash reference,
+    and looks up a key in it with the name "key1". If it is found, then it
+    tries to use the value as a hash reference, and looks up a key in it
+    with the name "key2", and its value will be substituted:
+
+        $value3 = { key1 => { key2 => "This will be substituted" } };
+
+    If the value, which is found is a code reference, then we stop the
+    key-lookup and call the sub e.g:
+
+        $value3 = { key1 => sub { return "This will be substituted"; } }
+
+  Using data in $obj->parsehash->{""} as value
+    If we did not find the referenced value by the process described above,
+    then we use the the value of the "" hash-key of the object's parsehash
+    instead of the variable. If it is a code-reference, then it is called
+    exactly like it was the variable that has found, e.g:
+
+        $obj->parsehash->{""} = sub { "Fallback value for this template"; }
+
+  Using data in $dTemplate::parse{""} as value
+    If we did not find the referenced value by the process described above,
+    then we use the the value of $dTemplate::parse{""} hash-key instead of
+    the variable. If it is a code-reference, then it is called exactly like
+    it was the variable that has found.
+
+  Calling code references
+    We can assign code references to variables, they will be called if we
+    encounter the variable, which needs substitution.
+
+    The function-call will have the following parameters:
+
+        - Full matched placeholder as the first argument
+        - An array reference to the splitted variable and path information as a
+          second argument.
+        - The dTemplate::Template object in which you called the "parse"
+          method.
+
+    For example if a placeholder is like to this:
+
+        $HASH1.key1.key2*uc$
+
+    and the parsing code is the following:
+
+        $t1->parse(
+            # ...
+            HASH1 => sub { my ($placeholder, $pathref, $object) = @_;
+                warn "Placeholder: $placeholder, Variable path:".@$pathref."\n";
+                # ...
+            }
+        );
+
+    Then it will print the following message to the standard error:
+
+        Placeholder: $HASH1.key1.key2*uc$, Variable path: HASH1 key1 key2
+
+  Calling encoders
+    If we have the data, which substitutes the placeholder, then we can
+    encode them or format them by the dTemplate encoders. The encoders are
+    code references, which are assigned the the values of the
+    %dTemplate::ENCODERS hash. Names of the encoders are the keys of the
+    hash.
+
+    Encoders are called in the order of declaration in the template, so
+
+        $variable*uc*h$
+
+    is not the same as
+
+        $variable*h*uc$
+
+    An encoder can have one optional parameter, which can be provided in the
+    placeholder, e.g:
+
+        $weight*eq/7*if/CHECKED$
+
+    (the last example returns CHECKED if the weight variable is equal to
+    "7", useful for radio-buttons or drop-down menus in HTML)
+
+    Note, that by default, the encoders are NOT called, if we did not find
+    the variable and we are using the local key of the local parsehash or
+    $dTemplate::parse. This is a feature, not a bug, because the "" keys are
+    designed to be used only to report errors or warnings, like this:
+
+        use Carp qw(cluck);
+        $dTemplate::parse{""} = sub {
+            cluck "$_[0] is not assigned";
+            return "";
+        }
+
+    If you want to use the $dTemplate::parse{""} value (or the local
+    parsehash's "" key) as it was a normal value, then set the
+    $dTemplate::NOTASSIGNED_MODE variable to true. In this case, the
+    encoders and the formatter are called on the value of
+    $dTemplate::parse{""} also.
+
+    For example, if the $dTemplate::parse{""} is assigned to the subroutine
+    above, and if $dTemplate::NOTASSIGNED_MODE is false (by default), the
+
+        $noassigned_variable%03d$
+
+    will be substituted with an empty string, but if it is true, it is
+    substituted to "000" (because the formatter is called).
+
+    The parameter-list of an encoder if it is called:
+
+      - The encodable text
+      - The (optional) encoder parameter
+      - The dTemplate::Template object in which the parsing is done
+
+  Changing placeholder special characters
+    You can change the placeholder parameters by changing (or localizing)
+    the following variables.
+
+        $dTemplate::START_DELIMITER     = '\$';
+        $dTemplate::END_DELIMITER       = '\$';
+        $dTemplate::VAR_PATH_SEP        = '\.';
+        $dTemplate::PRINTF_SEP          = '%+';
+        $dTemplate::ENCODER_SEP         = '\*';
+        $dTemplate::ENCODER_PARAM_START = '\/';
+        $dTemplate::ENCODER_PARAM_END   = '';
+
+    If you change these variables, then these are used in the compilation of
+    the following templates. Currently there is no supported way to
+    recompile an already compiled template, so you need to create a new
+    instance.
+
+    Although if you want to compile a variable, which is not compiled, then
+    you can call the $template->compile method on them by hand.
+
+    These variables can be set to any regular expressions, not just one
+    single character.
+
+    If you don't want to use any of the features, then set the corresponding
+    variable to any regexp that is too complex to be true.
+
+  Styles (Template choosers)
+    You can use the "chooser" to dynamically select one template from many
+    based on styles.
+
+    The current "style" is represented by a hash, for example:
+
+      my %style = (lang => 'spanish', color => 'white');
+
+    Based on informations in the hash, the chooser (which is a
+    dTemplate::Choose object) decides which dTemplate::Template object is
+    used in the parse operation.
+
+    dTemplate::Choose object also has a parse method, and it is compatible
+    with the parse method of dTemplate::Template, so you can use it
+    transparently.
+
+    When you define a template chooser object in the following way:
+
+        $template = dTemplate->new( choose => \%style,
+            "style1" => $dTemplate_object1,
+            "style2" => $dTemplate_object2,
+            "style3" => $dTemplate_object3,
+            "style3+style4" => $dTemplate_object4,
+            ...
+        );
+
+    , then you get a wrapper object, which wraps several dTemplate::Template
+    objects, which selects $dTemplate_object1 if "style1" is active,
+    $dTemplate_object2 if "style2" is active, $dTemplate_object3 if "style3"
+    and "style4" is active, etc.
+
+    If you call the "parse" method of this template, then it selects one of
+    the dTemplate objects ($dTemplate_object1, $dTemplate_object2, etc.) and
+    calls the parse method of them.
+
+    The chooser selects the template, which has the most "style" matched.
+
+    For example if the style hash is:
+
+        %style = (first_style => "style3", second_stype => "style99");
+
+    Then
+
+        $template->parse(...)
+
+    calls the parse method of $dTemplate_object3, but if
+
+        %style = (first_style => "style3", second_stype => "style4");
+
+    then it activates the $dTemplate_object4.
+
+    Note, that the keys in the %style hash has no meaning.
+
+COMPATIBILITY
+  Old-style constructors
+    Old-style constructors ("define dTemplate", "choose dTemplate", "text
+    dTemplate") is obsoleted, but still can be used. The preferred way to
+    call the "new" method in new programs.
+
+  Prior 2.3
+    dTemplate v2.3 removes the default value of $dTemplate::parse{""}. In
+    the pre 2.3 versions, $dTemplate::parse{""} was a code reference, which
+    returned the first parameter of it.
+
+HINTS
+  Template compilation
+    In the first parse of every template, the templates will be compiled. It
+    is used to speed up parsing.
+
+  %dTemplate::parse localization
+    Don't forget that %dTemplate::parse can be localized. This means you can
+    define local-only variable assignments in a subroutine:
+
+      local %dTemplate::parse = ( 
+          %dTemplate::parse, 
+          local_name => $value 
+      );
+
+  References and encoders
+    You don't need to use text as the input value of an encoder, you can use
+    any scalar, even references! If you want (for example) print a date by a
+    date encoder, which expects the date to be an array ref of [ year,
+    month, day ], then you can do this, e.g:
+
+       $dTemplate::ENCODERS{date} = sub {
+           return "" if ref($_[0]) ne 'ARRAY';
+           return $_[0]->[0]."-".$_[0]->[1]."-".$_[0]->[2];
+       }
+
+    Then, when you put $START_DATE*date$ to a template, you can parse this
+    template:
+
+      $template->parse(
+        START_DATE => [2000,11,13],
+        ...
+      );
+
+  Magical (tied) hashes
+    You can use magical hashes everywhere in the "parse" method parameter
+    list, where you can use normal hashes, but because I redesigned the
+    "parse" method with the speed with the first priority, it works quite a
+    bit different than the older ( <= 2.0 ) versions.
+
+    At template-compile time, the "compile" method collects the variable
+    names, which are found in that template, and the "parse" method knows
+    which variables are required for processing this template.
+
+    When the "parse" method realizes that a parameter is a hash reference,
+    then it always tries all the remaining template variables (which are not
+    assigned in the preceding part of the parameter list) in that hash
+    reference.
+
+    Imagine the following situation:
+
+      $template->parse( name => "blow", \%hash);
+
+    ... where %hash is a magical hash, and the $template contains the
+    "name", "address" and "method.type" variables. When the parse method
+    meets with the \%hash, the "name" is already assigned, so it olny tries
+    to read the $hash{address} and $hash{method} variables.
+
+    This is not a problem with normal hashes, but if you use magical hashes,
+    you may have a very expensive FETCH function, and this effect can cause
+    problems.
+
+    There are two way to work around it:
+
+    *   Use qualified variable names. If you use the following form of
+        parse:
+
+          $template->parse( name => "blow", data => \%hash);
+
+        ... then the %hash is called only when the template parser finds the
+        "data.address" and "data.method.type" variable references in the
+        template. Of course, you have to change the template variable names
+        also.
+
+    *   Use the hash instead of a hash reference:
+
+          $template->parse( name => "blow", %hash);
+
+        In this case, the magical hash is iterated through when the
+        parameter list is assembled. This is better only if you are afraid
+        of random key retrieval, but it can be also slow, if the FIRSTKEY,
+        NEXTKEY and FETCH operations are slow.
+
+        But if the random-key retrieval is not a problem for your magical
+        hash, then use the default form instead of this, because that
+        requires less operation (only one FETCH).
+
+EXAMPLE
+    It is an example, which contains most of the features this module has.
+    It is not intended to be a real-world example, but it can show the usage
+    of this module.
+
+    This example consists of one program, and some template modules.
+
+    The executable version of this program can be found in the example
+    directory of the module distribution.
+
+      use dTemplate;
+
+      ### definition of the standard templates
+
+      my @TEMPLATE_LIST=qw(page table_row table_cell);
+      my $templates={};
+      foreach my $template (@TEMPLATE_LIST) {
+        $templates->{$template} = 
+          define dTemplate("templates/$template.htm");
+      }
+
+      ### definition of the styled templates (styles = languages)
+
+      my @STYLES=qw(eng hun);
+      my @STYLED_TEMPLATE_LIST=qw(table_title);
+
+      my $style_select={ lang => 'hun' }; 
+
+      foreach my $template (@STYLED_TEMPLATE_LIST) {
+        my @array=();
+        foreach my $style (@STYLES) {
+          push @array, $style => 
+            define dTemplate("text/$style/$template.txt");
+        }
+        $templates->{$template} = 
+          choose dTemplate $style_select, @array;
+      }
+
+      ### setting up input data
+
+      my $table_to_print=[
+        [ "Buwam",   3, 6, 9 ],
+        [ "Greg",    8, 4, 2 ],
+        [ "You're",  8, 3, 4 ],
+        [ "HTML chars: <>", 3],
+      ];
+
+      ### setting up the global parse hash with parse parameters;
+
+      $dTemplate::parse{PAGENO}=7;
+
+      ### settings up a hash with personal data.
+
+      my $person_hash={
+        name => { first_name => "Greg" },
+        zip  => "9971",
+      };
+
+      ### this hash is simply added to other parse parameters
+
+      my $parse_hash={
+        "unknown" => { data => 157 },
+      };
+
+      ### the main page parse routine
+
+      print $templates->{page}->parse(
+        TABLE_TITLE =>             # name => value pair
+          $templates->{table_title}->parse(),
+        TABLE => sub {             # name => value pair. value is a sub
+          my $ret="";
+          foreach my $row (@$table_to_print) {
+            $ret .= $templates->{table_row}->parse(
+              BODY => sub {
+                my $ret="";
+                foreach my $cell (@$row) {
+                  $ret .= $templates->{table_cell}->parse(
+                    TEXT => $cell,
+                  )
+                }
+                return $ret;
+              }
+            )
+          }
+          return $ret;
+        },
+        "person" => $person_hash,  # name => value pair. value is a href
+        $parse_hash,               # only a hash with parse parameters
+      );
+
+    And the templates:
+
+    templates/page.htm:
+          <html>
+          <body>
+
+          <h1>$TABLE_TITLE*h$</h1>
+
+          <table>
+          $TABLE$
+          </table>
+
+          <br>
+          Person name: $person.name*h$, zip code: $person.zip*h$
+          <br>
+
+          Unknown data: $unknown.data*h$
+          <br>
+
+          Page: $PAGENO%02d*h$
+
+          </body>
+          </html>
+
+    templates/table_row.htm:
+          <tr>$BODY$</tr>
+
+    templates/table_cell.htm:
+          <td>$TEXT*h$</td>
+
+    text/eng/table_title.txt:
+          Table 1
+
+    text/hun/table_title.txt:
+          1. táblázat
+
+COPYRIGHT
+    Copyrigh (c) 2000-2001 Szabó, Balázs (dLux)
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+AUTHOR
+    dLux (Szabó, Balázs) <dlux@kapu.hu>
+
+SEE ALSO
+    perl(1), HTML::Template, Text::Template, CGI::FastTemplate, Template.
+

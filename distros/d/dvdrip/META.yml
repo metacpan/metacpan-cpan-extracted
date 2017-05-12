@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Video-DVDRip
+version:      0.97.3
+version_from: lib/Video/DVDRip.pm
+installdirs:  site
+requires:
+    Gtk2:                          1.081
+    Gtk2::Ex::FormFactory:         0.58
+    Locale::TextDomain:            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

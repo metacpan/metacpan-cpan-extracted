@@ -1,0 +1,182 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+dot_bot - dotReader web bot
+
+=cut
+
+package bin::dot_bot;
+
+use lib 'lib';
+use dtRdr::UserAgent;
+use HTTP::Cookies;
+use Getopt::Helpful;
+
+sub main {
+  my (@args) = @_;
+
+  my $seq;
+  my $ct =
+    # 'text/x-yaml'
+    'application/x-www-form-urlencoded'
+    ;
+  my $out_base;
+  my $debug;
+  my $hopt = Getopt::Helpful->new(
+    usage => "CALLER [opts] [GET|PUT|POST|DELETE] <url> [GET url...]\n" .
+      "      with content-type and file:\n" .
+      "        -c xml POST=path/to/file.xml <url>\n" .
+      "        'POST=(text/x-yaml)path/to/file.yml <url>'\n".
+      "      (otherwise, populates *one* POST from STDIN)",
+    ['s|sequential', \$seq, '', 'process requests in sequence'],
+    ['c|content-type=s', \$ct, '<yaml>',
+      'text/x-* for POST|PUT data'],
+    ['d|debug', \$debug, '', 'show response data'],
+    ['o|output=s', \$out_base, '<fileplace>', 'basename for output'],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+  unless($ct =~ m#/#) {
+    $ct = 'text/x-' . $ct;
+  }
+  @args or $hopt->usage('need some arguments');
+  my @requests;
+  my $methods = qr/GET|PUT|POST|DELETE/;
+  for(my $i = 0; $i < @args; $i++) {
+    my @req;
+    my $arg = $args[$i];
+    if($arg =~ m/^($methods)(?:=(.*))?$/) {
+      my $method = uc($1);
+      my $content_file = $2;
+      my $content_type = $ct;
+      if($content_file =~ s/^\(([^\)]+)\)//) {
+        $content_type = $1;
+      }
+      $arg = $args[++$i];
+      @req = ($method, $arg);
+      if($method =~ m/POST|PUT/) {
+        my $content;
+        if(defined($content_file)) {
+          (-e $content_file) or die "no file $content_file";
+          $content = do {
+            open(my $fh, '<', $content_file) or
+              die "cannot open $content_file -- $!";
+            local $/;
+            readline($fh);
+          };
+        }
+        else {
+          $content = do {local $/; readline(STDIN)};
+        }
+        push(@req, [Content_type => $content_type], $content);
+      }
+      else {
+        defined($content_file) and
+          die "method '$method' takes no content";
+      }
+    }
+    else {
+      @req = ('GET', $arg);
+    }
+    push(@requests, \@req);
+  }
+  my $req_0 = $requests[0];
+
+  my $out_counter = 0;
+  my $comp_sub = sub {
+    my $self = shift;
+    my ($token) = @_;
+    my %collected = $self->collect($token);
+    my $string = defined($collected{string}) ? $collected{string} : '~';
+    my $res = $collected{response};
+    if($debug) {
+      require YAML::Syck; warn YAML::Syck::Dump($res);
+      #warn $res->as_string;
+    }
+    #if($res->code == 301) {
+    #  require YAML::Syck;
+    #  warn "redirect: ", YAML::Syck::Dump($res);
+    #}
+    print "$token got ", $res->code;
+    if($out_base) {
+      my $filename = $out_base . '.' . $out_counter;
+      $out_counter++;
+      print ": to $filename\n";
+      open(my $fh, '>', $filename) or
+        die "cannot create $filename -- $!";
+      if($res->code =~ m/^40.$/) {
+        $string = $res->content;
+      }
+      print $fh $string;
+    }
+    else {
+      print ": $string\n";
+    }
+    warn "time shift: ", $collected{time_shift}, "\n";
+    # XXX silly redirect hacks here
+    if(0 and $res->code =~ m/^30[12]/) {
+      # XXX this is way wrong or something
+      my @req = @$req_0;
+      $req[1] = $res->headers->header('location');
+      $self->add_request(@req);
+      #unshift(@requests, $req_0);
+    }
+    elsif($seq and (my $req = shift(@requests))) {
+      $self->add_request(@$req);
+    }
+  };
+
+  my $cookies = HTTP::Cookies->new(
+    (-d '/tmp') ? (
+      file       => "/tmp/cookies.txt",
+      autosave   => 1,
+    ) : ()
+  );
+
+  my @passes = qw(e e e e e q q);
+  my $ua = dtRdr::UserAgent->new(
+    cookie_jar => $cookies,
+    #progress_sub => sub {warn "hey"},
+    complete_sub => $comp_sub,
+    auth_sub => sub {
+      if(1) {
+      warn "silly auth sub";
+      return('bob', 'e');
+      }
+      else {
+      warn "silly auth sub ($_[1]) $passes[0]";
+      return('bob', shift(@passes));
+      }
+    },
+  );
+  if($seq) {
+    $ua->add_request(@{shift(@requests)});
+  }
+  else {
+    $ua->add_request(@$_) for(@requests);
+  }
+
+  until($ua->pester) {0 and warn "pester\n";}
+
+  # requests that didn't finish
+  if(my %left = $ua->leftovers) {
+    foreach my $token (keys(%left)) {
+      warn "never got an answer for $token ", $left{$token}{response}->code;
+    }
+  }
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::dot_bot::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::dot_bot';

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<pkg:package name="t1_short" revision="1.0"
+  xmlns:pkg="http://osoft.com/package"
+  xmlns:books="http://osoft.com/book">
+  <pkg:properties>
+    <pkg:author>OSoft</pkg:author>
+    <pkg:publisher>OSoft</pkg:publisher>
+    <pkg:global_copy>false</pkg:global_copy>
+  </pkg:properties>
+<!-- This is a demo book for use by the test suite.  It may be expanded
+or CHANGED in the future, though the node identifiers will not. -->
+  <pkg:content>
+    <pkg:outlineMarker OutlineName="A Short Book" id="root" render="false">
+
+      <pkg:outlineMarker OutlineName="Cover" id="cover" visible="false">
+        <div class="cover">
+          <div class="content">
+
+            <h1 align="center">Welcome to a Short Book</h1>
+            <p align="center">Put a picture here?</p>
+            <p align="center">Copyright 2007, OSoft, Inc.</p>
+            <p>Here is some content.
+              <a href="http://www.dotreader.com/">This is a link</a>.
+            </p>
+
+          </div>
+        </div>
+      </pkg:outlineMarker>
+      <pkg:outlineMarker OutlineName="Start" id="page1">
+        <div class="content">
+
+          <h1>First Section in a Short Book</h1>
+          <p align="center">Put a picture here?</p>
+          <p>Here is some content.
+            <a href="http://www.dotreader.com/">This is a link</a>.
+          </p>
+
+        </div>
+      </pkg:outlineMarker>
+
+
+    </pkg:outlineMarker>
+  </pkg:content>
+</pkg:package>
+<!-- vim:ts=2:sw=2:et:sta
+-->

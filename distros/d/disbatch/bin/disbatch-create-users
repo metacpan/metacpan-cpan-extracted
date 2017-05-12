@@ -1,0 +1,145 @@
+#!/usr/bin/env perl
+
+use 5.12.0;
+use warnings;
+
+use Cpanel::JSON::XS;
+use Data::Dumper;
+use Disbatch::Roles;
+use File::Slurp;
+use Getopt::Long;
+use MongoDB 1.0.4;
+use Safe::Isa;
+use Term::ReadKey;
+use Try::Tiny::Retry;
+
+my ($config_file, $plugin_perms_file, $root_user, $create_root, $drop_roles);
+
+GetOptions(
+    'config=s' => \$config_file,
+    'plugin_perms=s' => \$plugin_perms_file,
+    'root_user=s' => \$root_user,
+    'create_root' => \$create_root,
+    'drop_roles' => \$drop_roles,
+);
+
+die "Must pass --config and --root_user" unless $config_file and $root_user;
+
+$plugin_perms_file //= '/etc/disbatch/plugin-permissions.json';
+
+my $config = Cpanel::JSON::XS->new->relaxed->decode(scalar read_file $config_file);
+my $plugin_perms = Cpanel::JSON::XS->new->relaxed->decode(scalar read_file $plugin_perms_file);
+
+die "No mongohost name in $config_file" unless $config->{mongohost};
+die "No database name in $config_file" unless $config->{database};
+die "No auth hash in $config_file" unless $config->{auth} and ref $config->{auth} eq 'HASH';
+die "No auth.disbatchd password in $config_file" unless $config->{auth}{disbatchd};
+die "No auth.disbatch_web password in $config_file" unless $config->{auth}{disbatch_web};
+die "No auth.task_runner password in $config_file" unless $config->{auth}{task_runner};
+
+print "Enter password for $root_user:";
+ReadMode('noecho');
+chomp(my $root_password = <STDIN>);
+ReadMode(0);
+
+if ($create_root // 0) {
+    say "Creating user '$root_user' in database 'admin' with the root role";
+    my $admin = MongoDB->connect($config->{mongohost}, $config->{attributes})->get_database('admin');
+    $admin->run_command([createUser => $root_user, pwd => $root_password, roles => [ { role => 'root', db => 'admin' } ]]);
+}
+
+$config->{attributes}{username} = $root_user;
+$config->{attributes}{password} = $root_password;
+
+my $test_db_root = MongoDB->connect($config->{mongohost}, $config->{attributes})->get_database($config->{database});
+my $roles = Disbatch::Roles->new(db => $test_db_root, plugin_perms => $plugin_perms, %{$config->{auth}});
+if ($drop_roles // 0) {
+    say "Dropping the following roles and users in database '$config->{database}' on $config->{mongohost}: disbatchd, disbatch_web, task_runner";
+    $roles->drop_roles_and_users;
+}
+try {
+    say "Creating the following roles and users in database '$config->{database}' on $config->{mongohost}: disbatchd, disbatch_web, task_runner";
+    $roles->create_roles_and_users;
+    say "Successfully created roles and users.";
+} catch {
+    die "Failed: $_->{message}\n" if $_->$_isa('MongoDB::Error');
+    die $_;
+};
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+disbatch-create-users - create roles and users for Disbatch
+
+=head1 VERSION
+
+version 3.990
+
+=head1 SYNOPSIS
+
+  disbatch-create-users --config /etc/disbatch/config.json --root_user root
+
+=head1 ARGUMENTS
+
+=over 2
+
+=item --config <string>
+
+Path to the JSON Disbatch config file.
+
+The config file must have keys for C<mongohost> and C<database>.
+
+It must also have the key C<auth> which is a hash with keys C<disbatchd>, C<disbatch_web>, and C<task_runner> whose values are the passwords for those MongoDB disbatch users.
+
+=item --root_user <string>
+
+Username of the MongoDB root user.
+
+=item --plugin_perms <string>
+
+Path to the JSON config file for C<plugin> permissions. Default is C</etc/disbatch/plugin-permissions.json>.
+
+No permissions are required, but note that L<Disbatch::Plugin::Demo> must be able to do C<insert> on the C<reports> collection.
+
+=item --create_root
+
+Will first create the root user in the C<admin> database. Optional.
+
+This only works if no other users have been created.
+
+=item --drop_roles
+
+Will drop Disbatch roles and users before creating them. Optional.
+
+=back
+
+=head1 SEE ALSO
+
+L<Disbatch>
+
+L<Disbatch::Web>
+
+L<Disbatch::Roles>
+
+L<Disbatch::Plugin::Demo>
+
+L<disbatchd>
+
+L<disbatch.pl>
+
+L<task_runner>
+
+=head1 AUTHORS
+
+Ashley Willis <awillis@synacor.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Ashley Willis.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004

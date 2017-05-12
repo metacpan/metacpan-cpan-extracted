@@ -1,0 +1,47 @@
+{
+    # Mandatory:
+    "mongohost": "mongodb://127.0.0.1:27017",
+    "database": "disbatch_test",
+    # Only needed if using SSL with MongoDB:
+    "attributes": {
+        "ssl": {
+            "SSL_ca_file": "/etc/ssl/certs/ca-bundle.crt",	# ssl is enabled on the server
+#            "SSL_verify_mode": 0,				# ssl is enabled on the server, but without a valid cert
+        },
+    },
+    # Only needed if using MongoDB authentication:
+    "auth": {
+        "disbatchd": "qwerty1",
+        "disbatch_web": "qwerty2",
+        "task_runner": "qwerty3",
+        "plugin": "qwerty4",
+    },
+
+    # Everthing below here is optional, and is set up for development, not production
+
+    "task_runner": "./bin/task_runner",			# defaults to "/usr/bin/task_runner"
+#    "gfs": false,					# defaults to 'auto'
+    "web_root": "etc/disbatch/htdocs/",			# defaults to "/etc/disbatch/htdocs/"
+    "plugins": [ "Disbatch::Plugin::Demo" ],		# defaults to []
+
+    # defaults to "DEBUG" for level, and "/var/log/disbatchd.log" for the filename
+    "log4perl": {
+        "level": "TRACE",
+        "appenders": {
+            "filelog": {
+                "type": "Log::Log4perl::Appender::File",
+                "layout": "[%p] %d %F{1} %L %C %c> %m %n",
+                "args": { "filename": "disbatchd.log" },
+            },
+            "screenlog": {
+                "type": "Log::Log4perl::Appender::ScreenColoredLevels",
+                "layout": "[%p] %d %F{1} %L %C %c> %m %n",
+                "args": { },
+            }
+        }
+    },
+
+    # you can use only one of these:
+#    "activequeues": [ "565b34420cef2c52d6000000" ],	# defaults to []
+#    "ignorequeues": [ "565e75f03fb6ecd1c8504499" ],	# defaults to []
+}

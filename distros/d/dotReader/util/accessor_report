@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+use lib 'lib';
+
+my %classmap;
+BEGIN {
+  use Class::Accessor;
+  my $mk = \&Class::Accessor::_mk_accessors;
+  my $subref = sub {
+    my ($class, $type, @list) = @_;
+    $classmap{$class} ||= [['--tacky--', '']];
+    push(@{$classmap{$class}}, map({[$type, $_]} @list));
+    goto $mk;
+  };
+  no strict 'refs';
+  no warnings 'redefine';
+  *{'Class::Accessor::_mk_accessors'} = $subref;
+}
+
+=head1 NAME
+
+accessor_report - who has what attributes
+
+=cut
+
+package bin::accessor_report;
+
+sub main {
+  my (@args) = @_;
+
+  use File::Find ();
+  my @files = @args;
+  unless(@files) {
+    File::Find::find( sub {
+      /\.pm$/ or return;
+      push(@files, $File::Find::name);
+      }, 'lib/');
+  }
+  
+  foreach my $file (@files) {
+    $file =~ s#lib/##;
+    $file =~ s#\\|/#::#g;
+    $file =~ s/\.pm$// or die;
+  }
+  my %skip = map({$_ => 1}
+    # Just skip all of the platform-specific shims and let the chooser
+    # module's BEGIN {} verify that they load.
+    grep(/^dtRdr::HTMLShim::/, @files),
+    );
+  foreach my $mod (@files) {
+    # skips
+    $skip{$mod} and next;
+    eval "require $mod";
+  }
+
+  ######################################################################
+  if(Class::Accessor::Classy->can('get_notes')) {
+    my %also = Class::Accessor::Classy->get_notes;
+    foreach my $class (keys(%also)) {
+      $classmap{$class} ||= [];
+      my $d = $also{$class};
+      my %abbr;
+      foreach my $name (keys(%$d)) {
+        my $type = $d->{$name};
+        next if($type =~ m/^->/);
+        next if($type eq 'stock');
+        $type = {
+          getter         => 'r ',
+          setter         => ' w',
+          private        => ' p',
+          'class getter' => 'R ',
+          'class setter' => ' W',
+          'private class setter' => ' P',
+        }->{$type};
+        my $base = $name;
+        $base =~ s/^(?:--)?set_//;
+        $abbr{$base} ||= ['','o'];
+        my $num = index($type, ' ');
+        substr($type, $num, 1, '');
+        $abbr{$base}[! $num] = $type;
+      }
+      push(@{$classmap{$class}},
+        map({[join('', @{$abbr{$_}}), $_]} sort keys %abbr)
+      );
+    }
+  }
+  ######################################################################
+
+  my $folding = 1;
+  my $fm = sub {
+    my ($l, $m) = @_;
+    my $count = 72 - 5 - length($l);
+    $count = 1 if($count <= 0);
+    return($l . ' 'x$count . $m);
+  };
+  my $mapper = sub {
+    my ($c) = @_;
+    my $lead = $c;
+    my @lines = map({"($_->[0])  $_->[1]"} @{$classmap{$c}});
+    if($folding) {
+      $lead = $fm->($lead, '  {{{');
+      $lines[-1] = $fm->($lines[-1], '}}}');
+    }
+    return($lead, @lines);
+  };
+  print join("\n",
+    map({
+      join("\n  ", $mapper->($_))
+    } sort keys(%classmap))), "\n";
+  print "\n\n", 'vim', ':foldmarker={{{,}}}',
+    ':foldtext=PlainFoldText():foldenable',
+    "\n" if($folding);
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::accessor_report::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::accessor_report';

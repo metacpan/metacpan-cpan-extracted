@@ -1,0 +1,377 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #000000;
+	background-color: #ffffff;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
+.title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color:#FFFFFF;
+	display: block;
+	background-color:#990000;
+	text-indent: 5pt;
+	margin:0px;
+	margin-bottom:2px;
+	padding:0px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#330033;
+}
+.title .function{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color:#FFFFFF;
+	display: block;
+	background-color:#990000;
+	text-indent: 5pt;
+	margin:0px;
+	margin-bottom:2px;
+	padding:0px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#330033;
+}
+.title .filename{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color:#FFFFFF;
+	display: block;
+	background-color:#990000;
+	text-indent: 5pt;
+	margin:0px;
+	margin-bottom:2px;
+	padding:0px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#330033;
+}
+.title .literal{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color:#FFFFFF;
+	display: block;
+	background-color:#990000;
+	text-indent: 5pt;
+	margin:0px;
+	margin-bottom:2px;
+	padding:0px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#330033;
+}
+div.sect1 h1.title{
+	padding:3px;
+	margin:0px;
+	margin-bottom:15px;
+}
+
+.refentrytitle {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color:#FFFFFF;
+	display: block;
+	background-color:#000066;
+	text-indent: 5pt;
+	margin:0px;
+	padding:0px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#330033;
+}
+.section{
+	margin:5px;
+	padding:3px;
+	border-width:0px;
+	border-style:solid;
+	border-color:#330033;
+	text-indent: 5px;
+	display: block;
+	margin-left: +5px;
+	margin-right: 0px;
+
+}
+.sect1{
+	margin:0px;
+	padding:0px;
+	border-width:0px;
+	border-style:solid;
+	border-color:#330033;
+	text-indent: 5px;
+	display: block;
+	margin-left: 1px;
+	margin-right: 0px;
+}
+.sect2{
+	margin:5px;
+	padding:3px;
+	border-width:0px;
+	border-style:solid;
+	border-color:#330033;
+	text-indent: 5px;
+	display: block;
+	margin-left: +5px;
+	margin-right: 0px;
+}
+.sect3{
+	margin:5px;
+	padding:3px;
+	border-width:0px;
+	border-style:solid;
+	border-color:#330033;
+	text-indent: 5px;
+	display: block;
+	margin-left: +5px;
+	margin-right: 0px;
+}
+.sect4{
+	margin:5px;
+	padding:3px;
+	border-width:0px;
+	border-style:solid;
+	border-color:#330033;
+	text-indent: 5px;
+	display: block;
+	margin-left: +5px;
+	margin-right: 0px;
+}
+.sect5{
+	margin:5px;
+	padding:3px;
+	border-width:0px;
+	border-style:solid;
+	border-color:#330033;
+	text-indent: 5px;
+	display: block;
+	margin-left: +5px;
+	margin-right: 0px;
+}
+.part{
+	padding:0px;
+	text-indent: 0pt;
+	display: block;
+	margin-left: 0px;
+}
+.refsect{
+	padding:3px;
+	text-indent: 10pt;
+	display: block;
+	margin-left: 5px;
+}
+.refsect1{
+	padding:3px;
+	text-indent: 10pt;
+	display: block;
+	margin-left: 5px;
+}
+.refsect2{
+	padding:3px;
+	text-indent: 10pt;
+	display: block;
+	margin-left: 5px;
+}
+.refsect3{
+	padding:3px;
+	text-indent: 10pt;
+	display: block;
+	margin-left: 5px;
+}
+.refsect4{
+	padding:3px;
+	text-indent: 10pt;
+	display: block;
+	margin-left: 5px;
+}
+.refsect5{
+	padding:3px;
+	text-indent: 10pt;
+	display: block;
+	margin-left: 5px;
+}
+.refnamediv{
+	margin-left: 10px;
+	/*margin: 0px;
+	padding:0px;
+	text-indent:0px;*/
+}
+
+.para{
+	margin: 2px;
+	padding:2px;
+	text-indent:0px;
+}
+
+div.chapter {
+	text-indent: 0pt;
+	margin: 0px;
+	padding:0px;
+}
+p{
+	text-indent:0px;
+	margin:5px;
+	margin-left:+5px;
+}
+
+ol{
+	text-indent: 0pt;
+}
+ul{
+	text-indent: 0pt;
+}
+li{
+	padding:3px;
+}
+
+
+
+table{
+	font-size: 10px;
+	background-color:#CCCCCC;
+	margin:1px;
+	padding:1px;
+	padding-left:2px;
+	text-indent: 0px;
+}
+th{
+	background-color:#990000;
+ color:#ffffff;
+	padding:2px;
+	margin:.5px;
+	text-indent: 0px;
+}
+td{
+	background-color:ffffff;
+	padding:2px;
+	margin:.5px;
+	text-indent: 0px;
+}
+
+
+
+table.figure{
+	border-width: 0px;
+	border-style: none;
+	background-color:#ffffff;
+	margin:0px;
+    margin-top:3px;
+	margin-left:+10px;
+	padding:0px;
+}
+table.figure td{
+	font-size:9px;
+	border-width: 0px;
+	border-style: none;
+	background-color:#ffffff;
+	margin:0px;
+	margin-left:+10px;
+	padding:0px;
+	text-indent:0px;
+}
+table.copy{
+	border-width: 0px;
+	border-style: none;
+	background-color:#ffffff;
+	margin:0px;
+	padding:0px;
+	text-indent:0px;
+}
+.listing{
+	background-color:#ffffff;
+	border: 0px;
+	width:100%;
+	border-style: none;
+	border-color: #ffffff;
+}
+.listing_body{
+	background-color:#ffffff;
+	border-color: #ffffff;
+	border: 0px;
+	width:100%;
+	border-style: none;
+}
+.listing_head a{
+ color:#FFFFFF;
+}
+.listing_footer a{
+ color:#FFFFFF;
+text-decoration:none;
+}
+.figure_footer a{
+ color:#000000;
+}
+.listing_head{
+	background-color:#999999;
+	color:#FFFFFF;
+	border-width: 1px;
+	border-bottom-width: 3px;
+	border-style: solid;
+	border-color:#666666;
+	font-size: 12pt;	
+}
+.listing_footer{
+	background-color:#999999;
+	border-width: 1px;
+	border-style: solid;
+	border-color:#666666;
+	text-align:right;
+	font-size: 8px;
+	padding: 0px;
+}
+a {
+ color:#000066;
+}
+a.external{
+ color:#0000CC;
+}
+
+.function{
+	font-weight: bold;
+	color: #006600;
+	font-size: 12px;
+}
+.literal{
+	color:#003399;
+	font-size:inherit;
+}
+.filename{
+	font-weight: bold;
+	color:#990000;
+	font-size:inherit;
+}
+pre.screen{
+	display:block;
+	margin:2px;
+	margin-top:5px;
+	margin-bottom:5px;
+	background-color:#000000;
+	padding:2px;
+	color:#FFFFFF;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #999999;
+	font-size: 9px;
+}
+
+pre{
+	display: block;
+	margin: 2px;
+	margin-top: 5px;
+	margin-bottom:5px;
+	background-color:#eeeeee;
+	padding:2px;
+	color:#000066;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #999999;
+	font-size: 9px;
+}

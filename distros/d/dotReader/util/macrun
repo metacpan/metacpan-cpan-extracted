@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+macrun - OSX:  because linux was too efficient
+
+=cut
+
+package bin::macrun;
+
+($^O eq 'darwin') or die "not a mac";
+
+sub main {
+  my (@args) = @_;
+
+  # XXX this is at least stupid.
+  # we should communicate the PID somehow and wait on that
+  my $errglob = "/tmp/dtrdr.*.err";
+  unlink($_) for(glob($errglob));
+  system('open', './.PerlWrapper.app') and die;
+  my $errfile;
+  until($errfile) {
+    my @files = glob($errglob);
+    @files or sleep(1);
+    (@files > 1) and die "I'm not that smart yet";
+    $errfile = $files[0];
+  }
+  #warn "found $errfile";
+  my $proc = $errfile;
+  $proc =~ s/.*\.(\d+)\..*/$1/;
+  warn "MACRUN:  wait on $proc\n";
+  $SIG{INT} = sub {
+    warn "MACRUN:  caught INT\n";
+    kill(2,$proc);
+  };
+  my $pid = fork;
+  defined($pid) or die "cannot fork";
+  unless($pid) {
+    warn "MACRUN:  tail $errfile\n";
+    exec('tail', '-f', $errfile) and die;
+  }
+  while(1) {
+    sleep(1);
+    use IPC::Run;
+    my ($in, $out, $err);
+    IPC::Run::run(['ps', 'axw'], \$in, \$out, \$err) or die;
+    grep(/^\s*$proc\s*/, split(/\n/, $out)) or last;
+  }
+
+  kill(2, $pid);
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::macrun::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::macrun';

@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+
+use Data::GUID;
+print Data::GUID->new()->as_hex;

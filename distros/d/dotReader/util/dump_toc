@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm, OSoft
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+dump_toc - a tool
+
+=cut
+
+package bin::dump_toc;
+
+use warnings;
+use strict;
+
+use lib 'lib';
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+local $SIG{__WARN__};
+
+sub main {
+  my (@args) = @_;
+
+  my $freezefile;
+  my $dumpfile;
+  my $yamlfile;
+  my $syckfile;
+  if(@args > 1) {
+    require Getopt::Helpful;
+
+    my $hopt = Getopt::Helpful->new(
+      usage => 'CALLER [options] <bookfilename>',
+      ['freeze=s', \$freezefile, '<freezefile>', 'file to make frozen version'],
+      ['yaml=s',   \$yamlfile,   '<yamlfile>', 'file to make YAML dump'],
+      ['syck=s',   \$syckfile,   '<yamlfile>', 'file to make YAML dump'],
+      ['dump=s',   \$dumpfile,   '<dumpfile>', 'file to make Data::Dumper dump'],
+      '+help',
+    );
+    $hopt->Get_from(\@args);
+    if($freezefile) { require Storable; }
+  }
+
+  my $uri = shift(@args);
+  (-e $uri) or die 'no $uri';
+
+  my $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+  warn $book;
+  if($freezefile) {
+    open(my $fh, '>', $freezefile);
+    warn "freezing now";
+    #print $fh $book->toc->freeze;
+    print $fh Storable::freeze($book->toc->_unhook);
+  }
+  elsif($dumpfile) {
+    require Data::Dumper;
+    open(my $fh, '>', $dumpfile);
+    warn "freezing now";
+    my $dump;
+    my $toc = $book->toc->_while_gutted(sub {
+      my $dumb = shift;
+      $dump = Data::Dumper::Dumper($dumb);
+    });
+    warn "and dumping";
+    print $fh $dump;
+  }
+  elsif($yamlfile) {
+    require YAML;
+    open(my $fh, '>', $yamlfile);
+    warn "freezing now";
+    my $yaml;
+    my $toc = $book->toc;
+    $toc->_while_gutted(sub {
+      my $dumb = shift;
+      $yaml = YAML::Dump($dumb);
+    });
+    warn "and dumping";
+    print $fh $yaml;
+  }
+  elsif($syckfile) {
+    require YAML::Syck;
+    open(my $fh, '>', $syckfile);
+    warn "freezing now";
+    my $yaml;
+    my $toc = $book->toc;
+    $toc->_while_gutted(sub {
+      my $dumb = shift;
+      $yaml = YAML::Syck::Dump($dumb);
+    });
+    warn "and dumping";
+    print $fh $yaml;
+  }
+  else {
+    print join("\n", $book->toc->_dump), "\n";
+  }
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::dump_toc::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::dump_toc';

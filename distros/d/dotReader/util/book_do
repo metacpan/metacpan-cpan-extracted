@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+book_do - like perl -e 'print book()->id, "\n"'
+
+=cut
+
+package bin::book_do;
+
+use lib 'lib';
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+use dtRdr::Annotation::IO;
+
+local $SIG{__WARN__};
+
+my $book;
+sub book () {
+  return($book);
+}
+
+sub main {
+  my (@args) = @_;
+  my ($uri, $command) = @args;
+  (-e $uri) or die "no file '$uri'";
+  $command or die "must have a statement to execute";
+  $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+  eval($command);
+  $@ and die $@;
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::book_do::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::book_do';

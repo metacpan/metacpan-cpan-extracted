@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use inc::testplan(1, 8);
+use test_inc::loginit;
+
+# TODO migrate this to the dtRdrTestUtil::GUI framework?
+
+# a little hack to let this be a quick way to test the editor box
+my $testing = scalar(@ARGV);
+
+BEGIN { use_ok('dtRdr::GUI::Wx::NoteEditor') };
+
+use Wx;
+use Wx::Event qw(
+  EVT_IDLE
+  );
+
+my $package = eval { require("./client/app.pl") };
+ok((not $@), "require ok") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+ok($package, $package || 'got a package') or
+  BAIL_OUT("app.pl failed to load...STOP");
+
+# NOTE: crash will typically happen here.  If it does, we're dead in
+# the water (probably a syntax error.)
+my $app = eval {$package->new(); };
+ok((not $@), "$package constructor") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+ok($app, 'application');
+
+my $editor;
+{
+my $main_frame = $package->_main_frame;
+$editor = dtRdr::GUI::Wx::NoteEditor->new($main_frame);
+$editor->set_saver(sub {$app->ExitMainLoop});
+$editor->set_reverter(sub {$app->ExitMainLoop});
+# TODO set a callback and find a way to fire it
+#   EVT_BUTTON( $this, $button, sub { $var = 1 } );
+#   my $event = Wx::CommandEvent->new(
+#     &Wx::wxEVT_COMMAND_BUTTON_CLICKED,
+#     $button->GetId()
+#   );
+#   $button->GetEventHandler->ProcessEvent( $event );
+# TODO check focus
+# TODO check the 3 ways of closing?
+$editor->Show(1);
+}
+
+my $idle_ok = 0;
+EVT_IDLE($app, sub {
+  my ($foo, $event) = @_;
+  $idle_ok++;
+  #warn "idle $idle_ok\n";
+  if($idle_ok >= 1) {
+    if($idle_ok == 1) {
+      $editor->Raise(); # not really needed... err?
+    }
+    $testing or $app->ExitMainLoop;
+  }
+  else {
+  }
+  $event->Skip;
+  1;
+});
+
+eval { $app->MainLoop(); };
+ok((not $@), "MainLoop done") or
+  BAIL_OUT("error: " . join('\n', split(/\n+/, $@)));
+ok(1, 'MainLoop');
+ok($idle_ok, 'exit');
+
+done;
+# vim:ts=2:sw=2:et:sta

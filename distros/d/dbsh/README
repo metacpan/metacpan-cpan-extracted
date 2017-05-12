@@ -1,0 +1,25 @@
+dbsh 0.01
+(c) Copyright 2001 by Milan Sorm, sorm@pef.mendelu.cz
+
+If you plan to use this program you must respect LICENSE file.
+
+This software works like database shell like file manager over database.
+
+Depends on installation of Tk, FindBin, DBIx::SystemCatalog, DBI 
+and some DBD driver.
+
+You need DBIx::SystemCatalog from SchemaView-Plus for fetching system catalog
+information. Version 0.06 and newer can emulate fs for dbsh.
+
+Please read manual page for dbsh for more information.
+
+To install make
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Than run
+
+	dbsh

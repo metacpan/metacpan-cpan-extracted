@@ -1,0 +1,4771 @@
+# dvd::rip German translation message catalog
+#
+# Copyright (c) 2002-2004 Jörn Reder <joern AT zyn.de>
+# This file is distributed under the same license as the dvd::rip package.
+#
+# Authors:
+# Jörn Reder <joern AT zyn.de>
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: dvd::rip 0.50.17\n"
+"Report-Msgid-Bugs-To: dvd::rip Translation Team <dvdrip-lang AT exit1.org>\n"
+"POT-Creation-Date: 2009-12-20 13:35+0100\n"
+"PO-Revision-Date: 2008-01-13 15:19+0100\n"
+"Last-Translator: Jörn Reder <joern AT zyn.de>\n"
+"Language-Team: German <dvdrip-lang AT exit1.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../bin/dvdrip:47
+msgid ""
+"\n"
+"Usage: dvdrip [-c] [-d level] [-p file] [-f function [-t title-nr]] [file]\n"
+"       dvdrip --version | -version | -v\n"
+"\n"
+"       -c open cluster control window\n"
+"\n"
+"       -d set debugging level\n"
+"\n"
+"       -f execute one of the following functions (needs filename)\n"
+"          transcode         transcode the selected title\n"
+"          transcode_split   transcode and split the selected title\n"
+"\n"
+"       -t title-nr to which the function above should apply\n"
+"          (Default: last selected title)\n"
+"\n"
+"       -p preferences filename (Default: ~/.dvdriprc)\n"
+"          A new file is created, if it doesn't exist.\n"
+"\n"
+msgstr ""
+"\n"
+"Aufruf: dvdrip [-c] [-d Stufe] [-p Datei] [-f Funktion [-t Titel-Nr]] "
+"[Datei]\n"
+"        dvdrip --version | -version | -v\n"
+"\n"
+"       -c Cluster Control Fenster öffnen\n"
+"\n"
+"       -d Debugging Level setzen\n"
+"\n"
+"       -f Ausführen einer dieser Funktionen (Dateiname muss angegeben "
+"werden)\n"
+"          transcode         ausgewählten Titel transkodieren\n"
+"\t  transcode_split   ausgewählten Titel transkodieren und aufteilen\n"
+"\n"
+"       -t Titelnummer auf die die Funktion angewendet werden soll\n"
+"          (Default: letzter ausgewählter Titel im Projekt)\n"
+"\n"
+"       -p Dateiname für die Voreinstellungen (Default: ~/.dvdriprc)\n"
+"          Eine neue Datei wird angelegt, wenn diese noch nicht existiert\n"
+"\n"
+
+#: ../bin/dvdrip-master:61
+msgid ""
+"\n"
+"Usage: dvdrip-master [-w [-W port] ] [loglevel]\n"
+"\n"
+"       loglevel  logs messages to stdout\n"
+"                 1 - basic logging, no details\n"
+"                 2 - log actual jobs\n"
+"                 3 - log all executed commands also\n"
+"\n"
+"       -w        start webserver service\n"
+"       -W port   port for webserver (default: 8888)\n"
+msgstr ""
+"\n"
+"Aufruf: dvdrip-master [-w [-W Port] ] [Protokollstufe]\n"
+"\n"
+"        Protokollstufe: Meldungen werden auf STDOUT ausgegeben\n"
+"                 1 - Standardmeldungen, keine Details\n"
+"                 2 - Jobs protokollieren\n"
+"                 3 - Alle ausgeführten Befehle protokollieren\n"
+"\n"
+"        -w       Webserver Dienst starten\n"
+"        -W port  TCP Port des Webservers (Default: 8888)\n"
+
+#: ../bin/dvdrip-splash:12 ../lib/Video/DVDRip/GUI/Main.pm:1036
+msgid "splash.en.png"
+msgstr "splash.de.png"
+
+#: ../lib/Video/DVDRip/CPAN/Scanf.pm:163
+#, perl-brace-format
+msgid "'{function}' not supported"
+msgstr "'{function}' unbekannt"
+
+#: ../lib/Video/DVDRip/FilterList.pm:400
+msgid "Video"
+msgstr "Video"
+
+#: ../lib/Video/DVDRip/FilterList.pm:401
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:121
+msgid "Audio"
+msgstr "Audio"
+
+#: ../lib/Video/DVDRip/FilterList.pm:434
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:208
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:217
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:127
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:133
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:79
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:192
+#: ../lib/Video/DVDRip/GUI/Main.pm:763
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:198
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:615
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:621
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:468
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:309
+#: ../lib/Video/DVDRip/GUI/Context.pm:99
+#: ../lib/Video/DVDRip/GUI/Context.pm:104
+msgid "Yes"
+msgstr "Ja"
+
+#: ../lib/Video/DVDRip/FilterList.pm:434
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:209
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:218
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:128
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:134
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:80
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:193
+#: ../lib/Video/DVDRip/GUI/Main.pm:764
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:199
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:616
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:622
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:469
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:208
+#: ../lib/Video/DVDRip/GUI/Context.pm:99
+#: ../lib/Video/DVDRip/GUI/Context.pm:104
+msgid "No"
+msgstr "Nein"
+
+#: ../lib/Video/DVDRip/Cluster/Node.pm:290
+#, perl-brace-format
+msgid "Node '{node}' stopped"
+msgstr "Knoten '{node}' gestoppt"
+
+#: ../lib/Video/DVDRip/Cluster/Node.pm:305
+#, perl-brace-format
+msgid "Node '{node}' started"
+msgstr "Knoten '{node}' gestartet"
+
+#: ../lib/Video/DVDRip/Cluster/Node.pm:354
+#, perl-brace-format
+msgid "Node {name} finished tests"
+msgstr "Knoten {name} hat die Tests durchlaufen"
+
+#: ../lib/Video/DVDRip/Cluster/Pipe.pm:124
+#, perl-brace-format
+msgid "execute command: {command} (timeout={timeout})"
+msgstr "Befehlsausführung: {command} (Timeout={timeout})"
+
+#: ../lib/Video/DVDRip/Cluster/Pipe.pm:164
+msgid "Command cancelled due to timeout"
+msgstr "Befehl abgebrochen wegen Zeitüberschreitung"
+
+#: ../lib/Video/DVDRip/Cluster/Pipe.pm:193
+#, perl-brace-format
+msgid "Job has PID {pid}"
+msgstr "Job hat Prozess ID {pid}"
+
+#: ../lib/Video/DVDRip/Cluster/Pipe.pm:240
+#, perl-brace-format
+msgid "Aborting command. Sending signal 1 to PID {pid}..."
+msgstr "Befehl wird abgebrochen. Sende Signal 1 zur PID {pid}..."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:98
+msgid "Master daemon activated"
+msgstr "Master Daemon aktiviert"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:110
+#, perl-brace-format
+msgid "Got signal {signal}."
+msgstr "Signal {signal} empfangen."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:181
+msgid "Node check watcher disabled"
+msgstr "Knotenbeobachter abgeschaltet"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:213
+msgid "Warning: node check fping reported nothing"
+msgstr "Warnung: fping Knotentest lieferte keine Ergebnisse."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:230
+#, perl-brace-format
+msgid "Node '{node_name}' is now online."
+msgstr "Knoten '{node_name}' is jetzt online."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:239
+#, perl-brace-format
+msgid "Node '{node_name}' is still reachable. Will be online in 5 seconds."
+msgstr ""
+"Knoten '{node_name}' ist immer noch erreichbar. Wird online geschaltet in 5 "
+"Sekunden."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:248
+#, perl-brace-format
+msgid "Node '{node_name}' is now reachable. Will be online in 10 seconds."
+msgstr ""
+"Knoten '{node_name}' ist jetzt erreichbar. Wird online geschaltet in 10 "
+"Sekunden."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:256
+#, perl-brace-format
+msgid "Node '{node_name}' is Ok again"
+msgstr "Knoten '{node_name}' ist wieder verfügbar."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:267
+#, perl-brace-format
+msgid "Warning: Node '{node_name}' is unreachable"
+msgstr "Warnung: Knoten '{node_name}' ist nicht erreichbar"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:277
+#, perl-brace-format
+msgid "Warning: Node '{node_name}' possibly offline"
+msgstr "Warnung: Knoten '{node_name}' ist möglicherweise offline"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:370
+#, perl-brace-format
+msgid "Loading node file '{file}'"
+msgstr "Lade Knotendatei '{file}'"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:394
+#, perl-brace-format
+msgid "Loading project file '{filename}'"
+msgstr "Lade Projektdatei '{filename}'"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:431
+msgid "Node must have a name"
+msgstr "Ein Knoten muss einen Namen haben"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:432
+msgid "Node with this name already exists"
+msgstr "Ein Knoten mit diesem Namen existiert bereits"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:441
+#, perl-brace-format
+msgid "Node '{node_name}' saved to '{filename}'"
+msgstr "Datei des Knotens '{node_name}' wurde nach '{filename}' gespeichert"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:522
+#, perl-brace-format
+msgid "Project with filename '{filename}' added"
+msgstr "Projekt wurde hinzugefügt, Dateiname '{filename}'"
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:655
+#, perl-brace-format
+msgid "Project {project} removed"
+msgstr "Projekt {project} wurde entfernt."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:741
+msgid "Master shutdown. Stopping active jobs."
+msgstr "Der Master wird heruntergefahren. Stoppe aktive Jobs."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:745
+msgid "Master shutdown"
+msgstr "Der Master wird heruntergefahren."
+
+#: ../lib/Video/DVDRip/Cluster/Master.pm:756
+msgid "Cluster control daemon will shutdown in 2 seconds..."
+msgstr "Der Master wird in zwei Sekunden heruntergefahren..."
+
+#: ../lib/Video/DVDRip/Cluster/ExecFlowFrontend.pm:50
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:97
+#, perl-brace-format
+msgid "Start job '{name}'"
+msgstr "Starte Job '{name}'"
+
+#: ../lib/Video/DVDRip/Cluster/ExecFlowFrontend.pm:83
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:137
+#, perl-brace-format
+msgid "Job '{name}' exited with error: {error}"
+msgstr "Job '{name}' wurde fehlerhaft beendet: {error}"
+
+#: ../lib/Video/DVDRip/Cluster/ExecFlowFrontend.pm:100
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:164
+#, perl-brace-format
+msgid "Job '{name}' warning: {warning}"
+msgstr "Job '{name}' Warnung: {warning}"
+
+#: ../lib/Video/DVDRip/Cluster/ExecFlowFrontend.pm:113
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:181
+#, perl-brace-format
+msgid "Job '{name}' cancelled"
+msgstr "Job '{name}' abgebrochen"
+
+#: ../lib/Video/DVDRip/Cluster/ExecFlowFrontend.pm:116
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:184
+#, perl-brace-format
+msgid "Job '{name}' finished"
+msgstr "Job '{name}' fertig"
+
+#: ../lib/Video/DVDRip/Cluster/Scheduler.pm:57
+msgid "All running cluster projects"
+msgstr "Alle laufenden Cluster Projekte"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:41
+#, perl-brace-format
+msgid "Process all PSU's - title #{nr}"
+msgstr "Verarbeite alle PSUs - Titel #{nr}"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:56
+msgid "Move PSU #0 file to final destination"
+msgstr "Verschiebe PSU #0 Datei in das Zielverzeichnis"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:227
+#, perl-brace-format
+msgid "Merge all audio tracks - title #{nr}, PSU #{psu}"
+msgstr "Alle Audiospuren verbinden - Titel #{nr}, PSU #{psu}"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:268
+#, perl-brace-format
+msgid "Multipass video transcoding - title #{nr}, PSU #{psu}, chunk #{chunk}"
+msgstr ""
+"Multipass Video Transkodieren - Titel #{nr}, PSU #{psu}, Abschnitt #{chunk}"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:289
+#, perl-brace-format
+msgid "Process all video chunks - title #{nr}, PSU #{psu}"
+msgstr "Alle Video Abschnitte verarbeiten - Titel #{nr}, PSU #{psu}"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:300
+#, perl-brace-format
+msgid "Merge video chunks - title #{nr}, PSU #{psu}"
+msgstr "Video Abschnitte zusammenführen - Titel #{nr}, PSU #{psu}"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:322
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:358
+#: ../lib/Video/DVDRip/JobPlanner.pm:308 ../lib/Video/DVDRip/JobPlanner.pm:465
+#: ../lib/Video/DVDRip/JobPlanner.pm:1064
+#: ../lib/Video/DVDRip/JobPlanner.pm:1166
+#: ../lib/Video/DVDRip/JobPlanner.pm:1247
+#: ../lib/Video/DVDRip/JobPlanner.pm:1283
+#: ../lib/Video/DVDRip/JobPlanner.pm:1291
+msgid "fps"
+msgstr "fps"
+
+#: ../lib/Video/DVDRip/Cluster/JobPlanner.pm:336
+#, perl-brace-format
+msgid "Merge all PSU files - title #{nr}"
+msgstr "Alle PSU Dateien zusammenführen - Titel #{nr}"
+
+#: ../lib/Video/DVDRip/TranscodeRC.pm:121
+msgid "can't send command to transcode"
+msgstr "Kann Befehl nicht zu transcode senden"
+
+#: ../lib/Video/DVDRip/TranscodeRC.pm:241
+#, perl-brace-format
+msgid "Unknown preview command '{command}'"
+msgstr "Unbekannter Vorschau Befehl '{command}'"
+
+#: ../lib/Video/DVDRip/Depend.pm:40
+msgid "All internal command files"
+msgstr "Alle internen Befehlskommandos"
+
+#: ../lib/Video/DVDRip/Depend.pm:51
+#, perl-brace-format
+msgid "ERROR: '{file}' not found in PATH\n"
+msgstr "FEHLER: '{file}' wurde im PATH Suchpfad nicht gefunden\n"
+
+#: ../lib/Video/DVDRip/Depend.pm:78
+msgid "dvd::rip is nothing without transcode"
+msgstr "dvd::rip ist nichts ohne transcode!"
+
+#: ../lib/Video/DVDRip/Depend.pm:100
+msgid "Needed for preview image processing"
+msgstr "Für die Erstellung von Vorschaubildern"
+
+#: ../lib/Video/DVDRip/Depend.pm:118
+msgid "FFmpeg video converter command line program"
+msgstr "FFmpeg Kommandozeilenprogramm"
+
+#: ../lib/Video/DVDRip/Depend.pm:132
+msgid "xvid4 configuration tool"
+msgstr "xvdi4 Konfigurationsprogramm"
+
+#: ../lib/Video/DVDRip/Depend.pm:147
+msgid "Needed for subtitles"
+msgstr "Benötigt für Untertitel"
+
+#: ../lib/Video/DVDRip/Depend.pm:162
+msgid "Needed for faster DVD TOC reading"
+msgstr "Benötigt zum schnellen Lesen des DVD Inhaltsverzeichnisses"
+
+#: ../lib/Video/DVDRip/Depend.pm:177
+msgid "Needed for compressed vobsub subtitles"
+msgstr "Benötigt für komprimierte vobsub Untertitel"
+
+#: ../lib/Video/DVDRip/Depend.pm:193
+msgid "Needed for subtitle vobsub viewing"
+msgstr "Benötigt zum Ansehen von vobsub Untertiteln"
+
+#: ../lib/Video/DVDRip/Depend.pm:214
+msgid "Needed for OGG/Vorbis"
+msgstr "Benötigt für OGG/Vorbis"
+
+#: ../lib/Video/DVDRip/Depend.pm:230
+msgid "For chapter progress bar (ogmtools)"
+msgstr "Für Kapitel Fortschrittsanzeige (ogmtools)"
+
+#: ../lib/Video/DVDRip/Depend.pm:245
+msgid "Needed for (S)VCD encoding"
+msgstr "Benötigt für (S)VCD Erstellung"
+
+#: ../lib/Video/DVDRip/Depend.pm:260
+msgid "Can be used to view DVD's/files"
+msgstr "Kann zum Ansehen von DVDs/Dateien benutzt werden"
+
+#: ../lib/Video/DVDRip/Depend.pm:275
+msgid "Only for cluster mode master"
+msgstr "Nur für den Cluster Master Rechner"
+
+#: ../lib/Video/DVDRip/Depend.pm:290
+msgid "Used for DVD device scanning"
+msgstr "Benötigt zum Ermitteln der angeschlossenen DVD Geräte"
+
+#: ../lib/Video/DVDRip/Depend.pm:352
+msgid "not installed"
+msgstr "nicht installiert"
+
+#: ../lib/Video/DVDRip/Depend.pm:549
+msgid "Program"
+msgstr "Programm"
+
+#: ../lib/Video/DVDRip/Depend.pm:549 ../lib/Video/DVDRip/GUI/Filters.pm:294
+msgid "Version"
+msgstr "Version"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:204
+msgid "Number of frames"
+msgstr "Anzahl Frames"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:211
+msgid "Frames per second"
+msgstr "Frames pro Sekunde"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:218
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:118
+msgid "Runtime"
+msgstr "Länge"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:253
+#, perl-brace-format
+msgid "Audio size is given with {audio_size} MB"
+msgstr "Audio Größe ist gegeben mit {audio_size} MB"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:258
+msgid "Audio size"
+msgstr "Audio Größe"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:292
+#, perl-brace-format
+msgid "(incl. {avi_overhead} byte AVI overhead per frame)"
+msgstr "(inkl. {avi_overhead} byte AVI Overhead pro Frame)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:300
+msgid "(assume nominal bitrate for this quality)"
+msgstr "(bei Durchnittsbitrate für diese Qualitätsstufe)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:303
+msgid "(exact bitrate match assumed)"
+msgstr "(exakte Bitratenberechnung vorausgesetzt)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:308
+#, perl-brace-format
+msgid "Audio track #{nr}"
+msgstr "Tonspur #{nr}"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:342
+#, perl-brace-format
+msgid "AVI video overhead ({avi_overhead} bytes per frame)"
+msgstr "AVI Video Overhead ({avi_overhead} Bytes pro Frame)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:365
+#, perl-brace-format
+msgid "OGG overhead ({ogg_overhead} percent of video+audio size)"
+msgstr "OGG Overhead ({ogg_overhead} Prozent von Video+Audio)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:398
+msgid "Number of discs"
+msgstr "Anzahl CDs"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:408
+msgid "Disc size"
+msgstr "CD Größe"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:422
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:470
+msgid "Target size"
+msgstr "Zielgröße"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:461
+msgid "VCD sector size addition (factor: 2324/2048)"
+msgstr "VCD Sektor Overhead (Faktor: 2324/2048)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:472
+msgid "VCD per disc overhead (600 sectors)"
+msgstr "VCD pro CD Overhead (600 Sektoren)"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:481
+msgid "(X)(S)VCD/CVD target size"
+msgstr "(X)(S)VCD/CVD Zielgröße"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:508
+msgid "vobsub size"
+msgstr "vobsub Größe"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:522
+#, perl-brace-format
+msgid "vobsub size subtitle #{nr}"
+msgstr "vobsub Größe Untertitel #{nr}"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:552
+msgid "Space left for video"
+msgstr "Platz übrig für Video"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:564
+msgid "Resulting video bitrate, rounded"
+msgstr "Ergebnis Video Bitrate, gerundet"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:587
+#: ../lib/Video/DVDRip/BitrateCalc.pm:708
+msgid "Resulting BPP"
+msgstr "Resultierende BPP"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:600
+msgid "Resulting video size"
+msgstr "Resultierende Video Größe"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:626
+#, perl-brace-format
+msgid "Bitrate too high, set to {max_video_rate}"
+msgstr "Bitrate zu groß, auf {max_video_rate} gesetzt"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:634
+#: ../lib/Video/DVDRip/BitrateCalc.pm:640
+msgid "Bitrate too high, limited"
+msgstr "Bitrate zu groß, Wert limitiert"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:646
+msgid "VCD has fixed rate"
+msgstr "VCD hat feste Bitrate"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:679
+msgid "Manual BPP setting"
+msgstr "Manuelle BPP Einstellung"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:686
+msgid "Resulting Video Bitrate"
+msgstr "Resultierende Video Bitrate"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:699
+msgid "Manual video bitrate setting"
+msgstr "Manuelle Video Bitrate"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:720
+msgid "Resulting Video Size"
+msgstr "Resultierende Video Größe"
+
+#: ../lib/Video/DVDRip/BitrateCalc.pm:742
+msgid "Resulting File Size"
+msgstr "Resultierende Dateigröße"
+
+#: ../lib/Video/DVDRip/Logger.pm:138
+msgid "Logfile nuked."
+msgstr "Protokolldatei wurde gelöscht."
+
+#: ../lib/Video/DVDRip/Subtitle.pm:138
+#, perl-brace-format
+msgid "{cnt} images"
+msgstr "{cnt} Bilder"
+
+#: ../lib/Video/DVDRip/Audio.pm:252 ../lib/Video/DVDRip/GUI/MultiAudio.pm:132
+msgid "Discard"
+msgstr "Verwerfen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:44 ../lib/Video/DVDRip/JobPlanner.pm:278
+#, perl-brace-format
+msgid "title #{title}"
+msgstr "Titel #{title}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:45
+#, perl-brace-format
+msgid "chapter #{chapter}"
+msgstr "Kapitel #{chapter}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:59 ../lib/Video/DVDRip/JobPlanner.pm:99
+#: ../lib/Video/DVDRip/JobPlanner.pm:135
+#, perl-brace-format
+msgid "Read TOC ({method})"
+msgstr "Inhaltsverzeichnis lesen ({method})"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:75
+msgid "Successfully read DVD TOC"
+msgstr "Inhaltsverzeichnis erfolgreich gelesen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:78
+msgid ""
+"Failed to copy the IFO files. vobsub creation won't work properly.\n"
+"(Did you specify the mount point of your DVD drive in the Preferences?)\n"
+"The error message is:\n"
+msgstr ""
+"IFO Dateien konnten nicht kopiert werden. Die Erzeugung von vobsub\n"
+"Dateien wird deshalb fehlschlagen. (Wurde der richtige Mount-Punkt\n"
+"in den Voreinstellungen angegeben?).\n"
+"Die System-Fehlermeldung ist:\n"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:106 ../lib/Video/DVDRip/JobPlanner.pm:149
+msgid ""
+"Error reading table of contents. Please check your DVD device settings in "
+"the Preferences and don't forget to put a DVD in the drive."
+msgstr ""
+"Das DVD Inhaltsverzeichnis konnte nicht eingelesen werden. Bitte überprüfen "
+"Sie die DVD Geräteeinstellungen im Voreinstellungsdialog und ob eine DVD in "
+"das Laufwerk eingelegt wurde."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:122
+msgid "Warning: lsdvd failed reading TOC, trying tcprobe."
+msgstr ""
+"Warnung: lsdvd konnte Inhaltsverzeichnis nicht lesen, versuche es mit "
+"tcprobe."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:138
+msgid "Determine number of titles"
+msgstr "Bestimme Anzahl der Titel"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:176
+#, perl-brace-format
+msgid "Probe - title #{title}"
+msgstr "Analyse - Titel #{title}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:211
+msgid "Probe all DVD titles"
+msgstr "Analysiere alle DVD Titel"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:238
+#, perl-brace-format
+msgid "Rip chapters of title #{nr}"
+msgstr "Kopiere Kapiel von Titel #{nr}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:251
+#, perl-brace-format
+msgid "Process title #{nr}"
+msgstr "Verarbeite DVD Titel #{nr}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:258
+msgid "Rip selected title(s) / chapter(s)"
+msgstr "Ausgewähle Titel/Kapitel auf die Festplatte kopieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:277
+msgid "Rip"
+msgstr "Kopieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:279
+#, perl-brace-format
+msgid "chapter {chapter}"
+msgstr "Kapitel {chapter}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:360
+#, perl-brace-format
+msgid "Chapter {nr} is too small and useless. You should deselect it."
+msgstr "Kapitel {nr} ist zu klein und unbrauchbar. Sie sollten es abwählen."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:391
+#, perl-brace-format
+msgid ""
+"DVD TOC reported wrong framerate {toc_fps}, adjusted frame rate to "
+"{disc_fps} and frame count to {disc_count}"
+msgstr ""
+"Im DVD Inhaltsverzeichnis ist eine falsche Framerate ({toc_fps}) "
+"eingetragen. Die Framerate wurde zu {disc_fps} korrigiert, die Anzahl der "
+"Frames auf {disc_count}."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:408
+#, perl-brace-format
+msgid ""
+"It seems that transcode ripping stopped short.\n"
+"The movie has {title_frames} frames, but only {disc_frames}\n"
+"were ripped. This is most likely a problem with your\n"
+"transcode/libdvdread installation, resp. a problem with\n"
+"this specific DVD."
+msgstr ""
+"Es scheint, dass transcode den Titel nicht vollständig\n"
+"kopiert hat. Der Titel hat {title_frames} Frames, aber nur\n"
+"{disc_frames} wurden eingelesen. Vermutlich gibt es ein\n"
+"Problem mit Ihrer transcode/libdvdread Installation oder auch\n"
+"ein spezifisches Problem mit dieser DVD."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:428
+#, perl-brace-format
+msgid "Detect audio bitrate of title #{nr}"
+msgstr "Audio Bitrate von Titel #{nr} ermitteln"
+
+#
+#: ../lib/Video/DVDRip/JobPlanner.pm:454
+msgid "Grab preview"
+msgstr "Hole Vorschaubild"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:495 ../lib/Video/DVDRip/JobPlanner.pm:519
+msgid "transcode can't find this frame. "
+msgstr "transcode konnte das gewünschte Bild nicht finden."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:496 ../lib/Video/DVDRip/JobPlanner.pm:520
+msgid "Try a lower frame number. "
+msgstr "Versuchen Sie es mit einer kleineren Frame Nummer."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:498 ../lib/Video/DVDRip/JobPlanner.pm:522
+msgid "Try forcing slow frame grabbing."
+msgstr "Versuchen Sie es mit der langsamen Methode."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:510 ../lib/Video/DVDRip/JobPlanner.pm:605
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:859
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:904
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:710
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:749
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:776
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:798
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:526
+msgid "You first have to rip this title."
+msgstr "Der Titel muss erst auf die Platte kopiert werden."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:540
+msgid "Process preview frame"
+msgstr "Verarbeite Vorschaubild"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:550
+msgid "Generate preview thumbnails"
+msgstr "Vorschaubilder erzeugen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:573
+msgid "Apply preset & make previews"
+msgstr "Vorlagenwerte übernehmen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:576
+msgid "Apply Clip & Zoom preset"
+msgstr "Clip & Zoom Einstellungen anwenden"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:613
+msgid "You can't select a frame range with psu core."
+msgstr "Ein Frame-Bereich kann mit dem PSU Core kombiniert werden."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:621
+msgid "PSU core only available for ripped DVD's."
+msgstr "PSU Core kann nur bei kopierten DVDs verwendet werden."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:627
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:416
+msgid "No chapters selected."
+msgstr "Keine Kapitel ausgewählt."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:633
+msgid ""
+"Splitting AVI files in\n"
+"chapter mode makes no sense."
+msgstr ""
+"Das Aufteilen von Dateien im\n"
+"Kapitel-Modus macht keinen Sinn."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:640
+msgid "WARNING: no target audio track #0"
+msgstr "WARNUNG: keine Tonspur auf Nummer #0"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:647
+msgid "Having more than one audio track isn't possible on a (X)VCD."
+msgstr "Mehr als eine Tonspur ist bei (X)VCD nicht möglich."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:655
+msgid ""
+"WARNING: Having more than two audio tracks\n"
+"on a (X)SVCD/CVD is not standard conform. You may\n"
+"encounter problems on hardware players."
+msgstr ""
+"WARNUNG: mehr als zwei Tonspuiren bei (X)SVCD/CVD ist\n"
+"nicht standardkonform. Es können Probleme bei einigen\n"
+"Abspielgeräten auftreten."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:666
+msgid ""
+"You better cancel now and select the appropriate\n"
+"preset on the Clip &amp; Zoom page."
+msgstr ""
+"Besser Sie brechen jetzt ab und wählen eine entsprechende\n"
+"Vorlage auf der Clip & Zoom Seite."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:731
+msgid "Transcode multiple titles"
+msgstr "Mehrere Titel transkodieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:802 ../lib/Video/DVDRip/GUI/Main.pm:359
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:38
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:651
+msgid "Transcode"
+msgstr "Transkodieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:816
+msgid "Transcode chapters"
+msgstr "Kapitel transkodieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:865
+msgid "Transcode with VBR audio, first pass"
+msgstr "Transkodiere mit VBR Audio, erster Durchgang"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:903
+msgid "Transcode with VBR audio, second pass"
+msgstr "Transkodiere mit VBR audio, zweiter Durchgang"
+
+#
+#: ../lib/Video/DVDRip/JobPlanner.pm:924
+msgid "Transcode with VBR audio"
+msgstr "Transkodieren mit VBR Audio"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:935
+msgid "Calculate video bitrate "
+msgstr "Video Bitrate berechnen "
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:943
+#, perl-brace-format
+msgid "Adjusted video bitrate to {video_bitrate} after vbr audio transcoding"
+msgstr ""
+"Video-Bitrate wurde auf {video_bitrate} eingestellt, nach VBR Audio "
+"Transkodierung."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:964
+msgid "Transcode multipass"
+msgstr "Transkodieren mit zwei Durchgängen"
+
+#
+#: ../lib/Video/DVDRip/JobPlanner.pm:989
+msgid "Transcode video"
+msgstr "Video Transkodieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:993
+#, perl-brace-format
+msgid "PSU {psu}"
+msgstr "PSU {psu}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:997
+#, perl-brace-format
+msgid "chunk {chunk}"
+msgstr "Block {chunk}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1001
+#, perl-brace-format
+msgid "pass {pass}"
+msgstr "Lauf {pass}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1004
+msgid "single pass"
+msgstr "Einzellauf"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1125
+msgid "Merge audio"
+msgstr "Audio hinzufügen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1127
+#, perl-brace-format
+msgid "audio track #{nr}"
+msgstr "Tonspur #{nr}"
+
+#
+#: ../lib/Video/DVDRip/JobPlanner.pm:1205
+msgid "Transcode & merge audio track"
+msgstr "Transkodieren und Audio hinzufügen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1216
+msgid "Add additional audio tracks"
+msgstr "Weitere Tonspuren hinzufügen"
+
+#
+#: ../lib/Video/DVDRip/JobPlanner.pm:1225
+msgid "Transcode audio"
+msgstr "Ton Transkodieren"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1227
+#, perl-brace-format
+msgid "track #{nr}"
+msgstr "Spur #{nr}"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1257
+msgid "Multiplex MPEG"
+msgstr "Multiplexe MPEG"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1279
+msgid "Split OGG"
+msgstr "OGG aufteilen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1279
+msgid "Split AVI"
+msgstr "AVI aufteilen"
+
+#
+#: ../lib/Video/DVDRip/JobPlanner.pm:1328
+msgid "Grab subtitle images"
+msgstr "Untertitelbilder holen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1349
+msgid ""
+"Need IFO files in place.\n"
+"You must re-read TOC from DVD."
+msgstr ""
+"IFO Dateien werden benötigt.\n"
+"Sie müssen das Inhaltsverzeichnis\n"
+"der DVD erneut einlesen."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1358
+msgid ""
+"No splitted target files available.\n"
+"First transcode and split the movie."
+msgstr ""
+"Keine aufgeteilten Zieldateien verfügbar.\n"
+"Bitte führen Sie zunächst das Transkodieren und Aufteilen durch."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1408
+#: ../lib/Video/DVDRip/JobPlanner.pm:1455
+msgid "Create vobsub files"
+msgstr "vobsub Dateien erstellen"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1448
+msgid "Extract PS1 streams from VOB"
+msgstr "Extrahiere PS1 Datenstrom von den VOB Dateien"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1466
+msgid "Splitted vobsub file generation"
+msgstr "Mehrteilige vobsub Dateierzeugung"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1477
+msgid "Count frames of files"
+msgstr "Zähle Frames der Dateien"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1496
+#, perl-brace-format
+msgid "File {file} has {frames} frames."
+msgstr "Datei {file} hat {frames} Frames."
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1532
+msgid "Single vobsub file generation"
+msgstr "Einzeldatei vosub Erzeugung"
+
+#: ../lib/Video/DVDRip/JobPlanner.pm:1543
+msgid "Extract PS1 stream from VOB"
+msgstr "Extrahiere PS1 Datenstrom von VOB Dateien"
+
+#: ../lib/Video/DVDRip/Title.pm:434
+#, perl-brace-format
+msgid ""
+"Set codec of audio track #{nr} to 'mp3', 'vorbis' not supported by AVI "
+"container"
+msgstr ""
+"Setze Codec von Tonspur #{nr} auf 'mp3', 'vorbis' wird von AVI nicht "
+"unterstützt"
+
+#: ../lib/Video/DVDRip/Title.pm:443
+#, perl-brace-format
+msgid ""
+"Set codec of audio track #{nr} to 'mp3', 'mp2' not supported by AVI container"
+msgstr ""
+"Setze Codec von Tonspur #{nr} auf 'mp3', 'mp2' wird von AVI nicht unterstützt"
+
+#: ../lib/Video/DVDRip/Title.pm:454
+msgid "Set video codec to 'xvid', '"
+msgstr "Setze Codec auf 'xvid', '"
+
+#: ../lib/Video/DVDRip/Title.pm:456
+msgid "' not supported by AVI container"
+msgstr "' wird nicht von AVI unterstützt"
+
+#: ../lib/Video/DVDRip/Title.pm:468
+#, perl-brace-format
+msgid "Set codec of audio track #{nr} to 'mp2', '"
+msgstr "Setze Codec von Tonspur #{nr} auf 'mp2', '"
+
+#: ../lib/Video/DVDRip/Title.pm:471 ../lib/Video/DVDRip/Title.pm:481
+msgid "' not supported by MPEG container"
+msgstr "' wird von MPEG nicht unterstützt"
+
+#: ../lib/Video/DVDRip/Title.pm:479
+msgid "Set video codec to 'SVCD', '"
+msgstr "Setze Video Codec auf 'SVCD', '"
+
+#: ../lib/Video/DVDRip/Title.pm:494
+#, perl-brace-format
+msgid "Set codec of audio track #{nr} to 'vorbis', '"
+msgstr "Setze Codec von Tonspur #{nr} auf 'vorbis', '"
+
+#: ../lib/Video/DVDRip/Title.pm:497
+msgid "' not supported by OGG container"
+msgstr "' wird von OGG nicht unterstützt"
+
+#: ../lib/Video/DVDRip/Title.pm:506
+msgid "Set video codec to 'xvid', MPEG not supported by OGG container"
+msgstr "Setze Video Codec auf 'xvid', MPEG wird von OGG nicht unterstützt"
+
+#: ../lib/Video/DVDRip/Title.pm:753
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:120
+msgid "Chp"
+msgstr "Kap"
+
+#: ../lib/Video/DVDRip/Title.pm:755
+msgid "Aud"
+msgstr "Aud"
+
+#: ../lib/Video/DVDRip/Title.pm:759
+msgid "frames"
+msgstr "Frames"
+
+#: ../lib/Video/DVDRip/Title.pm:831 ../lib/Video/DVDRip/Title.pm:909
+#, perl-brace-format
+msgid "Can't mkpath directory '{dir}'"
+msgstr "Kann Pfad des Verzeichnisses '{dir}' nicht anlegen"
+
+#: ../lib/Video/DVDRip/Title.pm:993
+msgid "Width isn't even."
+msgstr "Breite ist keine gerade Zahl"
+
+#: ../lib/Video/DVDRip/Title.pm:996
+msgid "Width is not divisible by 16."
+msgstr "Breite ist nicht durch 16 teilbar."
+
+#: ../lib/Video/DVDRip/Title.pm:999
+msgid "Height isn't even."
+msgstr "Höhe ist keine gerade Zahl."
+
+#: ../lib/Video/DVDRip/Title.pm:1002
+msgid "Height is not divisible by 16."
+msgstr "Höhe ist nicht durch 16 teilbar."
+
+#: ../lib/Video/DVDRip/Title.pm:1010
+msgid "Settings Ok"
+msgstr "Einstellungen Ok"
+
+#: ../lib/Video/DVDRip/Title.pm:1016
+msgid "After 1st clipping"
+msgstr "Nach 1. Beschnitt"
+
+#: ../lib/Video/DVDRip/Title.pm:1017
+msgid "After 2nd clipping"
+msgstr "Nach 2. Beschnitt"
+
+#: ../lib/Video/DVDRip/Title.pm:1018
+msgid "After zoom"
+msgstr "Nach Skalierung"
+
+#: ../lib/Video/DVDRip/Title.pm:1023
+#, perl-brace-format
+msgid "Eff. ratio: <b>{eff}</b>, phys. ratio: <b>{phys}</b>"
+msgstr "Eff.·Ratio.:·<b>{eff}</b>,·phys.·Ratio.:·<b>{phys}</b>"
+
+#: ../lib/Video/DVDRip/Title.pm:1187
+#, perl-brace-format
+msgid "Can't read VOB navigation file '{filename}'"
+msgstr "Kann VOB Navigationsdatei '{filename}' nicht lesen"
+
+#: ../lib/Video/DVDRip/Title.pm:1218
+msgid "Program stream units calculated"
+msgstr "PSUs berechnet"
+
+#: ../lib/Video/DVDRip/Title.pm:1301
+#, perl-brace-format
+msgid "invalid parameter for frame_size ('{frame_size}')"
+msgstr "Ungültiger Parameter für frame_size ('{frame_size}')"
+
+#: ../lib/Video/DVDRip/Title.pm:1721 ../lib/Video/DVDRip/Title.pm:3101
+#, perl-brace-format
+msgid "Can't read VOB navigation file '{vob_nav_file}'"
+msgstr "Kann VOB Navigationsdatei '{vob_nav_file}' nicht lesen"
+
+#: ../lib/Video/DVDRip/Title.pm:2036
+msgid "Enabled PSU core. Movie is NTSC and has more than one PSU."
+msgstr ""
+"PSU Core wurde eingeschaltet. Der Film ist NTSC und hat mehr als eine PSU."
+
+#: ../lib/Video/DVDRip/Title.pm:2041
+msgid "Not enabling PSU core, because this movie has only one PSU."
+msgstr "Schalte PSU Core nicht ein, weil der Film nur eine PSU hat."
+
+#: ../lib/Video/DVDRip/Title.pm:2559
+#, perl-brace-format
+msgid ""
+"When using fast resize: Clip1 and Zoom size must be divisible by "
+"{multiple_of}"
+msgstr ""
+"Wenn die Schnellskalierung verwendet wird, müssen 1. Beschnitt und die Zoom "
+"Größe teilbar sein durch {multiple_of}"
+
+#: ../lib/Video/DVDRip/Title.pm:2566
+msgid "When using fast resize: Width and height must both shrink or expand"
+msgstr ""
+"Bei Schnellskalierung: Höhe und Breite müssen beide kleiner oder beide "
+"größer werden"
+
+#: ../lib/Video/DVDRip/Title.pm:3075
+msgid ""
+"Fast VOB navigation only available for ripped DVD's, falling back to slow "
+"method."
+msgstr ""
+"Schnelle VOB Navigation nur möglich bei DVDs, die auf die Festplatte kopiert "
+"wurden.Benutze langsame Methode."
+
+#: ../lib/Video/DVDRip/Title.pm:3079
+msgid "VOB navigation file is missing. Slow navigation method used."
+msgstr "VOB Navigationsdatei fehlt. Langsame Methode wird verwendet."
+
+#: ../lib/Video/DVDRip/Title.pm:3083
+msgid "Using slow preview grabbing as adviced by user"
+msgstr "Verwende langsame Methode zur Vorschaugenerierung, wie vorgegeben."
+
+#: ../lib/Video/DVDRip/Title.pm:3113
+#, perl-brace-format
+msgid "VOB navigation file '{vob_nav_file}' is corrupted."
+msgstr "VOB Navigationsdatei '{vob_nav_file}' ist fehlerhaft."
+
+#: ../lib/Video/DVDRip/Title.pm:3128
+#, perl-brace-format
+msgid ""
+"Can't find frame {frame} in VOB navigation file '{vob_nav_file}' (which has "
+"only {frames} frames). "
+msgstr ""
+"Konnte Frame {frame} in VOB Navigationsdatei '{vob_nav_file}' nicht finden. "
+"Die Datei hat nur {frames} Frames."
+
+#: ../lib/Video/DVDRip/Title.pm:3566
+msgid "You first have to transcode this title."
+msgstr "Der Titel muss zunächst transkodiert werden."
+
+#: ../lib/Video/DVDRip/Title.pm:3729
+msgid "No files for image creation selected."
+msgstr "Keine Dateien für Image Erzeugung ausgewählt."
+
+#: ../lib/Video/DVDRip/Title.pm:3738 ../lib/Video/DVDRip/Title.pm:3815
+msgid "No burn files selected."
+msgstr "Keine Dateien zum Brennen ausgewählt."
+
+#: ../lib/Video/DVDRip/Title.pm:3739
+msgid "File is already an CD image."
+msgstr "Datei ist bereite ein CD Image."
+
+#: ../lib/Video/DVDRip/Title.pm:3744
+msgid "Can't burn (S)VCD on the fly"
+msgstr "Kann (S)VCD nicht on-the-fly brennen"
+
+#: ../lib/Video/DVDRip/Title.pm:3804
+msgid "No files for burning selected."
+msgstr "Keine Dateien zum Brennen ausgewählt."
+
+#: ../lib/Video/DVDRip/Title.pm:4072 ../lib/Video/DVDRip/Title.pm:4107
+msgid "No subtitle selected"
+msgstr "Keine Untertitel ausgewählt."
+
+#: ../lib/Video/DVDRip/Title.pm:4360
+#, perl-brace-format
+msgid ""
+"Your frame size isn't conform to the standard,\n"
+"which is {should_width}x{should_height} for {codec}/{mode}, but you "
+"configured {width}x{height}."
+msgstr ""
+"Die Bildgröße ist nicht standardkonform.\n"
+"Richtig wäre {should_width}x{should_height} bei {codec}/{mode}, aber Sie "
+"haben  {width}x{height} eingestellt."
+
+#: ../lib/Video/DVDRip/Title.pm:4385
+msgid ""
+"2nd clipping parameters can only be\n"
+"moved to 1st clipping parameters, if\n"
+"1st clipping is not defined."
+msgstr ""
+"2. Beschnitt kann nur zu 1. Beschnitt\n"
+"transformiert werden, wenn beim 1. Beschnitt\n"
+"keine Einstellungen vorgenommen wurden."
+
+#: ../lib/Video/DVDRip/Config.pm:195
+msgid "Default DVD device"
+msgstr "Standard DVD Gerät"
+
+#: ../lib/Video/DVDRip/Config.pm:204
+msgid "Eject Command"
+msgstr "Auswurf Befehl"
+
+#: ../lib/Video/DVDRip/Config.pm:210
+msgid "DVD player command"
+msgstr "DVD Abspielbefehl"
+
+#: ../lib/Video/DVDRip/Config.pm:221
+msgid "File player command"
+msgstr "Datei Abspielbefehl"
+
+#: ../lib/Video/DVDRip/Config.pm:228
+msgid "STDIN player command"
+msgstr "STDIN Abspielbefehl"
+
+#: ../lib/Video/DVDRip/Config.pm:237
+msgid "rar command (for vobsub compression)"
+msgstr "rar Befehl (für vobsub Komprimierung)"
+
+#: ../lib/Video/DVDRip/Config.pm:244
+msgid "Default data base directory"
+msgstr "Standarddatenverzeichnis"
+
+#: ../lib/Video/DVDRip/Config.pm:249
+msgid "Default directory for .rip project files"
+msgstr "Standardverzeichnis für Projektdateien"
+
+#: ../lib/Video/DVDRip/Config.pm:254
+msgid "OGG file extension"
+msgstr "OGG Dateiendung"
+
+#: ../lib/Video/DVDRip/Config.pm:260
+msgid "Start cluster control daemon locally"
+msgstr "Starte Cluster Control Daemon lokal"
+
+#: ../lib/Video/DVDRip/Config.pm:265
+msgid "Hostname of server with daemon"
+msgstr "Name des Servers mit dem Daemon"
+
+#: ../lib/Video/DVDRip/Config.pm:270
+msgid "TCP port number of daemon"
+msgstr "TCP Port Nummer des Daemons"
+
+#: ../lib/Video/DVDRip/Config.pm:276
+msgid "Default video codec"
+msgstr "Standard Video Codec"
+
+#: ../lib/Video/DVDRip/Config.pm:286
+msgid "Default container format"
+msgstr "Standard Container Format"
+
+#: ../lib/Video/DVDRip/Config.pm:292
+msgid "Default BPP value"
+msgstr "Default BPP Wert"
+
+#: ../lib/Video/DVDRip/Config.pm:296
+msgid ""
+"If this option is set dvd::rip automatically calculates the video bitrate "
+"using this BPP value"
+msgstr ""
+"Wenn diese Option gesetzt ist, so wird die Video Bitrate per Default nach "
+"diesem BPP (Bits Per Pixel) Wert berechnet"
+
+#
+#: ../lib/Video/DVDRip/Config.pm:301
+msgid "Grab subtitles while ripping"
+msgstr "Untertitelbilder beim Kopieren erstellen"
+
+#
+#: ../lib/Video/DVDRip/Config.pm:305
+msgid "Grab all subtitles"
+msgstr "Alle Untertitelbilder holen"
+
+#: ../lib/Video/DVDRip/Config.pm:306
+msgid "Grab subtitles of preferred language"
+msgstr "Untertitelbilder der bevorzugten Sprache kopieren"
+
+#
+#: ../lib/Video/DVDRip/Config.pm:307
+msgid "Don't grab subtitles"
+msgstr "Keine Untertitel  kopieren"
+
+#: ../lib/Video/DVDRip/Config.pm:311
+msgid "Default Clip & Zoom preset"
+msgstr "Default Clip & Zoom Vorlage"
+
+#: ../lib/Video/DVDRip/Config.pm:317
+msgid "Preferred language"
+msgstr "Bevorzugte DVD Sprache"
+
+#: ../lib/Video/DVDRip/Config.pm:323
+msgid "Workaround transcode NPTL bugs"
+msgstr "Umgehe transcode NPTL Fehler"
+
+#: ../lib/Video/DVDRip/Config.pm:329
+msgid "Set LD_ASSUME_KERNEL to"
+msgstr "Setze LD_ASSUME_KERNEL auf"
+
+#: ../lib/Video/DVDRip/Config.pm:336
+msgid "Optimize layout for small screens"
+msgstr "Oberfläche für kleinen Bildschirm optimieren"
+
+#: ../lib/Video/DVDRip/Config.pm:340
+msgid ""
+"With this option the dvd::rip GUI may be tweaked to fit even on small "
+"screens by adding scrollbars to the notebook pages. dvd::rip needs to be "
+"restarted to take effect"
+msgstr ""
+"Mit dieser Option kann die dvd::rip Oberfläche für kleine "
+"Bildschirmauflösungen optimiert werden, indem Scrollbalken zu den einzelnen "
+"Notizbuchseiten hinzugefügt werden. dvd::rip muss neu gestartet werden, "
+"damit sich Änderungen hieran auswirken."
+
+#: ../lib/Video/DVDRip/Config.pm:348
+msgid "Basic settings"
+msgstr "Grundeinstellungen"
+
+#: ../lib/Video/DVDRip/Config.pm:355
+msgid "Commands"
+msgstr "Befehle"
+
+#: ../lib/Video/DVDRip/Config.pm:361
+msgid "Cluster options"
+msgstr "Cluster"
+
+#: ../lib/Video/DVDRip/Config.pm:367
+msgid "Miscellaneous options"
+msgstr "Verschiedenes"
+
+#: ../lib/Video/DVDRip/Config.pm:388
+msgid "- No Modifications (anamorph) -"
+msgstr "- Nichts verändern (anamorph) -"
+
+#: ../lib/Video/DVDRip/Config.pm:404
+msgid "Autoadjust, Clipping only (anamorph)"
+msgstr "Autom. Beschnitt ohne Skalierung (anamorph)"
+
+#: ../lib/Video/DVDRip/Config.pm:409
+msgid "Autoadjust, Big Frame Size, HQ Resize"
+msgstr "Autom. Beschnitt, Großes Bild, Skal. mit hoher Qualität"
+
+#: ../lib/Video/DVDRip/Config.pm:416
+msgid "Autoadjust, Medium Frame Size, HQ Resize"
+msgstr "Autom. Beschnitt, Mittl. Bildgröße, Skal. mit hoher Qualität"
+
+#: ../lib/Video/DVDRip/Config.pm:423
+msgid "Autoadjust, Small Frame Size, HQ Resize"
+msgstr "Autom. Beschnitt, Kleine Bildgröße, Skal. mit hoher Qualität"
+
+#: ../lib/Video/DVDRip/Config.pm:430
+msgid "Autoadjust, Big Frame Size, Fast Resize"
+msgstr "Autom. Beschnitt, Großes Bild, Schnelle Skal."
+
+#: ../lib/Video/DVDRip/Config.pm:437
+msgid "Autoadjust, Medium Frame Size, Fast Resize"
+msgstr "Autom. Beschnitt, Mittl. Bildgröße, Schnelle Skal."
+
+#: ../lib/Video/DVDRip/Config.pm:444
+msgid "Autoadjust, Small Frame Size, Fast Resize"
+msgstr "Autom. Beschnitt, Kleine Bildgröße, Schnelle Skal."
+
+#: ../lib/Video/DVDRip/Config.pm:451
+msgid "VCD 4:3, PAL"
+msgstr "VCD 4:3, PAL"
+
+#: ../lib/Video/DVDRip/Config.pm:467
+msgid "VCD 16:9, PAL"
+msgstr "VCD 16:9, PAL"
+
+#: ../lib/Video/DVDRip/Config.pm:483
+msgid "SVCD 16:9 -> 4:3 letterbox, PAL"
+msgstr "SVCD 16:9 nach 4:3 Letterbox, PAL"
+
+#: ../lib/Video/DVDRip/Config.pm:499
+msgid "SVCD anamorph, PAL"
+msgstr "SVCD anamorph, PAL"
+
+#: ../lib/Video/DVDRip/Config.pm:515
+msgid "XSVCD anamorph, PAL"
+msgstr "XSVCD anamorph, PAL"
+
+#: ../lib/Video/DVDRip/Config.pm:531
+msgid "CVD anamorph, PAL"
+msgstr "CVD anamorph, PAL"
+
+#: ../lib/Video/DVDRip/Config.pm:547
+msgid "VCD 4:3, NTSC"
+msgstr "VCD 4:3, NTSC"
+
+#: ../lib/Video/DVDRip/Config.pm:563
+msgid "VCD 16:9, NTSC"
+msgstr "VCD 16:9, NTSC"
+
+#: ../lib/Video/DVDRip/Config.pm:579
+msgid "SVCD 16:9 -> 4:3 letterbox, NTSC"
+msgstr "SVCD 16:9 nach 4:3 Letterbox, NTSC"
+
+#: ../lib/Video/DVDRip/Config.pm:595
+msgid "SVCD anamorph, NTSC"
+msgstr "SVCD anamorph, NTSC"
+
+#: ../lib/Video/DVDRip/Config.pm:611
+msgid "XSVCD anamorph, NTSC"
+msgstr "XSVCD anamorph, NTSC"
+
+#: ../lib/Video/DVDRip/Config.pm:627
+msgid "CVD anamorph, NTSC"
+msgstr "CVD anamorph, NTSC"
+
+#: ../lib/Video/DVDRip/Config.pm:939
+#, perl-brace-format
+msgid "{file} executable : Ok"
+msgstr "{file} ausführbar : Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:942 ../lib/Video/DVDRip/Config.pm:958
+#, perl-brace-format
+msgid "{file} not found : NOT Ok"
+msgstr "{file} nicht gefunden : NICHT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:944
+#, perl-brace-format
+msgid "{file} not executable : NOT Ok"
+msgstr "{file} nicht ausführbar :  NICHT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:954
+msgid "has whitespace : NOT Ok"
+msgstr "hat Leerzeichen: NOT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:955
+msgid "is no absolute path : NOT Ok"
+msgstr "kein absoluter Phad : NOT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:960
+#, perl-brace-format
+msgid "{file} not writable : NOT Ok"
+msgstr "{file} nicht schreibbar : NICHT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:963
+#, perl-brace-format
+msgid "{file} writable : Ok"
+msgstr "{file} schreibbar : Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:974
+#, perl-brace-format
+msgid "{value} is numeric : Ok"
+msgstr "{value} ist numerisch : Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:977
+#, perl-brace-format
+msgid "{value} isn't numeric : NOT Ok"
+msgstr "{value} nicht nicht numerisch : NICHT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:987
+msgid "is empty : Ok"
+msgstr "ist leer : Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:998
+#, perl-brace-format
+msgid "{value} exists : Ok"
+msgstr "{value} existiert : Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:1001
+#, perl-brace-format
+msgid "{value} doesn't exist : NOT Ok"
+msgstr "{value} existiert nicht : NOT Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:1012
+#, perl-brace-format
+msgid "'{value}' is known : Ok"
+msgstr "'{value}' ist gültig : Ok"
+
+#: ../lib/Video/DVDRip/Config.pm:1016
+#, perl-brace-format
+msgid "'{value}' unknown: NOT Ok"
+msgstr "'{value}' unbekannt : NOT Ok"
+
+#: ../lib/Video/DVDRip/Project.pm:168
+#, perl-brace-format
+msgid "Project file saved to '{filename}'"
+msgstr "Projektdatei wurde nach '{filename}' gespeichert"
+
+#: ../lib/Video/DVDRip/Project.pm:174
+#, perl-brace-format
+msgid "Project temporary dir '{dir}' created"
+msgstr "Temporäres Projektverzeichnis '{dir}' erzeugt"
+
+#: ../lib/Video/DVDRip/Project.pm:229
+msgid "no filename set"
+msgstr "Kein Dateiname gesetzt"
+
+#: ../lib/Video/DVDRip/Project.pm:230 ../lib/Video/DVDRip/Project.pm:235
+#, perl-brace-format
+msgid "can't read {filename}"
+msgstr "Konnte Datei '{filename}' nicht lesen"
+
+#: ../lib/Video/DVDRip/Project.pm:244
+msgid "File is no dvd::rip file"
+msgstr "Datei ist keine dvd::rip Projektdatei"
+
+#: ../lib/Video/DVDRip/Project.pm:271
+#, perl-brace-format
+msgid "Can't load {filename}, wrong data format"
+msgstr "Konnte Datei '{filename}' nicht laden, falsches Datenformat"
+
+#: ../lib/Video/DVDRip/Project.pm:276
+#, perl-brace-format
+msgid "can't load {filename}. Perl error: {error}"
+msgstr ""
+"Konnte Datei '{filename}' nicht laden. Es traten Perl Fehler auf: {error}"
+
+#: ../lib/Video/DVDRip/Project.pm:403
+msgid "WARNING: no IFO files found - vobsub feature disabled."
+msgstr ""
+"WARNUNG: keine IFO Dateien gefunden - vobsub Funktion wird abgeschaltet."
+
+#: ../lib/Video/DVDRip/Project.pm:407
+#, perl-brace-format
+msgid "Copying IFO files from {src_dir} to {dir}"
+msgstr "Kopiere IFO Dateien von '{src_dir}' nach '{dir}'"
+
+#: ../lib/Video/DVDRip/Project.pm:444
+#, perl-brace-format
+msgid "Mounting DVD at {mount_point}"
+msgstr "Hänge DVD ein auf Mount-Punkt '{mount_point}'"
+
+#: ../lib/Video/DVDRip/Project.pm:455
+#, perl-brace-format
+msgid "Failed to mount DVD at {mount_point} ({mount_error})"
+msgstr ""
+"Konnte DVD nicht einhängen auf Mount-Punkt '{mount_point} ({mount_error})"
+
+#: ../lib/Video/DVDRip/Project.pm:476
+#, perl-brace-format
+msgid "Umount {mount_point}: "
+msgstr "Umount {mount_point}: "
+
+#: ../lib/Video/DVDRip/Project.pm:537
+#, perl-brace-format
+msgid ""
+"Warning: filter {filter} removed from title #{nr} because this transcode "
+"installation doesn't provide it anymore"
+msgstr ""
+"Warnung: Filter {filter} wurde vom Titel #{nr} entferne, weil diese "
+"transcode Installation den Filter nicht enthält."
+
+#: ../lib/Video/DVDRip/GUI/Preview.pm:143
+msgid ""
+"Error executing a transcode socket command:\n"
+"\n"
+msgstr ""
+"Fehler bei der Ausführung eines transcode Socket Befehls:\n"
+"\n"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:80
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:81
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:82
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:83
+msgid "Not tested yet"
+msgstr "Noch nicht getestet"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:101
+msgid "dvd::rip - Edit cluster node"
+msgstr "dvd::rip - Cluster Knoten bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:158
+msgid "Edit node properties"
+msgstr "Bearbeite Knoten Eigenschaften"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:162
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:576
+#: ../lib/Video/DVDRip/GUI/Depend.pm:132
+#: ../lib/Video/DVDRip/GUI/Filters.pm:173
+#: ../lib/Video/DVDRip/GUI/Filters.pm:219
+msgid "Name"
+msgstr "Name"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:168
+msgid "Hostname"
+msgstr "Rechnername"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:170
+msgid "Network hostname of this node. Defaults to node name."
+msgstr ""
+"Netzwerk Hostname von diesem Knoten. Ist per Default gleich dem Knotennamen."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:174
+msgid "No valid hostname"
+msgstr "Kein gültiger Knotenname"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:179
+msgid "Local data directory"
+msgstr "Lokales Datenverzeichnis"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:180
+msgid ""
+"This is the mount point of the dvd::rip data master directory on this node, "
+"e.g. connected via NFS or Samba"
+msgstr ""
+"Das ist der Einhängepunkt des dvd::rip Datenhauptverzeichnisses auf diesem "
+"Knoten, z.B. verbunden über das Netzwerk mit NFS oder Samba"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:186
+msgid "Speed index"
+msgstr "Geschwindigkeitsindex"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:188
+msgid ""
+"Enter an integer value indicating the speed of this node. The higher the "
+"value the faster it is. Faster nodes are preferred over slower nodes."
+msgstr ""
+"Geben Sie einen ganzahligen Wert als Indikator für die Geschwindigkeit "
+"dieses Knotens an. Je höher der Wert, desto schneller ist dieser Knoten. "
+"Schnelle Knoten werden gegenüber langsamen bevorzugt."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:195
+msgid "Additional transcode options"
+msgstr "Zusätzliche transcode Optionen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:197
+msgid ""
+"You can specify additional transcode options for this node, e.g. -u 4,2 to "
+"increase the performance on a two processor machine"
+msgstr ""
+"Hier können zusätzliche transcode Optionen für diesen Knoten angegeben "
+"werden, z.B. -u 4,2 um die Geschwindigkeit bei einem Zwei-Prozessor-System "
+"zu erhöhen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:203
+msgid "Node has dvd::rip data harddrive?"
+msgstr "Hat dieser Knoten die dvd::rip Datenfestplatte?"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:205
+msgid ""
+"If this node has the dvd::rip data hardrive locally connected, I/O intensive "
+"jobs are executed on this node with higher priority"
+msgstr ""
+"Wenn an diesen Knoten die dvd::rip Datenfestplatte angeschlossen ist werden "
+"Jobs mit viel Daten Ein/Ausgabe bevorzugt auf diesem Knoten ausgeführt"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:213
+msgid "Node runs Cluster Control Daemon?"
+msgstr "Läuft der Cluster Master Daemon hier?"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:214
+msgid ""
+"Specify whether on this node runs the cluster control daemon. In that case "
+"no ssh remote command execution is neccessary"
+msgstr ""
+"Geben Sie an ob auf diesem Knoten den dvd::rip Cluster Kontroll Daemon "
+"läuft. In diesem Fall ist keine Kommunikation über SSH notwendig"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:222
+msgid "Username to connect with ssh"
+msgstr "Benutzername für die Verbindungsaufnahme via SSH"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:223
+msgid ""
+"You need to setup passwordless authorization via ~/.ssh/authorized_keys for "
+"this user from the master server to the node"
+msgstr ""
+"Es ist notwendig mittels ~/.ssh/authorized_keys eine passwortlose "
+"Authentifizierung für diesen Benutzer zu konfigurieren, so dass Prozesse vom "
+"Master Cluster Daemon ohne Benutzerinteraktion über SSH ausgeführt werden "
+"können."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:230
+msgid "SSH command and options"
+msgstr "SSH Befehl und Optionen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:232
+msgid ""
+"Usually you leave this empty (defaults to 'ssh -x'), but if your setup needs "
+"special ssh options you may edit them here"
+msgstr ""
+"Diese Optionen werden zusätzlich an den SSH Befehl übergeben. Normalerweise "
+"muss hier nichts eingetragen werden."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:240
+msgid "Test settings"
+msgstr "Einstellungen testen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:244
+msgid ""
+"This triggers a simple test connection to the node, checking file "
+"permissions, transcode versions etc."
+msgstr ""
+"Hiermit wird eine Testverbindung zum Knoten aufgebaut und der Dateizugriff "
+"geprüft, sowie die transcode Version etc."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:267
+msgid "Node test results"
+msgstr "Testergebnisse"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:297
+msgid "Test"
+msgstr "Test"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:301
+msgid "Result"
+msgstr "Ergebnis"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:305
+msgid "Details"
+msgstr "Details"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:312
+msgid "SSH connection"
+msgstr "SSH Verbindung"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:324
+msgid "Data directory"
+msgstr "Datenverzeichnis"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:343
+msgid "Write access"
+msgstr "Schreibzugriff"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:357
+msgid "Program versions"
+msgstr "Programmversionen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:467
+msgid "No details available"
+msgstr "Keine Details verfügbar"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:468
+msgid "Not tested, no SSH connection!"
+msgstr "Nicht getestet, keine SSH Verbindung!"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:469
+msgid "OK"
+msgstr "OK"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:470
+msgid "NOT OK"
+msgstr "NICHT OK"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:475
+msgid "Master can connect to node"
+msgstr "Master kann Verbindung mit Knoten herstellen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:499
+msgid "Empty"
+msgstr "Leer"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:502
+msgid "Node's data directory"
+msgstr "Datenverzeichnis des Knotens"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:506
+msgid "Masters' data directory"
+msgstr "Datenverzeichnis des Masters"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:520
+msgid "Content of data directory matches"
+msgstr "Inhalt des Datenverzeichnisses stimmt überein"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:531
+msgid "Node's programs"
+msgstr "Programme des Knotens"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:533
+msgid "Masters's programs"
+msgstr "Programme des Masters"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:555
+msgid "Node can write to data directory"
+msgstr "Knoten kann ins Datenverzeichnis schreiben"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:605
+msgid "Can't execute tests:"
+msgstr "Konnte Tests nicht ausführen:"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:628
+msgid "ssh connect"
+msgstr "SSH Verbindung"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:629
+msgid "Content of project base directory"
+msgstr "Inhalt des Datenverzeichnisses"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:630
+msgid "Project base directory writable"
+msgstr "Datenverzeichnis ist beschreibbar"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:631
+msgid "transcode version match"
+msgstr "transcode Versionen passen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:659
+msgid "All tests successful"
+msgstr "Alle Tests waren erfolgreich"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:665
+msgid "Brief report"
+msgstr "Kurz-Report"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Node.pm:675
+msgid "Detailed report"
+msgstr "Detaillierter Report"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:64
+msgid "dvd::rip - Edit cluster project"
+msgstr "dvd::rip - Cluster Projekt bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:108
+msgid "Edit cluster project properties"
+msgstr "Cluster Projekt Eigenschaften bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:113
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:433
+msgid "Project"
+msgstr "Projekt"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:117
+msgid "Number of frames per chunk"
+msgstr "Anzahl der Frames pro Block"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:119
+msgid ""
+"The smaller the chunks the higher the parallelism, but overall bitrate "
+"distribution may suffer if set too low"
+msgstr ""
+"Je kleiner die Blockgröße desto höher die Parallelität. Allerdings kann die "
+"Videobitratenverteilung darunter leiden, wenn die Blockgröße zu klein "
+"gewählt wird"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:126
+msgid "Cleanup temporary files after merging?"
+msgstr "Temporäre Dateien nach Zusammenfügen löschen?"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Title.pm:132
+msgid "Cleanup original VOB files when finished?"
+msgstr "Original VOB Dateien am Ende löschen?"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:158
+msgid "dvd::rip - Cluster Control"
+msgstr "dvd::rip - Cluster Kontrolle"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:250
+#: ../lib/Video/DVDRip/GUI/Main.pm:289
+msgid "_File"
+msgstr "_Datei"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:253
+msgid "_Close window"
+msgstr "Fenster _schließen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:261
+msgid "_Master"
+msgstr "_Master"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:264
+msgid "_Connect Master Daemon"
+msgstr "_Verbindung zum Master Daemon aufbauen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:271
+msgid "_Disconnect from Master Daemon"
+msgstr "Verbindung zum Master Daemon _beenden"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:281
+msgid "Shutdown Master Daemon"
+msgstr "Master Daemon stoppen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:289
+msgid "_Node"
+msgstr "_Knoten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:292
+msgid "_Add node"
+msgstr "Knoten _hinzufügen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:298
+msgid "_Edit node"
+msgstr "Knoten _bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:310
+msgid "_Start node"
+msgstr "Knoten s_tarten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:320
+msgid "Sto_p node"
+msgstr "Knoten an_halten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:330
+msgid "_Remove node"
+msgstr "Knoten ent_fernen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:343
+msgid "_Project"
+msgstr "_Projekt"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:346
+msgid "_Edit project"
+msgstr "Projekt b_earbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:356
+msgid "_Start project"
+msgstr "Projekt _starten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:366
+msgid "_Cancel project"
+msgstr "Projekt _abbrechen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:376
+msgid "Res_tart project"
+msgstr "Projekt _neu starten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:386
+msgid "_Remove project"
+msgstr "Projekt ent_fernen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:421
+msgid "Project queue"
+msgstr "Projekt Warteschlange"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:432
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:575
+msgid "Number"
+msgstr "Nummer"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:434
+msgid "State"
+msgstr "Zustand"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:435
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:578
+#: ../lib/Video/DVDRip/Term/Progress.pm:75
+msgid "Progress"
+msgstr "Fortschritt"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:448
+msgid "Edit project"
+msgstr "Projekt bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:458
+msgid "Start project"
+msgstr "Projekt starten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:468
+msgid "Cancel project"
+msgstr "Projekt abbrechen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:478
+msgid "Restart project"
+msgstr "Projekt neu starten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:489
+msgid "Remove project"
+msgstr "Projekt entfernen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:508
+msgid "Job running status"
+msgstr "Job Status"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:563
+msgid "Registered Nodes"
+msgstr "Angemeldete Knoten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:577
+#: ../lib/Video/DVDRip/Term/Progress.pm:74
+msgid "Job"
+msgstr "Job"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:595
+msgid "Add node"
+msgstr "Knoten hinzufügen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:601
+msgid "Edit node"
+msgstr "Knoten bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:613
+msgid "Start node"
+msgstr "Knoten starten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:624
+msgid "Stop node"
+msgstr "Knoten stoppen"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:643
+msgid "Cluster control daemon log output"
+msgstr "Cluster Daemon Log Ausgaben"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:686
+msgid ""
+"You must first configure a cluster control daemon\n"
+"in the Preferences dialog."
+msgstr ""
+"Bitte konfigurieren Sie zunächst den Cluster Control Daemon\n"
+"im Voreinstellungen Dialog."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:717
+#, perl-brace-format
+msgid "Can't connect to master daemon on {server}:{port}."
+msgstr "Konnte nicht zum Master Daemon verbinden: {server}:{port}"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:736
+#, perl-brace-format
+msgid ""
+"Can't start local master daemon on port {port}.\n"
+"Execute the dvdrip-master program by hand to\n"
+"see why it doesn't run."
+msgstr ""
+"Konnte dvd::rip Cluster Master Daemon nicht lokal starten auf Port {port}. "
+"Führen Sie das dvdrip-master Programm per Hand aus, um zu sehen was genau "
+"das Problem ist."
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:984
+msgid "Please configure the master node first"
+msgstr "Bitte konfigurieren Sie zunächst den Master Knoten"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:1005
+msgid "Connection to master daemon lost!"
+msgstr "Die Verbindung zum Cluster Master wurde unterbrochen!"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:1058
+msgid "Do you want to remove the selected project?"
+msgstr "Soll das ausgewählte Projekt entfernt werden?"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:1140
+msgid "Do you want to remove the selected node?"
+msgstr "Soll der ausgewählte Knoten entfernt werden?"
+
+#: ../lib/Video/DVDRip/GUI/Cluster/Control.pm:1210
+msgid ""
+"Do you really want to shutdown\n"
+"the Cluster Control Daemon?"
+msgstr ""
+"Soll der Cluster Control Daemon wirklich\n"
+"heruntergefahren werden?"
+
+#: ../lib/Video/DVDRip/GUI/MultiAudio.pm:44
+msgid "dvd::rip - Manage multiple audio tracks"
+msgstr "dvd::rip - Verwaltung mehrerer Tonspuren"
+
+#: ../lib/Video/DVDRip/GUI/MultiAudio.pm:83
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:269
+msgid "Manage multiple audio tracks"
+msgstr "Mehrere Tonspuren verwalten"
+
+#: ../lib/Video/DVDRip/GUI/MultiAudio.pm:94
+msgid "Source tracks"
+msgstr "Quell Tonspuren"
+
+#: ../lib/Video/DVDRip/GUI/MultiAudio.pm:98
+msgid "Target tracks"
+msgstr "Ziel Tonspuren"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:42
+msgid "dvd::rip - Dependency check"
+msgstr "dvd::rip - Abhängigkeitsprüfung"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:58
+msgid "Required tools"
+msgstr "Benötigte Programme"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:76
+msgid " Text version "
+msgstr " Text Version "
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:82
+msgid "Text version, suitable for bug reports"
+msgstr "Textversion, geeignet für Fehlerberichte"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:85
+msgid " Ok "
+msgstr " Ok "
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:133
+msgid "Comment"
+msgstr "Kommentar"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:134
+msgid "Mandatory"
+msgstr "Notwendig"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:135
+msgid "Suggested"
+msgstr "Empfohlen"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:136
+msgid "Minimum"
+msgstr "Minimum"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:137
+msgid "Maximum"
+msgstr "Maximum"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:138
+msgid "Installed"
+msgstr "Installiert"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:139
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:282
+msgid "Ok"
+msgstr "Ok"
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:157
+msgid ""
+"- Mandatory tools must be present with the minimum version listed.\n"
+"- Non mandatory tools may be missing or too old - features are disabled "
+"then.\n"
+"- Suggested numbers are the versions the author works with, so they are well "
+"tested."
+msgstr ""
+"- Benötigte Programme müssen in der Minimum Version installiert sein.\n"
+"- Empfohlene Programme dürfen fehlen oder zu alt sein - die dazugehörigen\n"
+"  dvd::rip Funktionen werden dann automatisch abgeschaltet.\n"
+"- Die empfohlenen Versionsnummern sind die, mit denen der Autor arbeitet\n"
+"  Diese sind also in der Regel gut getestet."
+
+#: ../lib/Video/DVDRip/GUI/Depend.pm:171
+msgid "Installed tools"
+msgstr "Installierte Programme"
+
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:64
+#, perl-brace-format
+msgid "This task needs about {needed} MB, {free} MB are free."
+msgstr "Diese Aufgabe benötigt {needed} MB, {free} MB sind noch frei."
+
+#: ../lib/Video/DVDRip/GUI/ExecFlow.pm:71
+#, perl-brace-format
+msgid ""
+"Warning: diskspace is low. This task needs\n"
+"about {needed} MB, but only {free} MB are available.\n"
+"Do you want to continue anyway?"
+msgstr ""
+"Warnung: der Speicherplatz wird knapp. Diese Aufgabe benötigt\n"
+"etwa {needed} MB, aber es sind nur noch {free} MB verfügbar.\n"
+"Soll trotzdem fortgesetzt werden?"
+
+#: ../lib/Video/DVDRip/GUI/BitrateCalc.pm:42
+msgid "dvd::rip - Storage and bitrate calculation details"
+msgstr "dvd::rip - Details zur Bitratenberechnung"
+
+#: ../lib/Video/DVDRip/GUI/BitrateCalc.pm:107
+#: ../lib/Video/DVDRip/GUI/Filters.pm:173
+#: ../lib/Video/DVDRip/GUI/Filters.pm:219
+#: ../lib/Video/DVDRip/GUI/Filters.pm:289
+msgid "Description"
+msgstr "Beschreibung"
+
+#: ../lib/Video/DVDRip/GUI/BitrateCalc.pm:107
+msgid "Operator"
+msgstr "Operator"
+
+#: ../lib/Video/DVDRip/GUI/BitrateCalc.pm:107
+msgid "Value"
+msgstr "Wert"
+
+#: ../lib/Video/DVDRip/GUI/BitrateCalc.pm:107
+msgid "Unit"
+msgstr "Einheit"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:48
+msgid "Status"
+msgstr "Zustand"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:62
+msgid "Show job plan and progress details"
+msgstr "Job-Plan und Fortschrittsdetails anzeigen"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:76
+#: ../lib/Video/DVDRip/GUI/Progress.pm:245
+msgid "Pause and resume processing"
+msgstr "Verarbeitung Pausieren und Fortsetzen"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:90
+msgid "Cancel processing"
+msgstr "Verarbeitung abbrechen"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:180
+#, perl-brace-format
+msgid "Free diskspace: {free} MB"
+msgstr "Freier Festplattenspeicher: {free} MB"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:208
+msgid "dvd::rip - Job plan and progress details"
+msgstr "dvd::rip - Job Plan und Fortschrittsanzeige"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:232
+msgid "Hide window"
+msgstr "Fenster verstecken"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:233
+msgid "Hide details window"
+msgstr "Detail-Fenster ausblenden"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:243
+msgid "Pause jobs"
+msgstr "Jobs pausieren"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:244
+msgid "Resume"
+msgstr "Pausierung aufheben"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:259
+msgid "Cancel jobs"
+msgstr "Jobs abbrechen"
+
+#: ../lib/Video/DVDRip/GUI/Progress.pm:260
+msgid "Cancel all running jobs"
+msgstr "Alle laufenden Jobs abbrechen"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:56
+msgid "dvd::rip - Preferences"
+msgstr "dvd::rip - Voreinstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:74
+msgid "Global preferences"
+msgstr "Globale Voreinstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:172
+msgid "Create directory"
+msgstr "Anlegen"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:178
+#, perl-brace-format
+msgid ""
+"Can't create directory:\n"
+"\n"
+"{dir}"
+msgstr ""
+"Kann Verzeichnis nicht anlegen:\n"
+"\n"
+"{dir}"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:217
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:37
+msgid "This is a list of connected DVD drives found in your system"
+msgstr "Dies ist eine Liste der DVD Geräte, die im System gefunden wurden"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:265
+msgid "Check all settings"
+msgstr "Alle Einstellungen überprüfen"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:272
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:307
+msgid "Check results"
+msgstr "Prüfergebnisse"
+
+#: ../lib/Video/DVDRip/GUI/Preferences.pm:378
+msgid "not tested : Ok"
+msgstr "nicht geprüft : Ok"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:26
+msgid "No fast resizing"
+msgstr "Keine Schnellskalierung"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:45
+msgid "Using clip2"
+msgstr "anhand 2. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:46
+msgid "Using zoom"
+msgstr "anhand Skalierung"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:55
+msgid "Yes - use clip1"
+msgstr "Ja - anhand 1. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:56
+msgid "Yes - use clip2"
+msgstr "Ja - anhand 2. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:57
+msgid "No - take existent clip1"
+msgstr "Nein - nehme 1. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:96
+msgid "dvd::rip - Zoom Calculator"
+msgstr "dvd::rip - Zoom Kalkulator"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:131
+msgid "Apply Clip & Zoom settings"
+msgstr "Clip & Zoom Einstellungen anwenden"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:167
+msgid "Parameters"
+msgstr "Parameter"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:171
+msgid "Fast resize align"
+msgstr "Schnellskalierung Größe"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:175
+msgid "Result frame align"
+msgstr "Größe Zielbild teilbar durch"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:179
+msgid "Achieve result align"
+msgstr "Zielbildgröße erreichen"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:183
+msgid "Auto clipping"
+msgstr "Autom. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:202
+msgid "V-Rate: "
+msgstr "V-Rate: "
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:207
+msgid "BPP: "
+msgstr "BPP: "
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:212
+msgid "Total size: "
+msgstr "Gesamtgröße: "
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:216
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:465
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:482
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:728
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:741
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:748
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:770
+msgid "MB"
+msgstr "MB"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:247
+msgid "Zoom calculations"
+msgstr "Zoom Berechnungen"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:256
+msgid "Result size"
+msgstr "Endgröße"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:257
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:416
+msgid "BPP"
+msgstr "BPP"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:258
+msgid "Eff. AR"
+msgstr "Eff. AR"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:259
+msgid "AR error"
+msgstr "AR Fehler"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:260
+msgid "Clip1 (t/b/l/r)"
+msgstr "Clip1 (o/u/l/r)"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:261
+msgid "Zoom size"
+msgstr "Zoom Größe"
+
+#: ../lib/Video/DVDRip/GUI/ZoomCalculator.pm:262
+msgid "Clip2 (t/b/l/r)"
+msgstr "Clip2 (o/u/l/r)"
+
+#: ../lib/Video/DVDRip/GUI/Base.pm:117
+#, perl-brace-format
+msgid "Overwrite existing file '{filename}'?"
+msgstr "Datei {filename} überschreiben?"
+
+#: ../lib/Video/DVDRip/GUI/Base.pm:173
+msgid "Error message"
+msgstr "Fehlermeldung"
+
+#: ../lib/Video/DVDRip/GUI/Base.pm:207
+msgid "dvd::rip - Message"
+msgstr "dvd::rip - Nachricht"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:141
+#, perl-brace-format
+msgid ""
+"An internal exception was thrown!\n"
+"The error message was:\n"
+"\n"
+"{msg}"
+msgstr ""
+"Ein interner Fehler ist aufgetreten!\n"
+"The Fehlermeldung war:\n"
+"\n"
+"{msg}"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:160
+#, perl-brace-format
+msgid "Detected transcode version: {version}"
+msgstr "Erkannte transcode Version: {version}"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:174
+msgid "Opening project file failed. Aborting."
+msgstr "Die Projekt Datei konnte nicht geöffnet werden. Abbruch."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:292
+msgid "_New Project"
+msgstr "_Neues Projekt"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:300
+msgid "_Open Project..."
+msgstr "Pr_ojekt Öffnen..."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:308
+msgid "_Save Project"
+msgstr "_Projekt speichern"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:315
+msgid "Save _Project as..."
+msgstr "Projekt speichern unter..."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:322
+msgid "_Close Project"
+msgstr "Projekt s_chließen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:337
+msgid "_Exit"
+msgstr "B_eenden"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:345
+msgid "_Edit"
+msgstr "_Bearbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:348
+msgid "Edit _Preferences..."
+msgstr "_Voreinstellungen..."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:356
+msgid "_Title"
+msgstr "_Titel"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:370
+msgid "View target file"
+msgstr "Zieldatei an_sehen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:381
+msgid "Add project to cluster"
+msgstr "Projekt an _Cluster übergeben"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:398
+msgid "Create vobsub"
+msgstr "vobsub Datei erstellen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:411
+msgid "Create dvdrip-info file"
+msgstr "dvdrip-_info Datei erzeugen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:427
+msgid "Create WAV from selected audio track"
+msgstr "_WAV Datei der aktuellen Tonspur erzeugen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:438
+msgid "_Cluster"
+msgstr "_Cluster"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:441
+msgid "Contro_l..."
+msgstr "Kontro_llfenster..."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:449
+msgid "_Debug"
+msgstr "_Fehlersuche"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:453
+msgid "Show _Transcode commands..."
+msgstr "_transcode Befehle zeigen..."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:459
+msgid "Check _dependencies..."
+msgstr "Prüfe _installierte Pakete..."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:466
+msgid "_Help"
+msgstr "_Hilfe"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:469
+msgid "_About dvd::rip"
+msgstr "_Über dvd::rip"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:533
+msgid "Selected DVD title"
+msgstr "Gewählter DVD Titel"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:537
+msgid "Choose a DVD title at any time here"
+msgstr "Hier können Sie jederzeit einen anderen DVD Titel auswählen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:635
+#, perl-brace-format
+msgid "File '{filename}' not found or not readable."
+msgstr "Datei '{filename}' nicht gefunden oder nicht lesbar."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:687
+msgid "Save project: choose filename"
+msgstr "Projekt speichern: Dateiname wählen"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:698 ../lib/Video/DVDRip/GUI/Main.pm:725
+#, perl-brace-format
+msgid "Project {name} created"
+msgstr "Projekt {name} wurde angelegt"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:762
+msgid "Do you want to save this project first?"
+msgstr "Soll die Projektdatei vorher gespeichert werden?"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:813
+msgid ""
+"This is the first time you start dvd::rip. The Preferences dialog was opened "
+"automatically for you. Please review the settings, in particular the default "
+"DVD device and your data base directory. Point it to a directory with "
+"sufficient diskspace of at least 10 GB for full DVD copies."
+msgstr ""
+"Sie starten dvd::rip zum ersten Mal. Der Voreinstellungen Dialog wurde "
+"automatisch geöffnet. Bitte überprüfen Sie die Einstellungen, vor allem das "
+"Standard DVD Gerät und das Standarddatenverzeichnis. Dieses sollte "
+"mindestens 10 GB freien Speicher für vollständige DVD Kopien haben."
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:860
+msgid ""
+"Probe Command:\n"
+"==============\n"
+msgstr ""
+"Analyse Befehl:\n"
+"===============\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:872
+msgid ""
+"Rip Command:\n"
+"============\n"
+msgstr ""
+"Rip Befehl:\n"
+"===========\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:877
+msgid ""
+"Scan Command:\n"
+"============\n"
+msgstr ""
+"Scan Befehl:\n"
+"============\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:884
+msgid ""
+"Grab Preview Image Command:\n"
+"===========================\n"
+msgstr ""
+"Vorschaubild Holen Befehl:\n"
+"==========================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:895
+msgid "You must first rip the selected title to see this command.\n"
+msgstr ""
+"Zunächst muss der ausgewählte Titel kopiert werden, um diesen Befehl zu "
+"sehen.\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:900
+msgid ""
+"Transcode Command:\n"
+"==================\n"
+msgstr ""
+"Befehle zum Transkodieren:\n"
+"==========================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:929
+msgid ""
+"Additional audio tracks commands:\n"
+"============================\n"
+msgstr ""
+"Befehle für zusätzliche Tonspuren:\n"
+"===================================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:950
+msgid ""
+"View DVD Command:\n"
+"=================\n"
+msgstr ""
+"Befehl zum Ansehen einer DVD:\n"
+"=============================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:958
+msgid ""
+"View Files Command:\n"
+"===================\n"
+msgstr ""
+"Befehl zum Ansehen einer Videodatei:\n"
+"=====================================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:975
+msgid ""
+"CD image creation command:\n"
+"========================\n"
+msgstr ""
+"Befehl zur Erstellung des CD Images:\n"
+"====================================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:981
+msgid ""
+"CD burning command:\n"
+"==================\n"
+msgstr ""
+"Befehl zum CD Brennen:\n"
+"======================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:991
+msgid ""
+"WAV creation command:\n"
+"====================\n"
+msgstr ""
+"Befehl zur WAV Erzeugung:\n"
+"===========================\n"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:998
+msgid "Commands executed by dvd::rip"
+msgstr "Befehle, die von dvd::rip ausgeführt werden"
+
+#: ../lib/Video/DVDRip/GUI/Main.pm:1024
+msgid ""
+"One or several mandatory tools are\n"
+"missing or too old. You must install them\n"
+"before you can proceed with dvd::rip."
+msgstr ""
+"Ein oder mehrere notwengige Programme\n"
+"fehlen oder sind zu alt. Sie müssen diese\n"
+"installieren, bevor Sie mit dvd::rip fortfahren können."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:83
+msgid "Container options"
+msgstr "Container Einstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:86
+msgid "Select container"
+msgstr "Container Format"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:100
+msgid "Video options"
+msgstr "Video Einstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:121
+msgid "Video codec"
+msgstr "Video Codec"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:127
+msgid ""
+"Choose a video codec here. If you don't find the codec you want in the list, "
+"just enter its transcode name by hand"
+msgstr ""
+"Wählen Sie einen Video Codec aus. Wenn der gewünschte Codec nicht "
+"aufgelistet wird, so können Sie den Namen auch per Hand eingeben."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:133
+msgid "Configure..."
+msgstr "Konfigurieren..."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:135
+msgid ""
+"The xvid4 video codec may be configured in detail if you have the xvid4conf "
+"utility installed"
+msgstr ""
+"Der xvid4 Video Codec kann im Detail konfiguriert werden. Hierzu wird das "
+"externe Programm xvid4conf aufgerufen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:148
+msgid "ffmpeg/af6 codec"
+msgstr "ffmpeg/af6 Codec"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:154
+msgid ""
+"Some transcode video export modules support multiple video codecs, e.g. the "
+"ffmpeg module. Enter the name of the video codec the module should use here"
+msgstr ""
+"Einige transcode Video Export Module unterstützen mehrere Video Codecs, z.B."
+"das ffmpeg Modul. Der Name des zu verwendenden Codecs wird hier eingetragen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:159
+msgid "Keyframes"
+msgstr "Keyframes"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:163
+msgid ""
+"This setting controls the number of frames after which a keyframe should be "
+"inserted into the video stream. The lower this value the better the quality, "
+"but filesize may increase as well"
+msgstr ""
+"Hiermit wird festgelegt nach wievielen Frames ein Keyframe in den Videostrom "
+"eingefügt werden soll. Je niedriger der Wert desto besser die Qualität, aber "
+"die Dateigröße kann entsprechend ansteigen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:173
+msgid "Video framerate"
+msgstr "Video Bildrate"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:178
+msgid ""
+"This is the video framerate of this movie. Only change this if transcode "
+"detected the framerate wrong, which may happen sometimes. If you want true "
+"framerate conversion check out the Filters dialog, which provides some video "
+"filters for this task"
+msgstr ""
+"Das ist die Bildwiederholrate des Films. Dieser Wert sollte nur geändert "
+"werden, wenn die Rate von transcode falsch ermittelt wurde. Für echte "
+"Umrechnung in eine andere Bildwiederholrate gibt es eigene Transcode Filter, "
+"die über den Filterdialog aktiviert werden können."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:189
+msgid "2-pass encoding"
+msgstr "Zwei Durchläufe"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:193
+msgid ""
+"2-pass encoding increases video quality and video bitrate accuracy "
+"significantly. But the whole transcoding needs nearly twice the time. It's "
+"strongly recommended to use 2-pass encoding whenever possible."
+msgstr ""
+"2-Pass Kodierung erhöht die Videoqualität und Bitratenbestimmungsignifikant. "
+"Allerdings wird der Film hierfür quasi 2x transkodiert,d.h. der Vorgang "
+"dauert doppelt so lange. Es ist jedoch empfohlen, stets mit 2-Pass Kodierung "
+"zu arbeiten"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:202
+msgid "Reuse log"
+msgstr "Log wiederverw."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:204
+msgid ""
+"During the first pass of a 2-pass transcoding a logfile with statistic "
+"information about the movie is written. If you didn't change any parameters "
+"affecting the video you may reuse this logfile for subsequent transcodings "
+"by activating this button. dvd::rip will skip the first pass saving much "
+"time."
+msgstr ""
+"Während der ersten Phase einer 2-Pass Transkodierung wird eine Logdatei mit "
+"statistischen Informationen erzeugt. Wenn keinerlei Einstellungen das "
+"Videobild betreffend geändert wurden (z.B. nur Audio-Einstellungen), so kann "
+"die erste Phase übersprungen werden, was natürlich viel Zeit spart."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:215
+msgid "Deinterlace mode"
+msgstr "Deinterlace Modus"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:221
+msgid ""
+"Choose a deinterlacer algorithm here if the movie is interlaced, otherwise "
+"the transcoded movie is likely to have many artefacts. The 'Smart "
+"deinterlacing' setting is recommended."
+msgstr ""
+"Hier kann ein Deinterlacer Algorithmus eingestellt werden, falls derFilm im "
+"Zeilensprungverfahren aufgezeichnet wurde. Andererseitswird das Endergebnis "
+"viele Artefakte, z.B. Kammstrukturen beihorizontalen Bewegungen aufweisen. "
+"Der \"Smart Deinterlacer\"kann hierfür empfohlen werden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:228
+msgid "Filters"
+msgstr "Filter"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:231
+msgid "Configure filters & preview..."
+msgstr "Filter Einstellungen / Vorschau"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:232
+msgid ""
+"This opens a dialog which gives you access all filters transcode supports."
+msgstr ""
+"Diese Schaltfläche öffnet einen Dialog mit dem alle Filter von transcodeim "
+"Detail eingestellt werden können."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:247
+msgid "Audio options"
+msgstr "Audio Einstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:258
+msgid "Select track"
+msgstr "Spur auswählen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:264
+msgid "Multi..."
+msgstr "Multi..."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:311
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:324
+msgid "Quality"
+msgstr "Qualität"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:335
+msgid "Use quality mode"
+msgstr "Qualitätsmodus"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:348
+#, perl-brace-format
+msgid ""
+"{ac3_or_pcm} sound is passed through. Bit- and\n"
+"samplerate are detected from source,\n"
+"so you can't change them here."
+msgstr ""
+"{ac3_or_pcm} Ton wird 1:1 übernommen. Bit- und\n"
+"Samplerate wird automatisch erkannt,\n"
+"diese können hier nicht verändert werden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:364
+#: ../lib/Video/DVDRip/GUI/Filters.pm:776
+msgid "Filter"
+msgstr "Filter"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:367
+msgid "Volume rescale"
+msgstr "Lautst. max."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:375
+msgid "Scan value"
+msgstr "Wert emitteln"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:395
+msgid "Bit-/Samplerate"
+msgstr "Bit-/Samplerate"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:404
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:533
+msgid "kbit/s"
+msgstr "kbit/s"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:414
+msgid "hz"
+msgstr "hz"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:431
+msgid "Video bitrate calculation"
+msgstr "Video Bitraten-Berechnung"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:437
+msgid "By target size"
+msgstr "Nach Zielgröße"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:440
+msgid "Target media"
+msgstr "Ziel Medium"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:447
+msgid ""
+"Choose the desired number of discs here. dvd::rip computes the target size "
+"from it and optionally splits the result file accordingly."
+msgstr ""
+"Wählen Sie die gewünschte Anzahl Rohlinge aus. dvd::rip errechnet dann die "
+"passende Zielgröße und teilt die Zieldatei entsprechend auf."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:458
+msgid ""
+"Select the size of your media here (several CD and DVD form factors). The "
+"unit is a true megabyte (1024KB). You may enter an arbitrary value if the "
+"preset don't fit your needs."
+msgstr ""
+"Hier können Sie Größe der Zielmedien einstellen. Die Liste bietet diverse "
+"Standard CD und DVD Größen an. Die Einheit sind \"echte\" Megabyte (1024 KB)."
+"Der Wert kann auch manuell eingestellt werden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:477
+msgid ""
+"This entry is computed based on the settings above, but you may enter an "
+"arbitrary value as well."
+msgstr ""
+"Dieses Feld wird aufgrund der obigen Einstellungen automatisch berechnet. Es "
+"kann aber auch manuell ein eigener Wert eingegeben werden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:486
+msgid "Consider frame range"
+msgstr "Für Frame-Bereich"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:488
+msgid ""
+"If you specified a frame range in the 'General options' section activate "
+"this checkbutton if the video bitrate calculation should be based on this "
+"frame range, and not on the full title length. You need this if you entered "
+"the frame range not just for testing purposes but also for the final "
+"transcoding, e.g. for cutting off credits."
+msgstr ""
+"Wenn ein Frame-Bereich bei den \"Allgemeinen Einstellungen\" eingegeben "
+"wurde, so kann mit diesem Knopf eingestellt werden, ob die Video-Bitraten-"
+"Berechnung nur für diesen Bereich oder den gesamten Film gelten soll. Das "
+"ist sinnvoll, wenn der Bereich nicht nur zum Testen gesetzt wurde, sondern "
+"weil damit z.B. die Credits o.ä. herausgeschnitten werden sollen."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:500
+msgid "By quality"
+msgstr "Nach Qualität"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:504
+msgid "BPP value"
+msgstr "BPP Wert"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:509
+msgid ""
+"BPP stands for Bits Per Pixel and is a measure for the video quality. Values "
+"around 0.25 give fair results (VHS quality), 0.4-0.5 very good quality near "
+"DVD."
+msgstr ""
+"BPP steht für \"Bits per Pixel\" und ist eine Einheit für die Videoqualität."
+"Werte im Bereich 0.25 geben in etwa VHS Qualität, 0.4 bis 0.5 sehr gute "
+"Qualität mit DVD vergleichbar."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:517
+msgid "Manually"
+msgstr "Manuell"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:520
+msgid "Video bitrate"
+msgstr "Video Bitrate"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:528
+msgid ""
+"If you don't want a calculated video bitrate just enter an arbitrary value "
+"here."
+msgstr ""
+"Wenn die Video-Bitrate nicht berechnet werden soll, so können Sie hiereine "
+"beliebige Rate per Hand eingeben."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:549
+msgid "General options"
+msgstr "Allgemeine Optionen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:553
+msgid "Frame range"
+msgstr "Frame-Bereich"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:565
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:587
+#, perl-brace-format
+msgid "Movie has only {number} frames"
+msgstr "Der Film hat nur {number} Frames."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:571
+msgid "Start frame number must be smaller than end frame number"
+msgstr "Die Start-Frame-Nummer muß kleiner sein als die Ende-Frame-Nummer."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:593
+msgid "End frame number must be greated than start frame number"
+msgstr "Die Ende-Frame-Nummer muss größer sein also die Start-Frame-Nummer."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:602
+msgid "transcode options"
+msgstr "transcode Optionen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:607
+msgid "Process nice level"
+msgstr "Prozess nice Wert"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:614
+msgid "Preview window"
+msgstr "Vorschaufenster"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:620
+msgid "Use PSU core"
+msgstr "PSU Core"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:625
+msgid "Execute afterwards"
+msgstr "Nachher ausführen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:634
+msgid "and exit"
+msgstr "und beenden"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:646
+msgid "Operate"
+msgstr "Ausführen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:662
+msgid "View"
+msgstr "Ansehen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:673
+msgid "Add to cluster"
+msgstr "Zum Cluster"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:691
+msgid "Split files on transcoding"
+msgstr "Datei nach dem Transkodieren aufteilen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:702
+msgid "Calculated storage"
+msgstr "Speicherplatzberechnung"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:719
+msgid "V-Rate:"
+msgstr "V-Rate:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:724
+msgid "Video size:"
+msgstr "Video Größe:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:733
+msgid "BPP:"
+msgstr "BPP:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:737
+msgid "Audio size:"
+msgstr "Audio Größe:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:744
+msgid "Other size:"
+msgstr "Andere:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:752
+msgid "Details..."
+msgstr "Details..."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:762
+msgid "Total size:"
+msgstr "Gesamtgröße:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:886
+msgid "Titles in chapter mode are not supported"
+msgstr "Titel mit Kapitel-Modus werden nicht unterstützt"
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:892
+msgid "PSU core mode currently not supported"
+msgstr "PSU Core Modus derzeit nicht unterstützt."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:898
+msgid ""
+"Cluster mode is only supported\n"
+"for ripped DVD's."
+msgstr ""
+"Der Cluster Modus kann nur für DVDs verwendet\n"
+"werden, die auf die Festplatte kopiert wurden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:910
+msgid "MPEG processing is not supported for cluster mode."
+msgstr "MPEG Generierung wird vom Cluster Modus nicht unterstützt."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:916
+msgid ""
+"Transcoding without audio in an OGG container isn't supported in cluster "
+"mode."
+msgstr ""
+"Das Tanskodieren von Titeln ohne Tonspur im OGG Container ist im Cluster "
+"nicht möglich."
+
+#: ../lib/Video/DVDRip/GUI/Project/Transcode.pm:924
+msgid ""
+"WARNING: your frame range setting\n"
+"is ignored in cluster mode"
+msgstr ""
+"WARNUNG: die Frame-Bereich Einstellung wird\n"
+"beim Cluster Modus ignoriert"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:44
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:210
+msgid "Choose DVD device file"
+msgstr "Wählen Sie eine DVD Gerätedatei"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:49
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:136
+msgid "Press this button to open a file chooser dialog"
+msgstr "Klicken Sie diese Schaltfäche zum Öffnen eines Dateiauswahldialogs"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:55
+msgid "Storage"
+msgstr "Speicherung"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:60
+msgid "Storage path information"
+msgstr "Speicherpfad Informationen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:65
+msgid "Project name"
+msgstr "Projektname"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:66
+msgid ""
+"This is a short name for the project. All generated files are named like "
+"this."
+msgstr ""
+"Das ist der Kurzname für dieses Projekt. Alle Dateinamen werden vom "
+"Projektnamen abgeleitet."
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:73
+msgid "VOB directory"
+msgstr "VOB Verzeichnis"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:74
+msgid "DVD VOB files are stored here."
+msgstr "Die DVD VOB Dateien weden hier abgelegt."
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:79
+msgid "AVI directory"
+msgstr "AVI Verzeichnis"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:80
+msgid "For transcoded AVI, MPEG and OGM files."
+msgstr "Für die transkodierten AVI, MPEG und OGM Zieldateien."
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:85
+msgid "Temporary directory"
+msgstr "Temporäres Verzeichnis"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:86
+msgid "For temporary files"
+msgstr "Für temporäre Dateien"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:90
+msgid "Create project"
+msgstr "Erzeuge Projekt"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:94
+msgid ""
+"This asks for a project filename and creates the neccessary filesystem "
+"structure"
+msgstr ""
+"Geben Sie den Projektdateinamen an, daraufhin wird dann das Datenverzeichnis "
+"für das Projekt angelegt"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:109
+msgid "Data source selection"
+msgstr "Auswahl der Videodatenquelle"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:118
+msgid "Select a DVD device or an image directory for input"
+msgstr ""
+"Wählen Sie ein DVD Gerät oder ein DVD-Abbild-Verzeichnis als Videodatenquelle"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:123
+msgid "Choose DVD device"
+msgstr "DVD Gerät auswählen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:128
+msgid "or"
+msgstr "oder"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:131
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:242
+msgid "Choose DVD image directory"
+msgstr "DVD Abbildverzeichnis auswählen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:141
+msgid "Or enter by hand"
+msgstr "Oder per Hand eingeben"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:144
+msgid ""
+"dvd::rip uses this location for DVD input. Either it's the filename of a "
+"physical DVD device or the path of a full DVD image copy."
+msgstr ""
+"dvd::rip benutzt diesen Pfad als DVD Videoquelle. Entweder ist dies der "
+"Dateiname einer Gerätedatei oder der Pfad zu einem vollständigen DVD Abbild."
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:153
+msgid "Choose a ripping mode"
+msgstr "Wählen Sie einen Ripping-Modus"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:166
+msgid "Copy data from DVD to harddisk before encoding"
+msgstr "DVD Daten vor dem Transkodieren auf die Festplatte kopieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:168
+msgid ""
+"Use this mode if you have enough diskspace for a complete copy of the DVD "
+"contents. It's the fastest and most flexible DVD mode."
+msgstr ""
+"Dieser Modus ist der schnellste und empfohlene Modus zum Kopieren einer DVD, "
+"belegt allerdings viel Speicher auf der Festplatte, da der Film vor der "
+"Verarbeitung komplett auf die Festplatte kopiert wird."
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:177
+msgid "Encode DVD on the fly"
+msgstr "DVD ohne Zwischenspeichern transkodieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:178
+msgid "No DVD contents are copied to harddisk."
+msgstr "Keine DVD Inhalte werden auf die Festplatte kopiert."
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:182
+msgid ""
+"Copying DVD(-image) data to harddisk before encoding is\n"
+"the recommended mode, because it's faster and doesn't\n"
+"stress your DVD reader that much. Additionally some\n"
+"interesting features are available only with this mode,\n"
+"due to internal transcode restrictions:\n"
+"\n"
+"- Cluster transcoding\n"
+"- Subtitle rendering\n"
+"- Faster preview grabbing and frame range transcoding\n"
+"- transcode's PSU core for optimized A/V sync with NTSC video\n"
+msgstr ""
+"Es ist empfohlen die DVD(-Abbild) Daten vor der Verarbeitung\n"
+"auf die Festplatte zu kopieren. Das ist schneller und belastet das\n"
+"DVD Lesegerät weniger. Weiterhin sind einige interessante Funktionen\n"
+"nur in diesem Modus verfügbar, aufgrund von internen transcode\n"
+"Restriktionen:\n"
+"\n"
+"- Transkodieren im Cluster\n"
+"- Untertitel auf den Film zeichnen\n"
+"- Schnellere Vorschaubilderzeugung\n"
+"- transcode's PSU Core Modus für optimierte A/V Synchronisation für NTSC\n"
+
+#: ../lib/Video/DVDRip/GUI/Project/Storage.pm:259
+msgid ""
+"Selected directory is no DVD image directory. It has no VIDEO_TS folder."
+msgstr ""
+"Der ausgewählte Ordner enthält kein DVD Abbild. Der Ordner muss\n"
+"einen VIDEO_TS Unterordner haben."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:52
+msgid "Clip & Zoom"
+msgstr "Clip & Zoom"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:76
+msgid "Preview images"
+msgstr "Vorschaubilder"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:84
+msgid "Grab preview frame #"
+msgstr "Hole Frame #"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:91
+msgid "Force slow grabbing"
+msgstr "Langsame Methode verwenden"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:95
+msgid "Grab frame"
+msgstr "Hole Frame"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:103
+msgid "Show video from here"
+msgstr "Video ab hier anzeigen"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:248
+msgid "Adjust clip and zoom parameters"
+msgstr "Beschnitt- und Zoom-Einstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:279
+msgid "Presets"
+msgstr "Vorlage"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:287
+msgid "Apply preset values"
+msgstr "Vorlagenwerte übernehmen"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:292
+msgid ""
+"Overwrites all Clip & Zoom settings from the selected preset and regenerates "
+"the preview images."
+msgstr ""
+"Überschreibt alle Clip & Zoom Einstellungen mit den Werten der ausgewählten "
+"Vorlage und erzeugt die Vorschaubilder neu."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:301
+#: ../lib/Video/DVDRip/GUI/FormFactory/ClipImage.pm:20
+msgid "Top"
+msgstr "Oben"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:305
+#: ../lib/Video/DVDRip/GUI/FormFactory/ClipImage.pm:21
+msgid "Bottom"
+msgstr "Unten"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:309
+#: ../lib/Video/DVDRip/GUI/FormFactory/ClipImage.pm:22
+msgid "Left"
+msgstr "Links"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:313
+#: ../lib/Video/DVDRip/GUI/FormFactory/ClipImage.pm:23
+msgid "Right"
+msgstr "Rechts"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:319
+msgid "1st clipping"
+msgstr "1. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:349
+msgid "Generate preview images"
+msgstr "Vorschaubilder erzeugen"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:354
+msgid "Generates new preview images based on the actual settings"
+msgstr "Erzeugt neue Vorschaubilder mit den aktuellen Einstellungen."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:360
+msgid "2nd clipping"
+msgstr "2. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:390
+msgid "Move 2nd clipping to 1st"
+msgstr "Mache 2. zum 1. Beschnitt"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:393
+msgid ""
+"Turns second clipping into first clipping. This is possible only with high "
+"quality scaling."
+msgstr ""
+"Eliminiert den zweiten Beschnitt, indem die Werte für den ersten Beschnitt "
+"entsprechend umgerechnet werden."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:402
+msgid "Width"
+msgstr "Breite"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:406
+msgid "Height"
+msgstr "Höhe"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:412
+msgid "V-Rate"
+msgstr "V-Rate"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:422
+msgid "Zoom"
+msgstr "Skalierung"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:446
+msgid "Calc height"
+msgstr "Höhe ber."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:450
+msgid ""
+"Calculates the height based on the given width with correct aspect ratio"
+msgstr ""
+"Berechnet die Höhe anhand der gegebenen Breite, bei korrektem "
+"Seitenverhältnis."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:454
+msgid "Calc width"
+msgstr "Breite ber."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:457
+msgid ""
+"Calculates the width based on the given height with correct aspect ratio"
+msgstr ""
+"Berechnet die Breite anhand der gegebenen Höhe, bei korrektem "
+"Seitenverhältnis."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:463
+msgid "Use fast resizing"
+msgstr "Schnelles Skalieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:472
+msgid "Open zoom calculator"
+msgstr "Zoom Kalkulator öffnen"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:570
+#, perl-brace-format
+msgid "Preview image: {type}"
+msgstr "Vorschaubild: {type}"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:716
+msgid "This function is only avaiable for ripped DVD's."
+msgstr ""
+"Diese Funktion ist nur verfügbar bei DVDs, die auf die Festplatte kopiert "
+"wurden."
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:722
+msgid "Illegal frame number. Maximum is "
+msgstr "Ungültige Frame Nummer. Maximum ist"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:731
+#, perl-brace-format
+msgid "Executing command for video preview: {command}"
+msgstr "Führe Befehl für Video Vorschau aus: {command}"
+
+#: ../lib/Video/DVDRip/GUI/Project/ClipZoom.pm:755
+msgid ""
+"This is not possible because\n"
+"fast resizing is enabled."
+msgstr ""
+"Dies ist nicht möglich, weil die\n"
+"schnelle Skalierung aktiviert ist."
+
+#: ../lib/Video/DVDRip/GUI/Project/Logging.pm:26
+msgid "Logging"
+msgstr "Protokoll"
+
+#: ../lib/Video/DVDRip/GUI/Project/Logging.pm:37
+msgid "Log messages"
+msgstr "Protokoll Nachrichten"
+
+#: ../lib/Video/DVDRip/GUI/Project/Logging.pm:75
+msgid "Nuke log file"
+msgstr "Protokolldatei löschen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Logging.pm:83
+msgid "Log filename"
+msgstr "Log Dateiname"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:39
+msgid "Subtitles"
+msgstr "Untertitel"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:60
+msgid "This title has no subtitles"
+msgstr "Dieser DVD-Titel hat keine Untertitel"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:76
+msgid "Subtitle selection"
+msgstr "Untertitel Auswahl"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:80
+msgid "Select subtitle"
+msgstr "Wählen Sie einen Untertitel"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:84
+msgid "Activated:"
+msgstr "Aktiviert:"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:98
+msgid "Preview"
+msgstr "Vorschau"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:106
+#: ../lib/Video/DVDRip/GUI/Context.pm:790
+msgid "Grab"
+msgstr "Hole"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:128
+msgid "image(s)"
+msgstr "Bild(er)"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:132
+msgid "starting at"
+msgstr "beginnend bei"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:141
+#, perl-brace-format
+msgid "Movie has only {cnt} frames"
+msgstr "Der Film hat nur {cnt} Frames"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:145
+msgid "Invalid time/frame number format"
+msgstr "Ungültiges Zeit/Frame Format"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:149
+msgid "(timecode nn:nn:nn or frame number)"
+msgstr "(Zeitpunkt nn:nn:nn oder Frame Nummer)"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:173
+msgid "Render subtitle on movie"
+msgstr "Zeichnen der Untertitel auf den Film"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:189
+msgid "Activate this subtitle "
+msgstr "Untertitel aktivieren "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:194
+msgid "for rendering"
+msgstr "zum Zeichnen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:198
+msgid "Colors "
+msgstr "Farben "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:203
+msgid "Enable manipulation"
+msgstr "manipulieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:207
+msgid "Preview image count "
+msgstr "Anz. Vorschaubilder "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:218
+msgid "Vertical offset "
+msgstr "Abstand vertikal "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:227
+msgid "rows"
+msgstr "Zeilen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:232
+msgid "Gray A/B "
+msgstr "Grau A/B "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:241
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:250
+msgid "Value not between 0 and 255"
+msgstr "Wert ist nicht im Bereich von 0 bis 255"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:254
+msgid "Preview window "
+msgstr "Vorschaufenster "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:263
+msgid "Open"
+msgstr "Öffnen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:275
+msgid "Time shift "
+msgstr "Zeitverschiebung "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:284
+msgid "ms"
+msgstr "ms"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:290
+msgid "Index A/B "
+msgstr "Index A/B"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:305
+msgid "Postprocessing "
+msgstr "Postprocessing "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:309
+msgid "Antialiasing"
+msgstr "Antialiasing"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:312
+msgid "Suggest "
+msgstr "Vorschlagen "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:318
+msgid "Values for letterbox"
+msgstr "Werte für Letterbox"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:328
+msgid "Values for full size movie"
+msgstr "Werte für Vollbild"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:351
+msgid "Create vobsub file"
+msgstr "vobsub Datei erstellen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:363
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:367
+msgid "Create now"
+msgstr "Jetzt erstellen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:373
+msgid "View vobsub"
+msgstr "vobsub ansehen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:377
+msgid "Only useful for single-CD-rips or after transcoding"
+msgstr "Nur sinnvoll, wenn eine einzelne CD erstellt wird."
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:381
+msgid "Create later"
+msgstr "Später erstellen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:384
+msgid "after transcoding"
+msgstr "nach dem Transkodieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:388
+msgid "This considers splitted files automaticly"
+msgstr "Dabei werden aufgeteilte Videodateien berücksichtigt."
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:457
+msgid "You need Mplayer to view vobsub files."
+msgstr "Sie benötigen mplayer um vobsub Dateien anzusehen."
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:463
+msgid "This is only supported for ripped movies."
+msgstr ""
+"Dies ist nur möglich bei Filmen, die auf die Festplatte kopiert wurden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:469
+msgid "What about creating the vobsub file first?"
+msgstr "Sie müssen zunächst die vobsub Dateien erzeugen."
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:475
+msgid "Executing command: "
+msgstr "Führe Befehl aus: "
+
+#: ../lib/Video/DVDRip/GUI/Project/Subtitle.pm:532
+msgid "Sorry, you need subtitle2pgm for this to work."
+msgstr "Sie benötigen subtitle2pgm."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:40
+msgid "RIP Title"
+msgstr "Titel kopieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:51
+msgid "Read content"
+msgstr "Inhalt einlesen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:55
+msgid "Read DVD table of contents"
+msgstr "DVD Inhaltsverzeichnis einlesen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:56
+msgid "Scan the DVD for all available titles and setup the table of contents"
+msgstr "Einlesen des DVD Inhaltsverzeichnisses"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:65
+msgid "Open DVD tray"
+msgstr "DVD Schublade öffnen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:67
+msgid "Open the tray of your configured DVD device"
+msgstr "Öffnen der Schublade ihres DVD Lesegerätes"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:82
+msgid "Close DVD tray"
+msgstr "DVD Schublade schließen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:84
+msgid "Close the tray of your configuried DVD device"
+msgstr "Schließen der Schublade Ihres DVD Lesegerätes"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:100
+msgid "DVD table of contents"
+msgstr "DVD Inhaltsverzeichnis"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:112
+msgid "Select title for further operation"
+msgstr "Wählen Sie hier einen Titel für alle weiteren Operationen aus"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:117
+msgid "Title"
+msgstr "Titel"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:119
+msgid "Norm"
+msgstr "Norm"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:122
+msgid "Framerate"
+msgstr "Framerate"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:123
+msgid "Aspect"
+msgstr "Seitenverh."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:124
+msgid "Frames"
+msgstr "Frames"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:125
+msgid "Resolution"
+msgstr "Auflösung"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:142
+msgid "View selected title/chapter(s)"
+msgstr "Ausgewählte Titel/Kapitel ansehen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:150
+msgid "RIP selected title(s)/chapter(s)"
+msgstr "Ausgewähle Titel/Kapitel auf die Festplatte kopieren"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:178
+msgid "Select audio track"
+msgstr "Tonspur wählen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:179
+msgid ""
+"All audio tracks are ripped, but this track is also scanned for volume while "
+"ripping"
+msgstr ""
+"Alle Tonspuren werden kopiert, aber die Lautstärke der hier ausgewählten "
+"Spur wird gleich mit analysiert. Damit kann dann später die Lautstärke "
+"automatisiert angehoben werden."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:191
+msgid "Select viewing angle"
+msgstr "Sichtwinkel wählen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:192
+msgid ""
+"This selection affects ripping, so you must rip again if you change this "
+"later"
+msgstr "Es muss erneut kopiert werden wenn dies verändert wird."
+
+#
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:203
+msgid "Grab subtitle preview images"
+msgstr "Untertitelbilder holen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:210
+msgid ""
+"No subitle images are created while ripping but can be grabbed later on "
+"demand. This is the fastest ripping mode."
+msgstr ""
+"Keine Untertitelbilder während des Kopiervorgangs auf die Festplatte "
+"schreiben. Diese können auch später noch kopiert werden. Dies ist der "
+"schnellste Modus."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:217
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:265
+msgid "All"
+msgstr "Alle"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:219
+msgid ""
+"Images of all subtitle streams are created during ripping and available for "
+"preview immediately. Note that this will slow down the ripping process "
+"significantly."
+msgstr ""
+"Bilder von allen Untertiteln werden während des Kopiervorgangs angelegt und "
+"stehen später umgehend für eine Vorschau zur Verfügung. Dies wird den "
+"Kopiervorgang signifikant verlangsamen."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:227
+msgid "By language"
+msgstr "Nach Spr."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:229
+msgid ""
+"Grab subtitle images of specific languages only. Note that this will slow "
+"down the ripping process significantly."
+msgstr ""
+"Untertitelbilder nur von bestimmten Sprachen erstellen. Achtung: das wird "
+"den Kopiervorgang signifikant verlangsamen."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:246
+msgid "Select one or more languages"
+msgstr "Wählen Sie eine oder mehrere Sprachen aus"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:247
+msgid "Language selection"
+msgstr "Sprachauswahl"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:253
+msgid "Specify chapter mode"
+msgstr "Kapitelmodus einstellen"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:258
+msgid "None"
+msgstr "Kein"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:259
+msgid "The title is handled as a whole ignoring all chapter marks"
+msgstr ""
+"Der DVD Titel wird als ganzes verarbeitet. Alle Kapitelmarkierungen werden "
+"ignoriert."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:266
+msgid ""
+"Processing is divided into chapters. You get one file per chapter for all "
+"chapters of this title"
+msgstr ""
+"Die Verarbeitung erfolgt nach Kapiteln. Im Endergebnis wird für jedes "
+"Kapitel eine eigene Datei angelegt"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:273
+msgid "Selection"
+msgstr "Auswahl"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:274
+msgid ""
+"Processing is divided into chapters. You get one file per chapter for a "
+"specific selection of chapters"
+msgstr ""
+"Die Verarbeitung erfolgt nach Kapiteln. Sie können hier einzelne Kapitel zur "
+"Verarbeitung auswählen."
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:288
+msgid "Select one or more chapters"
+msgstr "Wählen Sie ein oder mehrere Kapitel aus"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:289
+msgid "Chapter selection"
+msgstr "Kapitelauswahl"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:303
+msgid ""
+"If you re-read the TOC, all settings in\n"
+"this project get lost. Probably you want\n"
+"to save the project to another file before\n"
+"you proceeed.\n"
+"\n"
+"Do you want to re-read the TOC now?"
+msgstr ""
+"Wenn das Inhaltsverzeichnis erneut eingelesen\n"
+"wird, gehen alle Einstellungen dieses Projektes\n"
+"verloren. Vielleicht möchten Sie dieses Projekt\n"
+"zunächst in eine andere Datei speichern, bevor\n"
+"Sie fortfahren.\n"
+"\n"
+"Soll das Inhaltsverzeichnis jetzt eingelesen werden?"
+
+#: ../lib/Video/DVDRip/GUI/Project/Title.pm:409
+msgid "Please select a title."
+msgstr "Bitte wählen Sie einen Titel aus."
+
+#: ../lib/Video/DVDRip/GUI/Context.pm:41
+msgid "No subtitles activated."
+msgstr "Keine Untertitel aktiviert."
+
+#: ../lib/Video/DVDRip/GUI/Context.pm:255
+#, perl-brace-format
+msgid "DVD title #{nr}"
+msgstr "DVD Titel #{nr}"
+
+#: ../lib/Video/DVDRip/GUI/Context.pm:304
+#, perl-brace-format
+msgid "Angle {angle}"
+msgstr "Winkel {angle}"
+
+#: ../lib/Video/DVDRip/GUI/Context.pm:790
+msgid "Show"
+msgstr "Anzeigen"
+
+#: ../lib/Video/DVDRip/GUI/FormFactory/ClipImage.pm:26
+msgid "Conformance check:"
+msgstr "Konformitätstest:"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:79
+msgid "dvd::rip - Filters & Preview"
+msgstr "dvd::rip - Fiter & Vorschau"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:165
+msgid "Available filters"
+msgstr "Verfügbare Filter"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:178
+msgid ""
+"Double click a row to activate a filter. Greyed out filters are not "
+"available anymore, because they are activated already."
+msgstr ""
+"Per Doppelklick wird ein Filter aktiviert. Ausgegraute Filter stehen nicht "
+"mehr zur Verfügung, weil sie bereits aktiviert wurden."
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:211
+msgid "Used filters"
+msgstr "Benutzte Filter"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:223
+msgid "Double click a row to remove a filter, reorder by drag and drop"
+msgstr "Doppelklick entfernt einen Filter, Reihenfolge ändern mit Drag'n Drop."
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:240
+msgid ""
+"You can't change the filter order\n"
+"while the preview window is open."
+msgstr ""
+"Die Filterreihenfolge kann nicht verändert werden,\n"
+"solange das Vorschaufenster geöffnet ist."
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:274
+msgid "Filter information"
+msgstr "Filter Information"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:284
+msgid "Filter name"
+msgstr "Filter Name"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:299
+msgid "Author(s)"
+msgstr "Autor(en)"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:304
+msgid "A/V type"
+msgstr "A/V Typ"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:309
+msgid "Colorspace"
+msgstr "Farbraum"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:314
+msgid "PRE/POST"
+msgstr "PRE/POST"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:319
+msgid "Multiple"
+msgstr "Mehrfachverwendung"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:338
+msgid "Filter settings"
+msgstr "Filter Einstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:349
+msgid "Preview settings"
+msgstr "Vorschau Einstellungen"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:354
+msgid ""
+"Frames buffered in the preview window and thus are available for scrubbing"
+msgstr ""
+"Gepufferte Bilder im Vorschaufenster die zum Vor- und Zurückspulen angezeigt "
+"werden können"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:362
+msgid "Preview should start at this frame"
+msgstr "Die Vorschau soll bei dieser Framenummer starten"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:371
+msgid "Preview should start stop this frame"
+msgstr "Die Vorschau soll bei dieser Bild-Nummer stoppen"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:398
+msgid "Preview control"
+msgstr "Vorschau Kontrolle"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:404
+msgid "Open preview window and play"
+msgstr "Vorschaufenster öffnen und abspielen"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:412
+msgid "Apply filter chain"
+msgstr "Filter Einstellungen anwenden"
+
+#
+#: ../lib/Video/DVDRip/GUI/Filters.pm:420
+msgid "Decrease preview speed"
+msgstr "Anzeigegeschwindigkeit reduzieren"
+
+#
+#: ../lib/Video/DVDRip/GUI/Filters.pm:428
+msgid "Increase preview speed"
+msgstr "Anzeigegeschwindigkeit erhöhen"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:438
+msgid "Pause/Resume"
+msgstr "Pause / Start"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:447
+msgid "Step backward one frame"
+msgstr "Ein Bild zurück"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:456
+msgid "Step forward one frame"
+msgstr "Ein Bild vorwärts"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:465
+msgid "Step backward several frames"
+msgstr "Einige Bilder zurück"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:474
+msgid "Step forward several frames"
+msgstr "Einige Bilder vorwärts"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:482
+msgid "Stop playing and close preview window"
+msgstr "Abspielen beenden und Vorschaufenster schließen"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:777
+msgid "Enable"
+msgstr "Einschalten"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:778
+msgid "Disable"
+msgstr "Abschalten"
+
+#: ../lib/Video/DVDRip/GUI/Filters.pm:779
+msgid "Enable or disable filter temporarily"
+msgstr "Filter vorrübergehend an- bzw. abschalten"
+
+#: ../lib/Video/DVDRip/Content.pm:77
+#, perl-brace-format
+msgid "Illegal title number {nr}"
+msgstr "Ungültige Titelnummer {nr}"
+
+#: ../lib/Video/DVDRip.pm:29
+msgid "No deinterlacing"
+msgstr "Kein Deinterlacing"
+
+#: ../lib/Video/DVDRip.pm:30
+msgid "Interpolate scanlines (fast)"
+msgstr "Scan-Zeilen interpolieren (schnell)"
+
+#: ../lib/Video/DVDRip.pm:31
+msgid "Handled by encoder (may segfault)"
+msgstr "Durch Encoder (kann abstürzen)"
+
+#: ../lib/Video/DVDRip.pm:32
+msgid "Zoom to full frame (slow)"
+msgstr "Auf Vollbild zoomen (langsam)"
+
+#: ../lib/Video/DVDRip.pm:33
+msgid "Interpolate scanlines / blend frames (pp=lb)"
+msgstr "Scan-Zeilen interpolieren / Überblenden (pp=lb)"
+
+#: ../lib/Video/DVDRip.pm:34
+msgid "Automatic deinterlacing of single frames"
+msgstr "Automatisches Deinterlacen von einzelnen Frames"
+
+#: ../lib/Video/DVDRip.pm:35
+msgid "Smart deinterlacing"
+msgstr "Smart Deinterlacer (empfohlen)"
+
+#: ../lib/Video/DVDRip.pm:36
+msgid "Inverse telecine"
+msgstr "Inverse Telecine"
+
+#: ../lib/Video/DVDRip.pm:40
+msgid "No antialiasing"
+msgstr "Kein Antialiasing"
+
+#: ../lib/Video/DVDRip.pm:41
+msgid "Process de-interlace effects"
+msgstr "Verarbeite Deinterlace Artefakte"
+
+#: ../lib/Video/DVDRip.pm:42
+msgid "Process resize effects"
+msgstr "Skalierungseffekte bearbeiten"
+
+#: ../lib/Video/DVDRip.pm:43
+msgid "Process full frame (slow)"
+msgstr "Verarbeite Vollbild (langsam)"
+
+#: ../lib/Video/DVDRip.pm:47
+msgid "None, volume rescale only"
+msgstr "Keine, nur Lautstärkenmaximierung"
+
+#: ../lib/Video/DVDRip.pm:48
+msgid "Range compression (liba52 filter)"
+msgstr "Komprimierung (liba52 Filter)"
+
+#: ../lib/Video/DVDRip.pm:49
+msgid "Normalizing (mplayer filter)"
+msgstr "Normalisierung (mplayer Filter)"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job/Command.pm:115
+#, perl-brace-format
+msgid "Executing command: {command}"
+msgstr "Befehlsausführung: {command}"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job/Command.pm:216
+msgid "Sending signal 9 to PID(s)"
+msgstr "Sende Signal 9 an Prozess ID(s)"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:330
+msgid "Cancelled"
+msgstr "Abgebrochen"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:331
+msgid "Error"
+msgstr "Fehler"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:332
+msgid "Skipped"
+msgstr "Übersprungen"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:334
+msgid "Waiting"
+msgstr "Warten"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:347
+#, perl-brace-format
+msgid "Duration: {time}"
+msgstr "Dauer: {time}"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:356
+msgid "Initializing"
+msgstr "Initialisierung"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:363
+#, perl-brace-format
+msgid "elapsed {time}"
+msgstr "vergangen {time}"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:367
+msgid " finished"
+msgstr " fertig"
+
+#: /home/joern/projects/Event-ExecFlow/lib/Event/ExecFlow/Job.pm:380
+#, perl-brace-format
+msgid "{percent}PERCENT done."
+msgstr "{percent}PERCENT erledigt."
+
+#~ msgid ""
+#~ "dvd::rip detected transcode version >= 1.1.x. Support for this version is "
+#~ "experimental. Please report bugs, if you find them."
+#~ msgstr ""
+#~ "dvd::rip hat eine transcode Version > 1.1.x erkannt. Die Unterstützung "
+#~ "für diese Version ist nur experimentell. Bitte melden Sie Fehler an den "
+#~ "Entwickler, wenn Sie welche finden."
+
+#~ msgid "Project '{project}' - title #{nr}"
+#~ msgstr "Projekt '{project}' - Titel #{nr}"
+
+#~ msgid "Process PSU #{nr}"
+#~ msgstr "Verarbeite PSU #{nr}"
+
+#~ msgid "Process all audio tracks - title #{nr}, PSU #{psu}"
+#~ msgstr "Alle Audiospuren verarbeiten - Titel  #{nr}, PSU #{psu}"
+
+#~ msgid "PS1 file '{filename}' already exists. Skip extraction."
+#~ msgstr ""
+#~ "PS1 Datei '{filename}' existiert bereits. Überspringe die Extraktion."
+
+#~ msgid ", file #{nr}"
+#~ msgstr ", Datei #{nr}"
+
+#
+#~ msgid "Volume scan"
+#~ msgstr "Lautstärkenanalyse"
+
+#~ msgid "Create WAV"
+#~ msgstr "WAV Datei erstellen"
+
+#~ msgid "NO"
+#~ msgstr "NO"
+
+#~ msgid "Read TOC"
+#~ msgstr "Inhaltsverzeichnis lesen"
+
+#~ msgid "{value} has not format n,n,n and is no file : NOT Ok"
+#~ msgstr "{value} hat nicht Format n,n,n und ist keine Datei : NOT Ok"
+
+#~ msgid "Filesystem"
+#~ msgstr "Dateisystem"
+
+#~ msgid "Warning: filter '"
+#~ msgstr "Warnung: Filter '"
+
+#~ msgid "' removed from title #"
+#~ msgstr "' wurde entfernt von Titel #"
+
+#~ msgid ""
+#~ "Use one of the following modes only, if ripping is no option for you.\n"
+#~ "Many interesting features are disabled for them:\n"
+#~ "No subtitle rendering, no PSU core for NTSC A/V sync optimization and\n"
+#~ "also preview grabbing and frame range transcoding is rather slow."
+#~ msgstr ""
+#~ "Benutzen Sie einen der Folgenden Modi nur, wenn das Kopieren der\n"
+#~ "Daten für Sie keine Möglichkeit ist. Viele interessante Funktionen sind\n"
+#~ "abgeschaltet für diese: keine Untertitel, kein PSU Core für\n"
+#~ "NTSC A/V Synchronisation. Weiterhin sind die Vorschaubildfunktion und\n"
+#~ "das Transkodieren eines ausgewählten Bereichs sehr langsam."
+
+#~ msgid "Use existing DVD image located in this directory:"
+#~ msgstr "DVD Abbild in folgendem Verzeichnis"
+
+#~ msgid ""
+#~ "Use this mode if you have a complete image of the DVD on your harddisk "
+#~ "already."
+#~ msgstr ""
+#~ "Benutzen Sie diesen Modus wenn Sie ein komplettes DVD Abbildbereits auf "
+#~ "der Festplatte haben."
+
+#~ msgid ""
+#~ "This directory must contain a complete unencrypted copy of the DVD, e.g. "
+#~ "it must contain a VIDEO_TS folder"
+#~ msgstr ""
+#~ "Dieses Verzeichnis muss eine vollständige, unverschlüsselte Kopie der DVD "
+#~ "enthalten, d.h. insbesondere ein VIDEO_TS Ordner muss darin sein"
+
+#~ msgid "CD type selection"
+#~ msgstr "CD Typ Festlegung"
+
+#~ msgid "ISO 9660 (.avi and .{ogg_ext} files)"
+#~ msgstr "ISO 9960 (.avi und .{ogg_ext} Dateien)"
+
+#~ msgid "(X)SVCD/CVD (.mpg files)"
+#~ msgstr "(X)SVCD/CVD (.mpg Dateien)"
+
+#~ msgid "(X)VCD (.mpg files)"
+#~ msgstr "(X)VCD (.mpg Dateien)"
+
+#~ msgid "File selection"
+#~ msgstr "Dateiauswahl"
+
+#~ msgid "Filename"
+#~ msgstr "Dateiname"
+
+#~ msgid "Size (MB)"
+#~ msgstr "Größe (MB)"
+
+#~ msgid "MB selected"
+#~ msgstr "MB ausgewählt"
+
+#~ msgid "Free diskspace"
+#~ msgstr "Freier Speicher"
+
+#~ msgid "Delete selected file"
+#~ msgstr "Ausgewählte Datei löschen"
+
+#~ msgid "View selected file"
+#~ msgstr "Ausgewählte Datei ansehen"
+
+#~ msgid "Label information"
+#~ msgstr "Label Information"
+
+#~ msgid "Abstract"
+#~ msgstr "Abstrakt"
+
+#~ msgid "Test mode"
+#~ msgstr "Test Modus"
+
+#~ msgid "Simulate burning"
+#~ msgstr "Brennen simulieren"
+
+#~ msgid "Writing speed"
+#~ msgstr "Schreibgeschwindigkeit"
+
+#~ msgid "Burn selected file(s)"
+#~ msgstr "Ausgewählte Datei(en) brennen"
+
+#~ msgid "Create CD image from selected file(s)"
+#~ msgstr "CD Image von gewählten Dateien erstellen"
+
+#~ msgid "Open burner tray"
+#~ msgstr "Brenner Schublade öffnen"
+
+#~ msgid "Close burner tray"
+#~ msgstr "Brenner Schublade schließen"
+
+#~ msgid "Blank CD-RW"
+#~ msgstr "CD-RW löschen"
+
+#~ msgid "Do you want to delete the file {filename}?"
+#~ msgstr "Möchten Sie die Datei {filename} löschen?"
+
+#~ msgid "Deleting file {filename}"
+#~ msgstr "Lösche Datei {filename}"
+
+#~ msgid "Needed for (S)VCD burning"
+#~ msgstr "Benötigt zum Brennen von (S)VCDs"
+
+#~ msgid "Needed for AVI/OGG burning"
+#~ msgstr "Benötigt zum Brennen von ISO CDs"
+
+#~ msgid "Needed for AVI/OGG burning on CD"
+#~ msgstr "Benötigt zum Brennen von ISO CDs"
+
+#~ msgid "Needed for AVI/OGG burning on DVD"
+#~ msgstr "Benötigt zum Brennen von ISO DVDs"
+
+#~ msgid "cdrecord device (n,n,n or filename)"
+#~ msgstr "cdrecord Gerät (n,n,n oder Dateiname)"
+
+#~ msgid "Estimate ISO size"
+#~ msgstr "ISO Größe abschätzen"
+
+#~ msgid ""
+#~ "Estimate the size before start writing. Necessary for some TEAC drives "
+#~ "for burning ISO discs on-the-fly"
+#~ msgstr ""
+#~ "Schätze die Größe vor dem Brennen. Das ist nötig für eine TEAC Brennerum "
+#~ "ISO CD-ROMs ohne ein Image brennen zu können."
+
+#~ msgid "cdrecord command"
+#~ msgstr "cdrecord Befehl"
+
+#~ msgid "mkisofs command"
+#~ msgstr "mkisofs Befehl"
+
+#~ msgid "vcdimager command"
+#~ msgstr "vcdimager Befehl"
+
+#~ msgid "cdrdao command"
+#~ msgstr "cdrdao Befehl"
+
+#~ msgid "cdrdao driver"
+#~ msgstr "cdrdao Treiber"
+
+#~ msgid "Overburning"
+#~ msgstr "Überbrennen"
+
+#~ msgid "Buffersize"
+#~ msgstr "Puffergröße"
+
+#~ msgid "CD-RW blank method"
+#~ msgstr "CD-RW Lösch-Methode"
+
+#~ msgid "CD burning"
+#~ msgstr "CD Brennen"
+
+#~ msgid "cdrdao options"
+#~ msgstr "cdrdao"
+
+#~ msgid "Enter value between 0 and 255"
+#~ msgstr "Geben Sie einen Wert zwischen 0 und 255 ein"
+
+#~ msgid "Double click a row to activate a filter"
+#~ msgstr "Doppelklick aktiviert den Filter"
+
+#~ msgid "Undo - view previous buffer"
+#~ msgstr "Rückgängig - vorherigen Puffer ansehen"
+
+#~ msgid "Split the file after transcoding?"
+#~ msgstr "Datei nach dem Transkodieren aufteilen?"
+
+#~ msgid "You have no target audio track selected."
+#~ msgstr "Es wurde keine Ziel Tonspur ausgewählt."
+
+#~ msgid "{name} started"
+#~ msgstr "{name} gestartet"
+
+#~ msgid "Started rpc listener on TCP port {port}"
+#~ msgstr "RPC Listener wurde auf TCP Port {port} gestartet"
+
+#~ msgid "Started log listener on TCP port {port}"
+#~ msgstr "Log Listener wurde auf TCP Port {port} gestartet"
+
+#~ msgid "Server stopped"
+#~ msgstr "Server gestoppt."
+
+#~ msgid "Got connection from {ip}:{port}. Connection ID is {cid}"
+#~ msgstr ""
+#~ "Verbindung von {ip}:{port} wurde angenommen. Verbindungs-ID ist {cid}"
+
+#~ msgid "Client disconnected"
+#~ msgstr "Client hat sich abgemeldet."
+
+#~ msgid "Created new object {object} with oid {oid}"
+#~ msgstr "Neues Objekt {object} wurde mit oid {oid} erzeugt"
+
+#~ msgid "Can't load class '{class}': {error}"
+#~ msgstr "Konnte Klasse '{class}' nicht laden: {error}"
+
+#~ msgid "Class {class}' successfully loaded"
+#~ msgstr "Klasse '{class}' wurde erfolgreich geladen."
+
+#~ msgid "Got logger connection from {ip}:{port}. Connection ID is {cid}"
+#~ msgstr "Log Verbindung von {ip}:{port} angenommen. Verbindungs-ID ist {cid}"
+
+#~ msgid "Log client disconnected"
+#~ msgstr "Log Client hat sich abgemeldet"
+
+#~ msgid "{log_message} on node {node}"
+#~ msgstr "{log_message} auf Knoten {node}"
+
+#~ msgid "Create vobsub of subtitle #{sid}, title #{title}"
+#~ msgstr "Erzeuge vobsub von Untertitel #{sid}, Titel #{title}"
+
+#~ msgid "part #{file_nr}"
+#~ msgstr "Teil #{file_nr}"
+
+#~ msgid "split OGG pass {pass}"
+#~ msgstr "Teile OGG auf, Lauf {pass}"
+
+#
+#~ msgid "split AVI"
+#~ msgstr "AVI aufteilen"
+
+#~ msgid "Count frames in target file(s)"
+#~ msgstr "Zahle Frames in Ziel Datei(en)"
+
+#~ msgid "Count frames of {file}"
+#~ msgstr "Zähle Frames in Datei {file}"
+
+#~ msgid "Dumping WAV"
+#~ msgstr "Schreibe WAV"
+
+#
+#~ msgid "Transcoding audio"
+#~ msgstr "Ton Transkodieren"
+
+#
+#~ msgid "Volume scanning"
+#~ msgstr "Lautstärkenanalyse"
+
+#~ msgid "Extract subtitle #{sid} from title #{title}"
+#~ msgstr "Extrahiere Untertitel #{sid} von Titel #{title}"
+
+#~ msgid "Multiplexing MPEG"
+#~ msgstr "Multiplexe MPEG"
+
+#~ msgid "Merging audio"
+#~ msgstr "Füge Audio hinzu"
+
+#
+#~ msgid "Transcoding video"
+#~ msgstr "Video Transkodieren"
+
+#~ msgid "Erase CD-RW"
+#~ msgstr "CD-RW löschen"
+
+#~ msgid "Burn CD"
+#~ msgstr "CD brennen"
+
+#~ msgid "{what} {test_mode}- waiting 10 seconds"
+#~ msgstr "{what} {test_mode}- warte 10 Sekunden"
+
+#~ msgid "{what} {test_mode}- starting in {wait} seconds"
+#~ msgstr "{what} {test_mode}-  beginne in {wait} Sekunden"
+
+#~ msgid "Fixating CD {test_mode}"
+#~ msgstr "Fixiere CD {test_mode}"
+
+#~ msgid "Probing"
+#~ msgstr "Analysiere"
+
+#
+#~ msgid "Grabbing preview"
+#~ msgstr "Hole Vorschaubild"
+
+#~ msgid "frame #{frame}"
+#~ msgstr "Frame #{frame}"
+
+#~ msgid "transcode can't find this frame. Try forcing slow frame grabbing."
+#~ msgstr ""
+#~ "transcode konnte das gewünschte Frame nicht finden. VersuchenSie es mit "
+#~ "der langsamen Methode."
+
+#~ msgid "Create CD image"
+#~ msgstr "Erzeuge CD Image"
+
+#~ msgid "Reading TOC"
+#~ msgstr "Lese Inhaltsverzeichnis"
+
+#~ msgid "Ripping"
+#~ msgstr "Kopieren"
+
+#~ msgid "Starting job ({nr}): "
+#~ msgstr "Starte Job ({nr}): "
+
+#~ msgid "Successfully finished job ({nr}): "
+#~ msgstr "Job erfolgreich beendet ({nr}): "
+
+#~ msgid "Aborting job: "
+#~ msgstr "Breche Job ab: "
+
+#~ msgid "Elapsed: {time}"
+#~ msgstr "Vergangen: {time}"
+
+#~ msgid "(no progress information available)"
+#~ msgstr "(keine Fortschrittsanzeige)"
+
+#~ msgid "{percent} percent done."
+#~ msgstr "{percent} Prozent erledigt."
+
+#~ msgid "Set container format to '{container}'"
+#~ msgstr "Setze Container Format auf '{container}'"
+
+#~ msgid ""
+#~ "Job '{job}' failed.\n"
+#~ "\n"
+#~ "Executed command: {command}\n"
+#~ "\n"
+#~ "Last output was:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Job '{job}' ist fehlgeschlagen.\n"
+#~ "\n"
+#~ "Ausgeführtes Kommando: {command}\n"
+#~ "\n"
+#~ "Letzte Ausgabe war:\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "You should analyze the last output of this job to see what's going wrong "
+#~ "here:"
+#~ msgstr ""
+#~ "Sie sollten die letzten Ausgaben dieses Jobs analysieren, um "
+#~ "festzustellen\n"
+#~ "was dabei schief gegangen ist:"
+
+#~ msgid "---- job output start ----"
+#~ msgstr "---- Job Ausgabe Start ---"
+
+#~ msgid "---- job output end ----"
+#~ msgstr "--- Job Ausgabe Ende ----"
+
+#~ msgid "WARNING {warning}\n"
+#~ msgstr "WARNUNG {warning}\n"
+
+#~ msgid ""
+#~ "Skipping 1st pass as requested by reusing existent multipass logfile."
+#~ msgstr ""
+#~ "Überspringe ersten Durchgang, weil \"Log wiederverwenden\" eingeschaltet "
+#~ "ist."
+
+#~ msgid ""
+#~ "This title is transcoded with vbr audio and video bitrate optimization."
+#~ msgstr ""
+#~ "Dieser Titel wird mit VBR Ton und Video Bitratenoptimierung verarbeitet."
+
+#~ msgid ""
+#~ "Can't determine number of titles.\n"
+#~ "Please put the DVD in your drive.\n"
+#~ "tcprobe output was:\n"
+#~ msgstr ""
+#~ "Konnte Anzahl der Titel nicht ermitteln\n"
+#~ "Bitte legen Sie die DVD in das Laufwerk.\n"
+#~ "Ausgabe von tcprobe war:\n"
+
+#~ msgid "DVD mount point"
+#~ msgstr "DVD Mount-Punkt"
+
+#~ msgid "Split target file"
+#~ msgstr "Zieldatei auf_teilen"
+
+#~ msgid "Creating job plan"
+#~ msgstr "Erzeuge Job Ausführungsplan."
+
+#, fuzzy
+#~ msgid "Move up"
+#~ msgstr "Nach oben"
+
+#, fuzzy
+#~ msgid "Move down"
+#~ msgstr "Nach unten"
+
+#, fuzzy
+#~ msgid "Schedule project"
+#~ msgstr "Projekt starten"
+
+#~ msgid "Jobs of the selected project"
+#~ msgstr "Jobs des ausgewählen Projektes"
+
+#~ msgid "Info"
+#~ msgstr "Info"
+
+#~ msgid "Dependencies"
+#~ msgstr "Abhängigkeiten"
+
+#~ msgid "Storage and bitrate calculation details"
+#~ msgstr "Details zur Bitratenberechnung"
+
+#~ msgid "Applied preset '{preset}'."
+#~ msgstr "Vorlage '{preset}' wurde übernommen."
+
+#~ msgid "Node is offline. Can't test its configuration."
+#~ msgstr "Knoten ist offline, die Konfiguration kann nicht getestet werden."
+
+#~ msgid "(from bpp {bpp})"
+#~ msgstr "(abgeleitet von BPP {bpp})"
+
+#~ msgid "(manual setting)"
+#~ msgstr "(manuelle Einstellung)"
+
+#~ msgid "' not supported by (S)VCD/CVD"
+#~ msgstr "' wird von (S)VCD/CVD nicht unterstützt"
+
+#~ msgid "You must grab preview images first"
+#~ msgstr "Sie müssen zunächst Vorschaubilder einlesen"
+
+#~ msgid "Create splitted _vobsub(s)"
+#~ msgstr "Aufgeteilte _vobsub Dateien erzeugen"
+
+#~ msgid "Create non-splitted _vobsub(s)"
+#~ msgstr "Einzelne vobs_ub Datei erzeugen"
+
+#~ msgid ""
+#~ "Splitting an AVI file in\n"
+#~ "Chapter Mode makes no sense."
+#~ msgstr ""
+#~ "Das Aufteilen einer Datei im Kapitel-Modus\n"
+#~ "macht keinen Sinn."
+
+#~ msgid ""
+#~ "Size: %d%sx%d%s\n"
+#~ "Eff. ratio: %s, phys. ratio: %s"
+#~ msgstr ""
+#~ "Größe: %d%sx%d%s\n"
+#~ "Eff. Ratio: %s, Phys. Ratio: %s"
+
+#~ msgid "Chapter {chapter}"
+#~ msgstr "Kapitel {chapter}"
+
+#~ msgid "One"
+#~ msgstr "Eins"
+
+#~ msgid "Two"
+#~ msgstr "Zwei"
+
+#~ msgid "Three"
+#~ msgstr "Drei"
+
+#~ msgid "render"
+#~ msgstr "Zeichnen"
+
+#~ msgid "vobsub"
+#~ msgstr "vobsub"
+
+#~ msgid "best but slower"
+#~ msgstr "gut aber langsam"
+
+#~ msgid "medium"
+#~ msgstr "mittel"
+
+#~ msgid "low but faster"
+#~ msgstr "schlecht aber schnell"
+
+#~ msgid "Configure filters"
+#~ msgstr "Filter konfigurieren"
+
+#~ msgid "id"
+#~ msgstr "id"
+
+#~ msgid "Visually select frame range"
+#~ msgstr "Frame-Bereich visuell auswählen"
+
+#~ msgid "No filter selected."
+#~ msgstr "Kein Filter ausgewählt."
+
+#~ msgid "This filter has no options"
+#~ msgstr "Dieser Filter hat keine Einstellungen"
+
+#, fuzzy
+#~ msgid "Selected entry</b>"
+#~ msgstr "Ausgewählte Filter"
+
+#~ msgid ""
+#~ "On the left all available source tracks are listed, so each row in this "
+#~ "table represents a source track. On the top all possible target track "
+#~ "numbers are listed, so each column represents a target track.\n"
+#~ "\n"
+#~ "You simply assign a source track to a target track number by clicking the "
+#~ "corresponding checkbutton.\n"
+#~ "\n"
+#~ "If you want to discard a source audio track, click the checkbutton in the "
+#~ "[Discard] column."
+#~ msgstr "Auf der linken Seite sind alle verfügbaren"
+
+#~ msgid "Confirmation"
+#~ msgstr "Bitte bestätigen"
+
+#~ msgid "Can't select title {title}. Aborting.\n"
+#~ msgstr "Titel {title} konnte nicht ausgewählt werden. Abbruch.\n"
+
+#~ msgid "/File/sep_quit"
+#~ msgstr "/Datei/sep_quit"
+
+#~ msgid "/File/_Exit"
+#~ msgstr "/Datei/_Beenden"
+
+#~ msgid "/_Operate"
+#~ msgstr "/_Ausführen"
+
+#~ msgid "/_Operate/Transcode and split"
+#~ msgstr "/_Ausführen/Transkodieren und Aufteilen"
+
+#~ msgid "/_Operate/Transcode"
+#~ msgstr "/_Ausführen/Transkodieren"
+
+#~ msgid "/_Operate/sep_vobsub"
+#~ msgstr "/_Ausführen/sep_vobsub"
+
+#~ msgid "/_Operate/sep_info"
+#~ msgstr "/_Ausführen/sep_info"
+
+#~ msgid "/_Operate/sep_wav"
+#~ msgstr "/_Ausführen/sep_wav"
+
+#~ msgid "Fast frame bisection"
+#~ msgstr "Schnelle Frame Bisektion"
+
+#~ msgid "Adjust {type}"
+#~ msgstr "Einstellen {type}"
+
+#~ msgid "subtitle2pgm is missing or too old"
+#~ msgstr "Das Programm subtitle2pgm fehlt oder ist nicht aktuell genug"
+
+#~ msgid "Close the window with [ESC]"
+#~ msgstr "Das Fenster kann mit [ESC] wieder geschlossen werden"
+
+#~ msgid "probably unused"
+#~ msgstr "wahrscheinlich unbenutzt"
+
+#~ msgid "Title isn't ripped"
+#~ msgstr "Titel wurde noch nicht kopiert."
+
+#~ msgid "Please grab preview images first."
+#~ msgstr "Bitte holen Sie zunächst Vorschaubilder."
+
+#~ msgid "You need to transcode the subtitles first."
+#~ msgstr "Sie müssen die Untertitel zunächst transkodieren."
+
+#~ msgid "Technical information"
+#~ msgstr "Technische Informationen"
+
+#~ msgid ""
+#~ "Select audio track for volume\n"
+#~ "scanning.\n"
+#~ "(Does not affect ripping, all\n"
+#~ "audio tracks are ripped)"
+#~ msgstr ""
+#~ "Wählen Sie die Tonspur zur\n"
+#~ "Lautstärkeanalyse.\n"
+#~ "(Betrifft nicht das Kopieren; alle\n"
+#~ "Tonspuren werden immer kopiert)"
+
+#~ msgid "No Audio"
+#~ msgstr "Kein Ton"
+
+#~ msgid "Angle 1"
+#~ msgstr "Winkel 1"
+
+#~ msgid "No audio"
+#~ msgstr "Kein Ton"
+
+#~ msgid "Skip / Deactivate this track"
+#~ msgstr "Spur nicht verarbeiten"
+
+#~ msgid "Track #{track}"
+#~ msgstr "Spur #{track}"
+
+#~ msgid "Audio track"
+#~ msgstr "Tonspur"
+
+#~ msgid "Please select at least one title."
+#~ msgstr "Bitte wählen Sie zumindest einen Titel aus."
+
+#~ msgid ""
+#~ "Warning: AVI files shouldn't get bigger than 2 GB.\n"
+#~ "Some players can't play them and you can't seek\n"
+#~ "within the files. Better use OGG for such big files."
+#~ msgstr ""
+#~ "Warnung: AVI Dateien sollten nicht größer als 2 GB werden.\n"
+#~ "Einige Abspielprogramme können mit diesen nicht umgehen,\n"
+#~ "z.B. kann das Spulen nicht funktionieren. Verwenden Sie besser\n"
+#~ "das OGG Format für solch große Dateien."
+
+#~ msgid "Keyframe interval"
+#~ msgstr "Keyframe Intervall"
+
+#~ msgid "Needs transcode 0.6.3"
+#~ msgstr "Benötigt min. transcode 0.6.3"
+
+#~ msgid "Use range"
+#~ msgstr "nur Frame-Bereich"
+
+#~ msgid "View AVI"
+#~ msgstr "AVI ansehen"
+
+#~ msgid "Total"
+#~ msgstr "Gesamt"
+
+#~ msgid "View MPEG"
+#~ msgstr "MPEG ansehen"
+
+#~ msgid "MPEG Variant"
+#~ msgstr "MPEG Variante"
+
+#~ msgid "View OGG"
+#~ msgstr "OGG ansehen"
+
+#, fuzzy
+#~ msgid "Execute command after transcoding: {command}"
+#~ msgstr "Befehlsausführung: {command}"
+
+#~ msgid "Don't add this track"
+#~ msgstr "Diese Spur nicht verwenden."
+
+#~ msgid ""
+#~ "PCM sound is passed through. Bit- and\n"
+#~ "samplerate are detected from the source,\n"
+#~ "so you can't change them here."
+#~ msgstr ""
+#~ "PCM Ton wird 1:1 übernommen. Bit- und\n"
+#~ "Samplerate wird automatisch erkannt,\n"
+#~ "diese können hier nicht verändert werden."
+
+#~ msgid "Bitrate calculation details"
+#~ msgstr "Details zur Bitratenberechnung"
+
+#~ msgid ""
+#~ "'{new_val}' is an illegal value here.\n"
+#~ "Old value '{old_val}' was restored."
+#~ msgstr ""
+#~ "'{new_val}' ist ein unerlaubter Wert hier.\n"
+#~ "Der alte Wert '{old_val}' wurde genommen."
+
+#~ msgid "Check settings on this page"
+#~ msgstr "Einstellungen dieser Seite prüfen"
+
+#~ msgid "Click on the image to open a window"
+#~ msgstr ""
+#~ "Klicken Sie auf das Bild um ein Fenster mit der Großansicht zu öffnen"
+
+#~ msgid "Burn"
+#~ msgstr "Brennen"
+
+#~ msgid "Project closed."
+#~ msgstr "Projekt geschlossen."
+
+#~ msgid "Select a frame range"
+#~ msgstr "Wählen Sie einen Frame-Bereich"
+
+#~ msgid "Start frame"
+#~ msgstr "Start Frame"
+
+#~ msgid "End frame"
+#~ msgstr "End Frame"
+
+#~ msgid "Set start"
+#~ msgstr "Start setzen"
+
+#~ msgid "Set end"
+#~ msgstr "Ende setzen"
+
+#~ msgid "Refresh"
+#~ msgstr "Aktualisieren"
+
+#~ msgid "Apply"
+#~ msgstr "Anwenden"
+
+#~ msgid "Startup window width"
+#~ msgstr "Fensterbreite beim Start"
+
+#~ msgid "Startup window height"
+#~ msgstr "Fensterhöhe beim Start"
+
+#~ msgid "Show tooltips"
+#~ msgstr "Tooltips anzeigen"
+
+#~ msgid "Test image count"
+#~ msgstr "Test: Anzahl Bilder"
+
+#~ msgid "Test view"
+#~ msgstr "Test: Ansehen"
+
+#~ msgid "Non video"
+#~ msgstr "Nicht Video"
+
+#~ msgid " after vbr audio transcoding"
+#~ msgstr " nach VBR Ton-Transkodierung"
+
+#~ msgid "Warning: audio track accessed, but no track selected.\n"
+#~ msgstr "Warnung: Tonspur angesprochen, aber keine Spur ausgewählt.\n"
+
+#~ msgid "Select a CD type"
+#~ msgstr "Wählen Sie einen CD Typ"

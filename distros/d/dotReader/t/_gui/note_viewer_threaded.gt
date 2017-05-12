@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use inc::testplan(1, 12);
+use test_inc::loginit;
+
+use lib 'inc';
+use dtRdrTestUtil::ABook;
+
+BEGIN { use_ok('dtRdr::Note') };
+
+my $book = ABook_new_1_0('test_packages/t1.short/book.xml');
+
+sub note {
+  my ($node, @path) = @_;
+
+  my $id = pop(@path);
+  my $nt = dtRdr::Note->create(
+    id => $id,
+    node => $node,
+    range => [undef, undef], # no position
+    title => lc($id),
+    content => "this is note '$id'",
+    (@path ? (references => [reverse(@path)]) : ()),
+  );
+  return($nt);
+}
+
+require dtRdrTestUtil::GUI;
+
+set_testing( scalar(@ARGV));
+set_dosub(sub {
+  my $frame = the_package()->_main_frame;
+  my $anno_io_dir = anno_io()->uri;
+  my $bvm = $frame->bv_manager;
+  $bvm->open_book($book);
+
+  my $node = $book->find_toc('cover');
+
+  # TODO check that callbacks are working
+  my $tree = $bvm->book_view->note_tree;
+
+  # have to add the note after bvm->open_book or else anno_io won't see
+  # the add and then the delete_note will get mad
+  $book->add_note(my $note2 = note($node, qw(A AA AAA)));
+  $book->add_note(my $note3 = note($node, qw(A AA AAA AAAA)));
+  $book->add_note(my $note4 = note($node, qw(A AA AAA AAAB)));
+
+  # TODO work on the situations where there is no root, etc
+  $book->add_note(my $note1 = note($node, qw(A)));
+  $note1->make_public(
+    owner  => undef,
+    server => 'server_id',
+  );
+  $note1->set_content("Got to try this with much much longer content
+    and see if that changes the layout.");
+
+  ok(-e "$anno_io_dir/A.yml", 'anno IO check');
+
+  $bvm->book_view->show_note($note4->id);
+});
+
+run();
+
+done;
+# vim:ts=2:sw=2:et:sta

@@ -1,0 +1,78 @@
+#! /usr/bin/perl
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
+
+=pod
+
+=head1 NAME
+
+dbMan -- interactive command line SQL shell/console.
+
+=head1 SYNOPSIS
+
+	dbman
+
+=head1 DESCRIPTION
+
+This software provides some functionality in database managing (SQL shell/console). 
+
+=cut
+
+use strict;
+use lib '.';	# where I can find dbMan
+use FindBin;
+
+BEGIN {
+	# some other paths
+	unshift @INC,"$FindBin::Bin/../lib";
+	unshift @INC,"$FindBin::Bin/lib";
+	unshift @INC,"$FindBin::Bin";
+}
+
+use DBIx::dbMan;	# main module
+
+$0 = 'dbman';		# process list name
+
+# main program
+
+# REAPER - if my children fall into zombie status, I kill him
+sub REAPER { wait; $SIG{CHLD} = \&REAPER; }  $SIG{CHLD} = \&REAPER;
+
+# main object, command line arguments + interface what I want
+my $dbman = new DBIx::dbMan (-argv => \@ARGV, -interface => 'cmdline');
+
+# dbMan starting
+$dbman->start;
+
+1;
+
+=head1 VERSION
+ 
+0.40
+ 
+=head1 LICENSE
+
+(c) Copyright 1999-2014 by Milan Sorm <sorm@is4u.cz>
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+ 
+Milan Sorm, sorm@is4u.cz,
+IS4U, s.r.o., Brno, Czech Republic.
+
+=head1 REPORTING BUGS
+
+Report bugs directly to sorm@is4u.cz.
+ 
+=head1 LAST MODIFIED
+ 
+Wed May  7 07:30:31 CEST 2014
+
+=head1 SEE ALSO
+ 
+DBI(3), dbish(1)
+
+=cut

@@ -1,0 +1,22 @@
+
+<?- this is comment -?>
+
+<? print 1; ?>
+
+<?=$x?>
+
+<?!test1 value1?>
+
+<?!test2 value2?>
+
+<?!include 04_page1.inc?>
+
+<?:if def1?>
+def1
+<?:else?>
+defx
+<?:end?>
+
+<?:for my $x in (@neco)?>
+dddd
+<?:done?>

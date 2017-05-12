@@ -1,0 +1,107 @@
+$Id: TODO 2330 2007-08-05 16:59:53Z joern $
+
+NOTE:
+=====
+The todo list beyond is my "notebook" for good ideas and
+suggestions, which would be senseful or fun to implement
+somedays. You see: this list is rather long. Some features
+may be implemented soon, some eventually never... ;)
+
+KNOWN BUGS
+==========
+- Currently none. Please report if you find one, but read this first:
+  http://www.exit1.org/dvdrip/support.cipp. Thanks.
+
+THE BIG ONES ;):
+================
+- add DVD authoring facility
+- add DVD 9->5 functionality
+- add VDR and TS input facility (TS demuxing)
+- add arbitrary file input facility
+- add .srt subtitle generation (OCR & stuff)
+  (refer to HOWTO from bnj.r AT web.de / 20.07.2005 09:08)
+- add forced subtitle stuff
+  (check subtitleripper patch from Jim Sager / 26.07.2006 16:44)
+
+TODO PRIORITY B:
+================
+- Add filename expansion to the "execute after transcoding" command.
+  Suggested by "Ivan F. Villanueva B." <dvdrip AT artificialidea.com>.
+- Add a FOURCC option to customize FOURCC of the generated .avi files.
+
+- On startup show a list of recently used projects together
+  with a snapshot image as a teaser. Suggested by
+  Sebastian Boell <s.boell AT gmail.com>
+- Cluster: make network device for dvdrip-master/GUI communication
+  configurable, for security reasons, e.g. to bind to localhost only.
+  Suggested by Edmund Urbani <emu AT emu.name>
+- pre-define user defaults for all clip & zoom and transcode parameters
+  in a special project .rip file located in the user's home directory.
+  The file can be loaded, all parameters changed, and saved. Future
+  projects will take their default parameters from this file.
+- chapter mode: option to merge files afterwards, suggested by
+  Kevin Pulo <kev AT pulo.com.au>
+- integration of HTML base help into dvd::rip, suggested by
+  Jacques Ferré <ferre-jacques AT wanadoo.fr>
+- generic target aspect ratio mechanism: user can provide an arbitrary
+  target aspect ratio (e.g. 1:1, 12:11, 16:11, 10:11 and 40:33)
+  All autoadjusting presets take that into account (currently they
+  always produce 1:1 ratio). Suggested by Christoph Lampert
+  <chl AT math.uni-bonn.de>
+- support multiple subtitles in the same vobsub file
+- detect interlaced material (-J 32detect). Suggested by Rafael
+  Kolless <rafael AT mondoria.de>
+- global nice preference, which apply to all started processes.
+  It's not necessary to adjust this per project. Suggested by
+  Spencer Ogden.
+- video bitrate calculation: use runtime instead of frames/framerate
+  for full encodings, because the frames/framerate formular doesn't
+  work for NTSC movies with mixed frame rates. Reported by
+  John Washington <jawashin AT uiuc.edu>.
+- transcode all selected titles on the rip tab in a row,
+  suggested by James Dowlearn <alwjdd AT utdallas.edu>
+- chapter mode: check if preview frame # is available in 1st
+  chapter and print better error message, suggested by
+  Ole Tange <tange AT tange.dk>
+
+TODO PRIORITY C:
+================
+- add comments to generated OGG files, suggested by Triffid Hunter.
+- recognize DVD's titles with non continuously enumerated audio tracks
+  and don't offer non-existent tracks for transcoding. Suggested
+  by Cato Minor <cato_minor AT arcor.de>
+- cluster PSU processing: user can switch off PSU's. Print PSU and size with
+  checkboxes, deactivate PSU's with less than 500 frames (or so) by default.
+  Suggested by Stephen P Lecheler <spl011100 AT utdallas.edu>.
+- change aspect ratio output (dvdrip-users posting Tue 22.11.2005 16:12)
+- make fping path configurable
+- subtitle preview: interactive subtitle positioning feature, suggested
+  by Benjamin Van Laere <B.VanLaere AT unpeu.com>
+- allow mono audio
+- make transcode's -H option configurable to solve A/V sync
+  problems with some material. Suggested by Wayne Hogue
+  <mythtv AT chiphead.net>
+- open a HOWTO section in the documentation, starting with
+  Gunnar's <gunix AT comhem.se> HOWTO for a quick rip including
+  subtitles.
+- support transcode's --export_par option, requested by Jim Darby
+  <jim AT jimbocorp.uklinux.net>
+- make cluster webinterface fully interactive, requested by
+  Stuecker, Sebastian <Stuecker AT nm.hsd.utc.com>
+- add support for new pixel aspect ratio transcode feature (ffmpeg
+  and xvid). Suggested by Christoph Lampert.
+- add support for MPEG2 requantization (needs transcode 0.6.11
+  or better) and basic DVD authoring.
+- extra logfile for dvdrip-master, suggested by
+  Martin Lohmeier <blackm AT ferris.dyndns.info>
+- a preference for default transcode options, suggested by Mark Rose.
+- .dvdrip-info file should list filters. Suggested by Götz Waschk.
+- add support for mpeg2enc -q option to the GUI (requested by
+  Simone Lehmann, 18.07.2003)
+- add a preference option whether dvd::rip project data files
+  should be saved in the project directory by default,
+  suggested by Davide Ferrari
+- overall video bitrate calculation for a collection of
+  selected titles. Requested by Felix Knecht <felixknecht AT web.de>
+- lock project file to prevent multiple instances of the
+  same project at the same time, suggested by Sven Hartge

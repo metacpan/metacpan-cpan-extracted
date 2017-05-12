@@ -1,0 +1,16 @@
+--- 
+book: xEF22EA3CDB3611DBA417B36A7806B258
+content: We really shouldn't have the doubly-visible inner sections, but we do, so I'll make a note on one.
+context: ~
+create_time: 1172023887
+end: ~
+id: xD66E731CC15011DB884BD901C9B462D6
+mod_time: 1172023927
+node: D
+public: 
+  owner: bob
+revision: 1
+selected: ~
+start: ~
+title: a section D note or something
+type: dtRdr::Note

@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+use lib 'lib';
+use dtRdr::Book;
+use dtRdr::Plugins;
+dtRdr::Plugins->init;
+
+use dtRdr::Note;
+use dtRdr::Annotation::IO;
+
+=head1 NAME
+
+mk_stupid_annotations - create a ridiculous quanity of annotations
+
+=cut
+
+package bin::mk_stupid_annotations;
+use Getopt::Helpful;
+
+sub main {
+  my (@args) = @_;
+
+  my $anno_store = 'annotations';
+  my $node_id;
+  my $target = 50;
+  my $hopt = Getopt::Helpful->new(
+    usage => 'CALLER [options] <bookfilename>',
+    ['a|anno-store=s', \$anno_store, '<dirname>',
+      "annotation store (default: '$anno_store')"], 
+    ['n|node=s', \$node_id, '<node id>', 'which node to use'],
+    ['t|target=i', \$target, '<target count>', 'make anno every n chars'],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+
+  my $uri = shift(@args);
+  (-e $uri) or die 'no $uri';
+
+  my $book = dtRdr::Book->new_from_uri($uri);
+  $book or die;
+  my $anno_io = dtRdr::Annotation::IO->new(uri => $anno_store);
+  $anno_io->apply_to($book);
+
+  my $node;
+  if(defined($node_id)) {
+    $node = $book->find_toc($node_id);
+  }
+  else {
+    $node = $book->toc;
+  }
+
+  my $min = $node->word_start;
+  my $max = $node->word_end;
+
+  my $length = $max - $min;
+  my $count = int($length / $target);
+  my $nlength = length($count);
+  warn "creating $count annotations...\n";
+  for(my $i = 0; $i < $count; $i++) {
+    ($i % 1000) or warn "$i\n";
+    my $spos = $i * $target + $min;
+    my $epos = $spos + $target;
+    # XXX this is pretty naive since those positions in $node may not be
+    # visible -- the book should really die in that case
+    my $range = $book->reduce_word_scope($node, $spos, $epos);
+    ##warn "range is at ", $range->a, ", ", $range->b;
+    # cheat
+    $range->{id} = sprintf("%0${nlength}d_of_$count", $i);
+    my $type = 'note';
+    my $class = {
+      bookmark  => 'dtRdr::Bookmark',
+      highlight => 'dtRdr::Highlight',
+      note      => 'dtRdr::Note',
+      selection => 'dtRdr::AnnoSelection',
+    }->{$type};
+    my $anno = $class->claim($range);
+    $anno->set_title("$type $i of $count");
+    $anno->can('set_content') and $anno->set_content("content of $type $i of $count");
+    my $method = 'add_' . $type;
+    $book->$method($anno);
+  }
+  
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::mk_stupid_annotations::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::mk_stupid_annotations';

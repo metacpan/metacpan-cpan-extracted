@@ -1,0 +1,65 @@
+# DotReader Log4Perl log.conf file
+
+log4perl.logger.dtRdr.Search     = INFO
+log4perl.logger.dtRdr.GUI.Wx.SearchPane = DEBUG
+log4perl.logger                  = INFO, Logfile
+
+#log4perl.logger.#todo            = DEBUG, Screen
+#log4perl.logger.info.#todo       = INFO,  Screen
+#log4perl.logger.warn.#todo       = WARN,  Screen
+#log4perl.logger.error.#todo      = ERROR, Screen
+#log4perl.logger.fatal.#todo      = FATAL, Screen, Logfile
+
+#log4perl.logger.#book            = DEBUG, Screen
+#log4perl.logger.info.#book       = INFO,  Screen
+#log4perl.logger.warn.#book       = WARN,  Screen
+#log4perl.logger.error.#book      = ERROR, Screen
+#log4perl.logger.fatal.#book      = FATAL, Screen, Logfile
+
+#-----------------------------------------------------------------------
+# appenders
+log4perl.appender.Screen        = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr = 1
+log4perl.appender.Screen.layout = Log::Log4perl::Layout::SimpleLayout
+
+log4perl.appender.Logfile        = dtRdr::Logger::Appender::File
+log4perl.appender.Logfile.filename = dotreader.log
+log4perl.appender.Logfile.mode = append
+log4perl.appender.Logfile.autoflush = 1
+log4perl.appender.Logfile.layout = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.Logfile.layout.ConversionPattern=%p - %m at %C line %L%n
+
+########################################################################
+# those that aren't using the logger:
+#log4perl.logger.caught.dtRdr::Book = WARN,  Screen
+#log4perl.logger.#caught      = WARN, Logfile
+#
+#log4perl.appender.caught            = Log::Log4perl::Appender::Screen
+#log4perl.appender.caught.additivity = 0
+#log4perl.appender.caught.stderr     = 1
+#log4perl.appender.caught.layout     = Log::Log4perl::Layout::SimpleLayout
+
+
+__END__
+
+#----------------------------------------------------------------------
+# Begin Pod
+
+=head1 DotReader Log4perl log.conf
+
+This is a standard Log4perl conf file, please see L<Log::Log4perl> for
+more information.
+
+=head2 Appenders
+
+Appenders tell Log4perl where to send the log line.
+In addition to the standard appenders, a dialog appender has been included.
+
+See: L<Log::Log4perl::Appender>,  L<dtRdr::Logger> and
+L<dtRdr::Logger::Appender::WxMessageBox>.
+
+=head2 Filters
+
+See: L<Log::Log4perl::Filter>
+
+=cut

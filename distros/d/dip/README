@@ -1,0 +1,228 @@
+NAME
+    dip - Dynamic instrumentation like DTrace, using aspects
+
+SYNOPSIS
+        $ dip -e 'aspect Profiler => call qr/^Person::set_/' myapp.pl
+        $ dip -s toolkit/count_new.dip -- -S myapp.pl
+        $ dip -e 'before { count("constructor", ARGS(1), ustack(5)); $c{total}++ }
+            call "URI::new"' test.pl
+
+        $ cat quant-requests.dip
+        # quantize request handling time, separated by request URI
+        before { $ts_start = [gettimeofday] }
+            call 'Dancer::Handler::handle_request';
+        after { quantize ARGS(1)->request_uri => 10**6*tv_interval($ts_start) }
+            call qr/Dancer::Handler::handle_request/;
+        $ dip -s request-quant.dip test.pl
+        ...
+        /
+               value  ------------------ Distribution ------------------ count
+                1024 |                                                   0
+                2048 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    95
+                4096 |@@                                                 4
+                8192 |                                                   0
+               16384 |@                                                  1
+               32768 |                                                   0
+
+        /login
+               value  ------------------ Distribution ------------------ count
+                 512 |                                                   0
+                1024 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                70
+                2048 |@@@@@@@@@@@@@@@                                    30
+                4096 |                                                   0
+
+DESCRIPTION
+    "dip" is a dynamic instrumentation framework for troubleshooting Perl
+    programs in real time. "dip" can provide fine-grained information, such
+    as a log of the arguments with which a specific function is being
+    called.
+
+    Conceptually, "dip" sits on top of Aspect and uses pointcuts and advice
+    - to use Aspect-oriented programming jargon - to define dynamic
+    instrumentation. These instruments are applied to the program from the
+    outside, without having to change the program code at all. While most
+    "dip" scripts will consist of aspect-oriented instrumentation, they can
+    also use the full power of Perl.
+
+    "dip" aims to bring some of the power of DTrace to perl. Therefore it is
+    useful to stick to DTrace terminology. "dip" pointcuts resemble DTrace
+    "probes"; "dip" advice resembles DTrace "actions".
+
+    Whenever the condition for a probe is met, the associated action is
+    executed; the probe "fires". A typical probe might fire when a certain
+    function is entered or exited. The probe's action may analyze the
+    run-time situation by accessing the call stack and context variables and
+    evaluating expressions; it can then print out or log some information,
+    record it in a database, or modify variables - an action is, after all,
+    pure Perl code. Using variables allows probes to pass information to
+    each other, allowing them to cooperatively analyze the correlation of
+    different events. For example, a probe that fires when a function is
+    entered could record the current time; another probe that fires when
+    that function is exited could record how much time the function took.
+
+    Because of the nature of Aspect-oriented programming in Perl, you only
+    pay for what you use. When probes are defined, all existing possible
+    locations for running the action are examined, and the probe is only
+    activated for those locations that match the probe's condition.
+
+  Output
+    At the end of your program run, during "END" time, all aggregators - see
+    below - will dump their results. Also any other hashes you have written
+    to in your dip scripts will be dumped.
+
+    For example, if you simply wanted to know which kinds of objects have
+    been instantiated at least once, you could use:
+
+        before { $c{total}++ } call qr/::new$/
+
+    and then %c will be dumped.
+
+  Aggregating functions
+    "dip" provides aggregating functions that help in understanding a set of
+    data. You can keep counts of occurrences, or quantize data, much like
+    with DTrace.
+
+    The "quantize" aggregating function generates a power-of-two
+    distribution - see its documentation.
+
+FUNCTIONS
+  import
+    Remembers the dip script given on the command-line so we can run it in
+    "instrument()". Complains if there was no dip script. The "--delay"
+    option is passed in this way as well.
+
+  instrument
+    Evaluates the dip script we remembered in "import()". Dies if there was
+    a problem evaluating it.
+
+    Normally this function will be called automatically during "INIT" time,
+    but you can delay by giving the "--delay" option to "dip"; you would use
+    this if your program loads other code at runtime - using "do()", for
+    example - that needs to be instrumented as well. In that case you have
+    manually activate the instrumentation using:
+
+        $dip::dip && $dip::dip->();
+
+  run
+    Convenience function that takes a filename and runs the file via "do()".
+    This is what "dip -s" uses. For example:
+
+        dip -s myscript.dip myapp.pl
+
+    is turned into:
+
+        dip -e 'run q!$file!' myapp.pl
+
+    and ultimately
+
+        perl -Mdip='run q!$file!' myapp.pl
+
+  ustack
+    Returns a concise stack trace. Takes an argument of how many levels deep
+    the stack trace should be; the default is 20 levels. Stack frames that
+    point to a package name in the "Aspect::" or "dip" namespace are
+    omitted.
+
+    Example: count how many times a "XML::LibXML::NodeList" object is
+    created, and keep a separate counter for each place it is created from,
+    remembering three stack frames for each place:
+
+        before { count "constructor", ARGS(0), ustack(3) }
+            call 'XML::LibXML::NodeList::new'
+
+  cluck
+    Returns what Carp's "cluck()" would return, again with "Aspect::" and
+    "dip" namespaces omitted.
+
+  longmess
+    Returns what Carp's "longmess()" would return, again with "Aspect::" and
+    "dip" namespaces omitted.
+
+  count
+    This aggregator function takes a counter name and a value and keeps a
+    count of how often this value was seen for this counter.
+
+    You can pass several values; they will be concatenated using newlines.
+    See the example for "ustack()".
+
+    Example: For each class, count how many objects are created. Also keep a
+    total count.
+
+        before { count("constructor", ARGS(0)); $c{total}++ }
+            call qr/::new$/
+
+  dump_var
+    Convenience method to dump a variable like Data::Dumper does.
+
+    Example: Show all requests a Dancer web application handles:
+
+        before { dump_var ARGS(1) }
+            call 'Dancer::Handler::handle_request'
+
+  rtrim
+    Convenience function to right-trim a string.
+
+  rref
+    Convenience function that, if given a string - for example, a package
+    name -, just returns the string, but if given an object, it returns that
+    object's class.
+
+    Useful if objects you want to instrument are sometimes created by
+    calling "new()" on existing objects:
+
+        before { count("constructor", rref ARGS(0)) } call qr/::new$/
+
+  ARGS
+    Convenience function to access the arguments of a function that you are
+    instrumenting. ARGS(0), for example, returns the first argument. You can
+    use several argument indices; in this case the indicated function
+    arguments will be stringified and concatenated with a space.
+
+    ARGS(0) is equivalent to "$_->{args}[0]"; "ARGS(1,2)" is equivalent to
+    "join ' ' => ARGS(0), ARGS(1)" - see Aspect for the kind of context
+    information that is passed to advice code.
+
+    For example:
+
+        # print SQL statements as they are prepared by DBI
+        before { print ARGS(1) } call qr/DBI::.*::prepare/
+
+  quantize
+    This aggregator function takes a name, or an reference to a list of
+    names, and a value. For each name, it keeps track of a power-of-two
+    frequency distribution of the values of the specified expressions.
+    Increments the value in the highest power-of-two bucket that is less
+    than the specified expression.
+
+  p
+    The "p()" function from Data::Printer is available to dip scripts.
+    Example:
+
+        # Print a stack trace every time the name is changed,
+        # except when reading from the database.
+        before { print longmess(p $_->{args}[1]) if $_->{args}[1] }
+            call "MyObj::name" & !cflow("MyObj::read")
+
+  gettimeofday
+    The "gettimeofday()" function from Time::HiRes is available to dip
+    scripts.
+
+  tv_interval
+    The "tv_interval()" function from Time::HiRes is available to dip
+    scripts.
+
+AUTHOR
+    The following person is the author of all the files provided in this
+    distribution unless explicitly noted otherwise.
+
+    Marcel Gruenauer <marcel@cpan.org>, http://perlservices.at
+
+COPYRIGHT AND LICENSE
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    This software is copyright (c) 2011 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

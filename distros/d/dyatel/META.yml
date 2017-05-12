@@ -1,0 +1,28 @@
+---
+abstract: ~
+author:
+  - 'Andrey Kostenko <andrey@kostenko.name>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: dyatel
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor: 0
+  Data::Dumper: 0
+  Net::Twitter::Stream: 0
+  Sys::Syslog: 0
+  WWW::Mechanize: 0
+  YAML: 0
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,18 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: "<p>Keep at it man, you'll get over it.</p>\n<p>When this server thing starts working, maybe other people will create some notes for you.  It's a big world out there.</p>"
+context: ~
+create_time: 1172023071
+end: 93
+id: xEFDAF34AC14E11DB884BD901C9B462D6
+mod_time: 1172023170
+node: cover
+public: 
+  owner: joe
+references: 
+  - xCFC0AD66C14E11DB884BD901C9B462D6
+revision: 1
+selected: ~
+start: 85
+title: "Re:  content?"
+type: dtRdr::Note

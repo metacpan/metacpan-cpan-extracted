@@ -1,0 +1,799 @@
+Revision history for Perl extension dbMan
+
+0.40 <20140507>
+	- extension CmdConnections - support for config option
+	- DBI support for config variables
+	- extension Connections - support for config in show connections
+	- patches for Term::Readline are obsolete, use .inputrc hints (in README)
+	- extension CmdInputCSV - allow for escape, allow_loose_escapes and allow_loose_quotes
+	- extension InputCSV - support for new options from CmdInputCSV
+	- small amendments to TODO
+
+0.39 <20140119>
+	- fix for mysql explain [Shinn pull]
+	- db connection group support
+
+0.38 <20140117>
+	- interface Interface.pm - infobox() fallback support to print() and DBIx::dbMan::History link
+	- contact changed to IS4U
+	- extension HelpCommands - new contact to is4u.cz
+	- extension Authors - change e-mail addresses to is4u.cz and igloonet.cz
+	- extension BenchmarkStart - correct use of Time::HiRes
+	- extension CmdSetSuggestionCache - set suggestion cache on or off
+	- extension OracleSQL - cacheable results for completion
+	- extension StandardSQL - cacheable results for completion
+	- extension DescribeCompleteOracle - cacheable results for completion
+	- extension Describe - cacheable results for completion
+	- Extension - new contacts
+	- extension SuggestionCacheStore - store completion (suggestion) data to DBI cache
+	- extension Transaction - corrected prompt_num, use configurable prompt
+	- DBI - add support for local mempool
+	- extension Connections - notify about changing connection
+	- extension FallbackNotify - stop propagating notifications
+	- extension SuggestionCacheRetrieve - use cache instead code completation
+	- extension Clipboard - configurable prompt
+	- extension CmdDescribe - support for caching
+	- extension CmdSetOracleSpecials - set DBMS_XPLAN module on/off
+	- extension StandardSQL - DBMS_XPLAN usage if set
+	- moved to github
+
+0.37 <20050220>
+	- Makefile.PL - fatal settings for prerequisities disappear
+	- interface curses - support for menu/compat config directives
+	- interface curses - TAB complete universal prefix
+	- History::reverse_search - searching in history
+	- interface curses - Control-R reverse-i-search
+	- extension Transaction - operation change
+	- extension Connections - use create TRANSACTION/change operation
+		(Kacer's bug in change connection without change transaction status)
+
+0.36 <20050212>
+	- extension CmdMacros and MacroWorks - small changes in ^$ macros
+	- Interface::get_key - change detection for keys
+	- new interface Curses - base behaviour, menu support, commands history
+	- Interface::can_pager - is paging allow?
+	- extension OutputPager - control can_pager on interface
+	- Interface::clear_screen - clearing screen
+	- extension Clear - move clearing to Interface object
+	- extension EditLine - correct work with interface
+	- Interface::go_away and Interface::come_back for curses
+	- extension EditOracle - correct work with interface
+	- extension Quit - menu support
+	- extension Authors - change menu structure information
+	- extension HelpCommands - change menu structure information
+	- Interface::extensions_loaded changed to Interface::rebuild_menu
+	- extension Extensions - rebuilding menu after (un)loading extension
+	- extension Extensions - menu support for show extensions (submenus)
+	- extension HelpCommands - added other HELP actions to menu
+	- new extenstion CmdSetHorizScrollBars - setting horizontal scrollbar in windows
+	- Extension::load_ok for stopping initialization of extension
+	- extension CmdHelp - also support show licence
+	- Interface::gather_complete - algorithm for get expressions to complete
+	- interface cmdline - use gather_complete
+	- extension KeyBindings - choose another file for curses interface
+	- extension KeyBindings - corrected defining new persistent keys
+	- Interface::status, Interface::nostatus - for information about working
+	- extension StandardSQL - status information about executing SQL
+	- Interface::print_prompt - print information about something need from user
+	- extension KeyBindings - print_prompt usage
+	- extension Authors, HelpCommands - infobox
+	- extension Clear - menu support
+	- extension CmdSetOutputFormat - menu support
+	- extension Connections - menu support
+	- Interface::gui for selecting GUI support
+	- new extension GuiCreateConnection
+	- new extension GuiLoadExtension
+	- extension CmdSetLineNumbers - menu support
+	- new extensions CmdSetGUI and GUI
+	- extension CmdSetAllowSystemTables - menu support
+	- extension CmdSetBenchmark - menu support
+	- extension CmdSetDBMS - menu support
+	- extension CmdSetTotalCount - menu support
+	- core correct known_actions handling
+	- extension Transaction - menu support
+	- extension CmdClipboard and Clipboard - menu support
+	- extension History - menu support
+	- extension EditLine - menu support
+	- Interface::curent_line for extracting current line
+	- extension CmdLongSQL - menu support
+	- extension MacroWorks - menu support
+	- extension KeyBindings - menu support
+	- extension CmdShowErrors - menu support
+	- new extension GuiInputFile
+
+0.35 <20050209>
+	- extension CmdMacros - cmdcomplete for undef
+	- extension MacroWorks - small changes in cmdcomplete (cosmetic)
+	- new extension CmdKeyBindings - implement commands for key bindings work
+	- new extenision KeyBindings - implement key bindings defines/work
+	- Interface::bind_key - specify key bindings
+	- Interface::get_key - can get key sequence from keyboard
+	- implement of bind_key in cmdline with readline
+	- implement of get_key in cmdline with ReadKey
+	- extension EditObjectsOracle - support for multiple schemas
+	- extension EditOracle - support for multiple schemas
+	- extension CmdMacros and MacroWorks - support for ^ as first character in macro name
+
+0.34 <20050209>
+	- new extension SimpleMacros - add simple macro language feature
+	- titles in names disappear
+	- extension CmdHelp - show license command
+	- extension HelpCommands - license command
+	- new extension CmdMacros - implement commands for macro work
+	- new extension MacroWorks - implement macro defines/work
+
+0.33 <20050130>
+	- extension SQLOutputInsert - PgSQL bug with unknown type_info types
+	- 2005 to copyright addenum
+	- license change (now without addenum)
+	- make README more actual
+	- extension Authors - new emails of current authors, menu support (Kepi), new author Tomas Klein
+	- all extensions - new Perl syntax of inheritance and our-variables
+	- extension Clear - use Term::Screen if available
+	- extension Transaction - merge two done() subroutines
+	- extension SQLResultPreprocess - correct compile time bug
+	- extension DescribeCompleteOracle - bug in non-Oracle completation (TomKlein)
+	- Interface::extensions_loaded - patch from Kepi for gtkdbman support
+	- extension HelpCommands - menu support (Kepi)
+	- extension DescribePg - default value etc. patch (TomKlein)
+	- extension StandardSQL - some case sensitive things patch (TomKlein)
+	- extension StandardSQL - WITH select support
+	- new extension CmdSetAllowSystemTables - allow system tables in completation
+
+0.32 <20040308> promoted as stable
+	- 2004 to copyright addenum
+	- little TODO plan changes
+	- extension SQLOutputCube - OLAP output
+	- extension StandardSQL - exception around ->{TYPE} fetching (DBD::google problem)
+	- dbMan core - exception catching bug corrected (stop action cycle needed) (TomMajer)
+	- dbMan core - deep recursion test simple implementation
+	- extension EditLine - \e don't reduce multiple spaces to single bug (TomKlein)
+	- extension Clipboard - NULL bug (copying NULL produce 'NULL') (Alin)
+	- extension CmdStandardSQL - ALTER complete (Alin)
+	- extension CmdStandardSQL - TAB complete bug (Ricmond)
+	- extension Authors - Kepi patch
+	- Tk change state to "obsolete"
+	- little license addenum changes
+
+0.31 <20030111>
+	- extension Authors - number of extensions
+	- extension AutoSQL - propagate silent_autosql config tag
+	- dbMan DBI - silent_autosql config tag support
+	- extension CmdConnections - correct bug with CREATE PERMANENT CONNECTION tab completion
+	- dbMan core - experimental deep recursion detection algorithm
+	- extension OracleSQL anti deep recursion set
+	- extension OutputQuiet - output_quiet => 1 action modifier executor
+	- DBMAN_TRACE environment variable set default trace level (implicit 0)
+	- dbMan DBI - load_connection send open and use to action list instead of calling methods
+	- dbMan DBI - current_connection (config directive) bug corrected
+	- extension Transaction - cleaning code for obsolete be_quiet()
+	- extension AutoSQL - cleaning code for obsolete be_quiet()
+	- extension Connections - error messages on open(), close(), set_current() etc.
+	- dbMan DBI - be_quiet() obsolete
+	- dbMan DBI - don't show any information, only return error codes
+	- extension ShowTables - study RE improvement
+	- extension CmdStandardSQL - corrected complete bug with multiple select tablenames
+	- extension CmdShowTables - corrected bug with \dt
+	- extension CountPost - summarize action output from COUNT iterations
+	- extension CountPre - interpret action COUNT and COUNTRE
+	- extension CmdCount - COUNT <table>,... and COUNTRE <re>
+	- extension StandardSQL - correct error with EXPLAIN PLAN
+	- dbMan Interface - trace() for trace messages output to STDERR
+	- license changed (another phrase about military instead last)
+
+0.30 <20030105>
+	- extension SQLOracleOutput - little code cleanup
+	- extension StandardSQL - little code cleanup
+	- dbMan DBI - little code cleanup
+	- dbMan MemPool - little code cleanup
+	- extension SQLResultPreprocess - new form of source code (Perl borders :-))
+	- dbMan core - massive code cleanup
+	- dbMan core - correcting bugs in searching candidates algorithm
+	- dbMan core - comments
+	- dbMan core - new exception-catching mechanism in handle_event()
+	- dbMan core - new trace system (messages to interface object)
+	- dbman exe file - comments
+	- docs - SLT2002 CZ presentation
+	- docs - man dbman
+	- docs - TODO plan for next versions
+	- extension ShowTablesOracle - corrected bug with Ctrl+C
+
+0.29 <20030103>
+	- extension TotalCount innovation - corrected bug with not ref ARRAY
+
+0.28 <20030101>
+	- extension StandardSQL innovation - bug with bad field names (mysql)
+	- extension TotalCount - showing information about total lines and cols
+	- extension CmdSetTotalCount - set total count on/off
+	- extension CmdLineNumbers - set line numbering on/off
+	- extension LineNumbers - auto line numbering
+	- extension SQLOutputNULL - compilation bug
+	- extension CmdComments - support for remark, --
+	- extension CmdStandardSQL innovation - support for /* */
+
+0.27 <20021203>
+	- extension EditOracle innovation - same
+	- extension CmdEditObjects innovation - set edit object errors on/off
+	- extension CmdSetDBMS innovation - server output (with space)
+	- extension Eval - standard EVAL action handling
+	- extension CmdEval - eval and system commands
+	- extension SQLOutputPlain innovation - nullvalues support changed
+	- extension SQLOutputInsert innovation - nullvalues support changed
+	- extension SQLOutputNULL innovation - ignoring insert format
+
+0.26 <20021201>
+	- dbMan testing directives changing
+	- extension SQLOutputInsert - insert-like SQL command output
+	- extension SQLOutputPlain innovation - quoting by fieldtypes
+	- improved TODO list
+	- extension SQLOutputHTML innovation - deregister format
+	- extension SQLOutputOldTable innovation - deregister format
+	- extension SQLShowResult innovation - select format unless format set
+	- extension SQLOutputPlain innovation - deregister format
+	- extension SQLOutputTable innovation - deregister format
+	- dbMan::MemPool innovation - deregister()
+	- extension Transaction innovation - deregister prompt
+	- extension Connections innovation - deregister prompt
+	- extension CmdLongSQL innovation - deregister prompt
+	- extension CmdClipboard innovation - deregister prompt
+	- dbMan::Interface innovation - deregister_prompt()
+	- extension ShowTablesOracle innovation - bug with invalid RE corrected
+
+0.25 <20021001>
+	- extension CmdFormat - set singleoutput to
+	- extension EditLine - \e support
+	- extension CmdEditLine - \e
+	- extension CmdSetDBMS - set serveroutput on/off
+	- extension OracleSQL innovation - dbms_output mempool support
+	- extension CmdClipboard innovation - \unioncopy
+
+0.24 <20020923> 
+	- dbMan::Interface::cmdline innovation - history_add()
+	- dbMan::Interface innovation - history_add()
+	- extension CmdLongSQL innovation - long sql one line history
+	- extension ClipboardInfo - info messages about \copy
+	- extension Clipboard - clipboard engine
+	- extension CmdClipboard - \copy, \paste
+	- extension CmdStandardSQL innovation - execute command
+
+0.23 <20020922>
+	- extension SQLOutputPlain - self-NULL converting (without "")
+	- extension SQLOutputNULL - for plain format don't convert NULLs
+	- extension Format
+	- extension CmdFormat - \f()
+	- extension Quit innovation - complete bugfixed
+	- extension StandardSQL innovation - corrected NULL bug
+	- extension SQLResultPreprocess innovation - ignore undef values
+	- extension Transaction innovation - known_actions
+	- extension SQLShowResult innovation - known_actions
+	- extension SQLOutputPlain innovation - known_actions
+	- extension SQLOutputOldTable innovation - known_actions
+	- extension SQLOutputNULL innovation - known_actions
+	- extension SQLOutputHTML innovation - known_actions
+	- extension SQLOracleOutput innovation - known_actions
+	- extension SQLHelp innovation - known_actions
+	- extension ShowTableOracle innovation - known_actions
+	- extension OutputPager innovation - known_actions
+	- extension InputFile innovation - known_actions
+	- extension InputCSV innovation - known_actions
+	- extension History innovation - known_actions
+	- extension Extensions innovation - sorting show by criteria
+	- extension CmdExtensions innovation - show extensions by criteria
+	- extension Extensions innovation - known_actions
+	- extension EditOracle innovation - known_actions
+	- extension EditObjects innovation - known_actions
+	- extension EditObjectsOracle innovation - known_actions
+
+0.22 <20020922>
+	- extension DeviceOutput innovation - output_device | and > supported
+	- extension DeviceOutput innovation - known_actions
+	- extension Descrie innovation - known_actions
+	- extension DescribePg innovation - known_actions
+	- extension Connections innovation - known_actions
+	- extension CmdTransaction innovation - known_actions
+	- extension CmdStandardSQL innovation - known_actions
+	- extension CmdShowTables innovation - known_actions
+	- extension HelpCommands innovation - bugfixed known_actions
+	- extension OracleSQL innovation - known_actions
+	- extension CmdShowErrors innovation - known_actions
+	- extension CmdPager innovation - known_actions
+	- extension CmdOutputToFile innovation - known_actions
+	- extension CmdLongSQL innovation - known_actions
+	- extension CmdInputCSV innovation - known_actions
+	- extension CmdHistory innovation - known_actions
+	- extension StandardSQL innovation - known_actions
+	- extension DescribeCompleteOracle innovation - known_actions
+	- extension CmdExtensions innovation - known_actions
+	- extension EditObjects innovation - known_actions
+
+0.21 <20020922>
+	- extension TrimCmd innovation - known_actions
+	- extension LineComplete innovation - known_actions
+	- extension CmdDescribe innovation - known_actions
+	- extension CmdConnections innovation - known_actions
+	- extension CmdClear innovation - known_actions
+	- extension CmdInputFile innovation - known_actions
+	- extension CmdSetBenchmark innovation - known_actions
+	- extension HelpCommands innovation - known_actions
+	- extension CmdHelp innovation - known_actions
+	- extension CmdSQLHelp innovation - known_actions
+	- extension CmdSetOutputFormat innovation - known_actions
+	- extension CmdAuthors innovation - known_actions
+	- extension Quit innovation - known_actions
+	- extension Clear innovation - known_actions
+	- extension BenchmarkStart innovation - known_actions
+	- extension Output innovation - known_actions
+	- extension AutoSQL innovation - known_actions
+	- extension Authors innovation - known_actions
+	- extension SQLResultPreprocess innovation - known_actions
+	- extension EditFallback innovation - known_actions
+	- extension ShowTables innovation - known_actions
+	- dbMan core known_actions() support
+	- dbMan::Extension innovation - known_actions selector
+	- extension CmdSetTracing - start/stop tracing extensions
+	- dbMan core tracing feature
+	- extension Extensions innovation - bugfixed re-requiring modules
+	- extension Authors innovation - new authors registration
+	- extension HelpCommands innovation - version showing
+	- dbMan core bugfixes in candidates matching - re-requiring modules
+	- extension SQLOutputNULL innovation - bugfixed (prirority 0 => 20)
+	- extension SQLOracleOutput - dbms_output_get
+	- extension OracleSQL innovation - dbms_output_enable
+	- extension CmdHelp innovation - SHOW VERSION
+
+0.20 <20020902>
+	- extension CmdStandardSQL innovation - analyze SQL command
+	- extension CmdShowTables innovation - empty args => ^
+	- extension StandardSQL innovation - explain plain case-insensitive
+	- dbMan::DBI innovation - auto_login yes|no (bug with always yes :()
+	- extension CmdLongSQL innovation - clearing buffer between \l
+	- dbMan::Interface innovation - no experimental release message now
+	- change in LICENSE - blocking militaristic country
+
+0.19 <20020611>
+	- extension SQLHelp
+	- extension CmdSQLHelp - add support for \h
+	- extension Help innovation
+	- extension CmdHelp innovation - add support for context help
+	- extension Extensions innovation - correct $/ bug
+	- extension Clear
+	- extension CmdClear - clear screen
+	- extension TrimCmd innovation - preference 4000 -> 5000
+	- extension CmdLongSQL - for long sql commands (\l, \g)
+	- extension InputCSV innovation - czech CSV support
+	- merge changefiles and credits with old branch
+	- tests (core/dbi/line), TEST flag in start() loop
+	- dbMan::Interface::cmdline - clearing history in readline
+	- dbMan::Interface::tkgui innovation - history tests
+	- dbMan::Interface innovation - clearing history
+	- extension History innovation - clearing history
+
+0.18 <20020520>
+	- dbMan::DBI innovation - longreadlen()
+	- extension EditOracle innovation - support long source and views
+	- extension StandardSQL innovation - longreadlen support
+
+0.17 <20020329>
+	- dbMan::Inteface::cmdline innovation - also work w/Term::ReadLine::Gnu
+	- extension OracleSQL innovation - autocomplete FUNCTIONS, PACKAGES
+	- extension CmdSetOutputFormat innovation
+	- extension CmdSetBenchmark - benchmarking support (and HiRes of course)
+	- extension BenchmarkStart
+	- extension BenchmarkStop
+	- extension CmdStandardSQL innovation - better INSERT support
+	- dbMan::Extension innovation
+	- extension SQLOutputOldTable - oldtable, sqlplus and records out form
+	- extension CmdConnections innovation - reopen support
+	- extension Connections innovation
+	- extension Transaction innovation - correcting prompt
+	- extension StandardSQL innovation - higher priority, explain plan
+	- extension SQLResultPreprocess - displaying nondisplay values
+	- extension Quit innovation
+
+0.16 <20020329>
+	- extension CmdShowTables innovation - RE filter
+	- extension ShowTables innovation
+	- extension ShowTablesOracle innovation
+	- dbMan innovation
+	- dbMan::Interface::cmdline innovation - line completation
+	- extension LineComplete
+	- extension CmdAuthors innovation
+	- extension CmdConnections innovation
+	- dbMan::DBI innovation
+	- extension CmdHelp innovation
+	- extension CmdExtension innovation
+	- extension Quit innovation
+	- extension CmdHistory innovation
+	- extension CmdDescribe innovation
+	- extension Describe innovation
+	- dbMan::Interface innovation
+	- extension CmdInputCSV innovation
+	- extension CmdInputFile innovation
+	- extension CmdOutputToFile innovation
+	- extension CmdPager innovation
+	- extension CmdSetOutputFormat innovation
+	- extension CmdShowErrors innovation
+	- extension CmdTransaction innovation
+	- extension CmdEditObjects innovation
+	- extension EditObjectsOracle innovation
+	- extension DescribeCompleteOracle
+	- extension StandardSQL innovation
+	- extension CmdStandardSQL innovation
+	- extension OracleSQL innovation
+	- dbMan::Interface::tkgui - Tk interface
+	- xdbman script
+	- extension Fallback innovation
+	- dbMan::History innovation
+
+0.15 <20020129>
+	- dbMan::DBI innovation
+	- extension CmdEditObjects
+	- extension EditObjects
+	- extension EditFallback
+	- extension EditObjectsOracle
+	- extension CmdShowErrors
+	- extension EditOracle
+	- extension OracleSQL innovation
+
+0.14 <20020124>
+	- dbMan::DBI innovation
+	- extension OracleSQL
+	- extension SQLShowResult innovation
+	- extension ShowTablesOracle
+	- extension CmdStandardSQL innovation
+	- extension CmdInputLine innovation
+	- extension CmdInputCSV
+	- extension Describe innovation
+	- extension StandardSQL innovation
+	- extension InputCSV
+
+0.13 <20020120>
+	- dbMan innovation
+	- dbMan::Config innovation
+	- dbMan::DBI
+	- dbMan::MemPool
+	- extension Fallback innovation
+	- extension Quit innovation
+	- extension Connections
+	- extension CmdConnections
+	- extension TrimCmd
+	- extension Extensions
+	- extension CmdExtensions
+	- extension CmdHelp
+	- extension HelpCommands
+	- extension CmdAuthors
+	- extension Authors
+	- extension CmdStandardSQL
+	- extension StandardSQL
+	- extension SQLShowResult
+	- extension Output
+	- extension CmdOutputToFile
+	- extension DeviceOutput
+	- extension CmdShowTables
+	- extension ShowTables
+	- extension CmdTransaction
+	- extension Transaction
+	- extension CmdInputFile
+	- extension InputFile
+	- extension SQLOutputTable
+	- extension SQLOutputPlain
+	- extension SQLOutputHTML
+	- extension SQLOutputNULL
+	- extension AutoSQL
+	- extension CmdDescribe
+	- extension Describe
+	- extension DescribePg
+	- extension CmdHistory
+	- extension History
+	- extension CmdPager
+	- extension OutputPager
+	- module list
+
+0.12 <20020117> complete rewritten
+	- first new rewritten release
+	- extension Fallback
+	- extension Quit
+
+0.11 <20000614>	last release from old branch (now at http://dbman.linux.cz/)
+	- nDBD::Oracle 'describe' support for schema (describe schema.table)
+	- multiline \l and \g system (useful in command line debugging query)
+	- bind buffer - \bq, \bp, \gb
+	- German translation from Christian Schulz
+	- dbman-le correction
+	- FAQ for DBD::CSV and DBD::XBase and experience with CSV in FAQ
+	- new macro style emacro (emacro num def) where num args are changed
+		instead of $variables (FAQ example)
+
+0.10 <20000228>
+	- dbMan online proxying system
+	- dbMan online my/local $q bug (destroying connection to database)
+	- dbMan online Browse application
+	- nDBI ndbi_tables - alternative with func('_ListTables')
+	- nDBI connect eval wrapper
+	- $DEFAULT_DIR situated about 3 lines from the top of each file
+	- dbman-* programs dbManLang support
+	- xdbish DSN startup emulation
+	- Table Designer development started
+	- Artistic License (optional license)
+	- Deutch language support (started translating)
+	- dbman-le-default
+	- splash screen
+	- CPAN installation support
+
+0.09 <19991229>
+	- nonTk testing messages disappear	
+	- 'dba_tab_columns' bug fixed (Adrian's bugreport)
+	- underline characters in menu item by English version
+	- \lt internal command corrected
+	- new manual (chapter about basic use, menus and internal commands)
+	- some changes in documentation, new server dbman.linux.cz
+	- what's new document
+	- dbMan SQL Server - starting of evolution
+	- fetchall_arrayref changed to fetchrow_array cycles (speedy :))
+	- \b (something other than select or describe) try show table
+	- dbMan online
+	- dbMan online SQL monitor
+	- list of tables small bugs (show unknown table etc.) - Ada's bugrep.
+	- Lt Lindley's patch for $ORIG_0 finding through FindBin
+	- dbMan language editor
+	- contribute program - language support
+
+0.08 <19990618>
+	- Balloon support disappear (unstable thing)
+	- correct bug in drop|etc. commands
+	- correct NULL output in table format
+	- new structure of CREDITS file
+	- Table manager supports schemas
+	- view folder icon
+	- database icon
+	- new design of folder and open folder icon for Table Manager
+	- new tag 'import quick', new shortcut \iq
+	- quick import of SQL files (Kostik's point)
+	- new tag 'output_len_warn'
+	- quit etc. don't show output_len_warn window
+	- import of newline character corrected
+	- dbMan logo
+	- make-dist programs
+	- checksums, testing checksums
+	- website
+	- logo I use dbMan!
+	- manual
+	- RPM distribution
+	- unproportional font for czdbman
+	- nDBD::Oracle ORA-00907: missing right parenthesis bug corrected
+	- and of course other "describe" nDBD::Oracle bugs
+	- filters in list of tables
+	- refresh in list of tables
+	- unselect in list of tables
+	- empty null showing (optional) - Petr's point
+	- tag 'empty_null yes', shortcut \en
+	- Tk is not needed when command line interface is used
+
+0.07 <19990524>
+	- correct nDBI autoload bug (parameters for ndbd_)
+	- nDBD with ndbd_describe support
+	- nDBD::Pg ndbd_describe implementation	
+	- "describe" SQL query wrapper for command line
+	- SQL compatible transaction commands
+	- tag 'sql_transaction'
+	- regexp macros :)
+	- trivial nDBD:: Sponge, ADO, NullP, ExampleP, XBase, Sybase, Solid,
+	                 QBase, pNET, ODBC, NET, Ingres, Informix, Informix4,
+			 Illustra, Fulcrum, Adabas, CSV, DB2, FreeTDS (MS SQL)
+      	 	 	 and mSQL
+	- option '-l' to start command line shell variant of interface
+	- option '-s' to start SLang based variant of interface
+	- option '-c' to start Curses based variant of interface
+	- correct showing '\!' in internal help
+	- new shortcut '\ew' to clear SQL output window
+	- new shortcut '\db' to prevent buffering (and tag 'buffer')
+	- menu item for prevent buffering (single query window)
+	- new shortcut '\ec' to edit configuration
+	- new shortcut '\sc' to save configuration
+	- new shortcut '\fa' to freeze authentification
+	- new shortcut '\fap' to freeze authentification with password
+	- executing shells and configuration editor only via system in command
+	  line mode
+	- new comand line help (-h) and version info (-v)
+	- quiet mode implicit for command line
+	- command line intro
+	- endline backslash (\) means continue on next line in command line
+	- Term::Readline support for history
+	- /pattern searching query history, / again (Ctrl+/ hotkey)
+	- DBMAN_LIB environment variable for specifying "nDBD etc." directory
+	- nDBD function ndbd_create_table for generate CREATE TABLE definition 
+	  string
+	- nDBD::Pg ndbd_create_table implementation
+	- shortcut \ex to export tables
+	- command 'eval' for Perl evaluating in wrapper dbManEval mode
+	- interface do_sql, sql_select a execute in dbManEval
+	- eval output redirected to output window/buffer
+	- 'about', 'version' and 'author' keywords
+	- show version after start
+	- command line option '-e' for executing SQL queries
+	- nDBI 0.0.3 interface for proxying to dbman-proxy
+	- 'ndbi_proxy', 'proxy_host' and 'proxy_port' tags
+	- login_sql only if auth passed
+	- auto proxy login
+	- proxy switch in Remote connection
+	- spaces at the end of lines in output buffer removed (Petr's point)
+	- 'maxchilds' tag for dbman-proxy (maximum forked childs)
+	- in process list you can see name of host (for sessions)
+	- dbman-proxy '-i' and '-p' command line option for selecting host 
+	  and port
+	- SQL output rows counting (Petr's point)
+	- new tag 'counting', new shortcut '\co' for the same thing
+	- dbman-bug bug reporting program
+	- Control-Space and '\es' shortcut to edit SQL query in editor
+	- new tag 'external_editor' and menu item for selecting editor
+	- internal editor (default for editing SQL queries)
+	- command line interface for authentizating via nDBI proxy
+	- correct bug with visible passwords in command line mode
+	- searching in list of tables window
+	- plugPgSql ... vacuum command, list of databases, system tables list
+	- plugOracle ... Select schema dialog
+	- separator function to Plugin
+	- mirror list in MIRRORS
+	- nDBD::Oracle 0.0.2 with ndbd_create_table and ndbd_describe
+	- tag 'warning_before', shortcut \wb
+	- danger SQL query (update, drop, delete, vacuum, shutdown, truncate)
+	  can be commited via dialogbox (option if Config menu)
+	- Storable bug fixing - error message Magic number checking...
+	- Storable is not required in non-proxy mode now
+	- Table manager - view hasn't fields and mustn't be displayed
+	- fatal errors in execute SQL queries wrapper and reporter
+	- tag 'format plain' and shortcut \fp
+	- plain format output
+	- \r bug in output corrected
+	- summary information, tag 'summary', shortcut \si
+	- in command line mode you can type '' represent empty string in auth.
+	- nDBI/nDBD login_string functions
+	- command line auth. history buffer clear
+	- db drivers in history buffer in command line auth. driver field
+	- nDBI::Statement 0.0.2 (mysql {hash variables} add)
+	- DBD::mysql bug ($sth->{NAME}) fixed
+	- select|describe expand to select|describe|show class of output
+	- dbman-proxy -d (debugging outputs in Compact mode)
+	- nDBD::mysql with ndbd_oid support (search for simple primary key or
+	  any unique index)
+	- ndbi_tables wrapper for tables (from DBI), ndbd_tables bridge
+	- nDBD::mysql ndbd_tables implemented
+	- proxycall debug
+	- NULL values (undef return) show as NULL
+	- VERSION -> Changelog
+	- shortcut \ip to install plugins
+
+0.06 <19990511>
+	- Oracle error in select rowid,* from ... (must be rowid,table.* ...)
+	- Manual (I'm happy for this)
+	- auto-language selection with english default if language doesn't exist
+	- czdbman $* correct (for command line arguments)
+	- nDBD::mysql (only inherited class of nDBD)
+	- \. - repeat last SQL query or command
+	- \. <number> - repeat <number> of SQL history command
+	- shortcut \eh to clear history buffer
+	- shortcut \hw to display hitory window
+	- shortcut \ph to print history into output window
+	- display numbers in history window, history list in output window
+	- count of rows function
+	- multiline SQL support (Hynek point)
+	- select number of rows for SQL multiline
+	- new tags 'multiline yes' and 'multiline_count'
+	- SQLline take focus after dbMan starts
+	- \! command starts commands and input its result to text
+	- \! standalone starts xterm (forked) or environment DBMAN_SHELL
+	- simple tag 'macro' into configuration file
+	- tag 'fields_separators' to change |-+ character
+	- edit configuration file in Configuration menu
+	- save configuration (font, multiline parameters, filehistory)
+	- freeze configuration (authentification) w/wo password into config
+	- tag 'login_sql' (Mira's point)
+	- tag 'longreadlen' for setup LongReadLen DBI option
+	- change current \dt to \lt (separate window with list of tables)
+	- new internal command \dt produces list of tables into output window
+	- new internal command \cr to count of rows function
+
+0.05 <19990414>
+	- \s command - save current query output to file
+	- multiple spaces between \command and query
+	- \w sends output of query to separate window (standalone)
+	- SQL commands help now show option menu with all known commands
+	- checkbutton in help for SQL command window to produce help into
+	  separate standalone window
+	- \w \h, \w \? support
+	- \st ... as \s but in '','','','' format
+	- history window with history list
+	- use output font in browse window
+	- upper case in column title in browse window
+	- find in browse
+	- unlimited items in browse windows (in past max 100.000)
+	- nDBI/nDBD implemented
+	- nDBD::Pg and nDBD::Oracle support
+	- editable browse for single tables
+	- changing values in existing fields
+	- add new rows to table (active first blank row after table)
+	- delete row (pre-version)
+	- sort of editable browse by clicking on title bar
+	- database connection fail in intro dialog don't terminate program
+	- DBD::Proxy support via Remote connection (server e.g. 
+			dbiproxy --localport=7777 --mode=single)
+	- 'proxy on' tag in config file for initial remote connection
+	- for proxy remote connection show all nDBD drivers
+	- \e as edit table
+	- transaction mode control before table edit and select auto-commit
+       		mode in this question	
+	- experimental Balloon helps
+
+0.04 <19990403>
+	- correct some bugs (from 0.03 and later 0.03b)
+	- support for multiline values in output cols (0.03b)
+	- adding text to end instead of current position of cursor
+	- searching modules in startup directory
+	- transaction support (Begin/End-Auto/Commit/Rollback)
+	- transaction block highlight
+	- permanent visible X scrollbar
+	- 1 million character in output window warning and clear window option
+		(Kostik's memory feature for Ariadna)
+	- SQL help from dbman.help, index and standard Pg SQL commands help text
+	- browse select and describe outputs in grids
+	- \b command for quick query browsing
+	- \f has pattern as arg
+	- Help for SQL commands, SQL index and in-line commands (from menu)
+	- list of tables, browsing tables, describing tables via SQL commands
+	- \dt now start list of tables, \m table manager
+	- \d table start describing of table via SQL
+	- open database change from \o to \c
+	- \o produces output to filename or stdout
+	- output to filename also from menu and dialog box
+	- correct all -w warnings about modules and uninitialized values
+	- import SQL file (include in-line commands e.g. \b select ...)
+	- \i alternative for import SQL file
+	- export to SQL file from list of tables (not CREATE TABLE)
+	- support for many languages via dbManLang.pm
+	- added Czech (cz) and English (en) messages and texts
+	- you can choose language via LANG or DBMAN_LANG envirnoment variables
+	- support for ~ in all filenames
+	- support languages in plugins
+	- Refresh button in browse
+	- czdbman wrapper
+
+0.03 <19990306>
+	- fix null font problem at startup 
+	- change order of menu Window and Table
+	- plugins
+	- multiline tags in config file
+	- tags 'plugin_dir', 'plugin'
+	- initializating messages (Perl, config, DBI, Tk, plugins)
+	- Ctrl+C unload plugins
+	- command line arg -q to supress init messages
+	- query 'manager' change to '\m'
+	- support for \q, \? and \h
+	- opendb clear window
+	- support for \o and \f
+	
+0.02 <19990305>
+	- support Oracle (ending ; bug)
+	- *.xbm in the same directory as dbman
+	- horizontal scrollbar displayed if needed
+	- localhost and port displayed only if Pg driver used
+	- different connect string for Pg, Oracle and other dbsys
+	- support MySQL describe query tables
+	- support exit|quit|logout query
+	- help query shows URL to SQL help
+	- support \dt|manager query
+	- don't need DBD::Pg driver to start dbman
+	- show opendb dialog at start
+	- command line arguments login@dbname (or only dbname)
+	- font selection (e.g. good ISO8859-2 font is 
+		-adobe-courier-medium-r-normal-*-*-*-*-*-*-*-iso8859-2)
+	- support for ~/.dbmanrc or $INSTALLDIR/dbmanrc config file
+	- tags 'font', 'database', 'login', 'driver', 'host', 'port', 'auth',
+		'filehistory', 'history' in config
+	- saving history in file, erasing this file
+	- find patterns (RE)
+	- show table column type in Table Manager
+	- import type-table for Pg from dbsys at start
+	- support for scale of types in Table Manager (no Pg, ? Oracle)
+	
+0.01 <19990228>
+	- first release

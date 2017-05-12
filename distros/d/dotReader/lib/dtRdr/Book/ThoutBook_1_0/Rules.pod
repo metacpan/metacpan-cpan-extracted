@@ -1,0 +1,21 @@
+=pod
+
+=head1 node attributes
+
+=head2 render="false"
+
+
+calling get_content for a node which is render=false does:
+
+  o if it has children or younger siblings, you get the first of those
+
+  o if it has neither of those, you get the node's content
+    (aside:  the current client just fails here)
+
+When encountered inline (as in viewing a render=false node's parent), the node is just pruned.
+
+Aside: in the java client, accessing any terminal node which is r=f is an error
+
+=cut
+
+# vim:ts=2:sw=2:et:sta

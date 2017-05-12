@@ -1,0 +1,29 @@
+bin/dthumb
+Build.PL
+Changelog
+COPYING
+lib/App/Dthumb.pm
+lib/App/Dthumb/Data.pm
+lib/App/Dthumb/Data.pm.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+share/close.gif
+share/html_end.dthumb
+share/html_start.dthumb
+share/lightbox.css
+share/lightbox.js
+share/loading.gif
+share/main.css
+share/overlay.png
+t/00-compile-pm.t
+t/01-compile-pl.t
+t/05-synopsis.t
+t/10-pod.t
+t/20-app-dthumb.t
+t/29-app-dthumb-data.t
+t/imgdir/.thumbs/invalid.png
+t/imgdir/one.png
+t/imgdir/two.png
+META.yml
+SIGNATURE    Added here by Module::Build

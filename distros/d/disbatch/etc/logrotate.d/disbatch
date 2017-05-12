@@ -1,0 +1,15 @@
+/var/log/disbatchd.out {
+	missingok
+	copytruncate
+	notifempty
+	rotate 2
+	compress
+}
+
+/var/log/disbatchd.log {
+	missingok
+	copytruncate
+	notifempty
+	rotate 7
+	compress
+}

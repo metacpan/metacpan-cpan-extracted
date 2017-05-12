@@ -1,0 +1,29 @@
+Revision history for Perl module define
+
+1.04 2015-10-27 NEILB
+    - Updated github repo URL after changing my github username
+    - Include a META.json in releases, and tag & push to github on release
+
+1.03 2014-06-27 NEILB
+    - Dropped min perl version from 5.8.4 to 5.6.0
+    - Switched to Dist::Zilla
+    - Integer constants now defined in a way that will be constant folded
+      by the optimizer. Added simple new test t/scalar.t, which checks that
+      string constants still work.
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Added github repo to pod
+    - Added some links to SEE ALSO
+
+1.02 2004-09-04 GGUREVICH
+    - documentation patch
+
+1.01 2004-09-04 GGUREVICH
+    - rewritten to behave more like constant.pm
+    - removed problematic 'no define SYMBOL => VALUE' functionality
+
+1.00 2002-04-30
+    - unreleased draft
+
+0.01 2002-04-03
+    - original version; created by h2xs 1.23
+

@@ -1,0 +1,11 @@
+CREDITS
+
+These modules were written by me, but great work was made by Martin Kula
+<martin.kula@deltaes.cz> on Kdb.pm on which DeltaX::Database is based.
+
+If you notice any problems, create any patches, or add any features,
+be sure to let me know so your name can be in the above list!
+
+--
+Jakub Spicak <jakub.spicak@deltaes.cz>
+25. 2. 2003

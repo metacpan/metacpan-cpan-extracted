@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+use strict;
+$| = 1;
+
+my $USAGE = <<__EOU;
+Usage: dvdrip-thumb in-file out-file top right bottom left
+       dvdrip-thumb in-file out-file width height
+__EOU
+
+main: {
+    if ( @ARGV == 6 ) {
+        cut(@ARGV);
+    }
+    elsif ( @ARGV == 4 ) {
+        resize(@ARGV)
+    }
+    else {
+        usage();
+    }
+}
+
+sub usage {
+    print $USAGE;
+    exit 1;
+}
+
+sub cut {
+    my ($in_file, $out_file, $top, $right, $bottom, $left) = @_;
+    
+    print "$in_file: cut $top $right $bottom $left\n";
+    
+    if ( !$top && !$right && !$bottom && !$left ) {
+        require File::Copy;
+        File::Copy::copy($in_file, $out_file);
+        return;
+    }
+    
+    my $identify = qx[ identify $in_file 2>&1 ];
+    my ($width, $height);
+
+    ($width, $height) = ( $identify =~ /\s+(\d+)x(\d+)([+-]\d+[+-]\d+)?\s+/ );
+
+    die "Identify error: $identify" unless defined $width &&
+                                           defined $height;
+
+    my $new_width  = $width - $left - $right;
+    my $new_height = $height - $top - $bottom;
+
+    my $command =
+        "convert $in_file -crop ".
+        "${new_width}x${new_height}+$left+$top ".
+        $out_file.
+        " && CONVERT_OK";
+
+    my $convert = qx[ ( $command ) 2>&1 ];
+    
+    die "Convert error: $convert" unless $convert =~ /CONVERT_OK/;
+}
+
+sub resize {
+    my ($in_file, $out_file, $new_width, $new_height) = @_;
+
+    print "$in_file: resize $new_width $new_height\n";
+
+    my $command =
+        "convert $in_file -geometry ".
+        "'${new_width}!x${new_height}!' ".
+        $out_file.
+        " && CONVERT_OK";
+
+    my $convert = qx[ ( $command ) 2>&1 ];
+    
+    die "Convert error: $convert" unless $convert =~ /CONVERT_OK/;
+}

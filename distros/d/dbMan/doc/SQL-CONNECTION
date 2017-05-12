@@ -1,0 +1,11 @@
+You can create permanent connection
+
+CREATE PERMANENT CONNECTION name AS driver:dsn LOGIN login PASSWORD password AUTOOPEN
+
+and put
+
+autosql SOMETHING
+
+into ~/.dbman/connections/name file.
+
+E.g. Oracle's alter session etc.

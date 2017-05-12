@@ -1,0 +1,17 @@
+--- 
+book: xF0D8058ADB3911DB8F2B386E7806B258
+content: we got fun and games.
+context: ~
+create_time: 1171239787
+end: 7
+id: x3686F946BA2F11DB96288BF3C8B462D6
+mod_time: 1171239820
+node: cover
+public: 
+  owner: sue
+revision: 1
+selected: 
+  - Welcome
+start: 0
+title: Welcome to the jungle
+type: dtRdr::Note

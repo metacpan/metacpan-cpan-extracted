@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+
+$| = 1;
+main: {
+    my $last_image;
+    while (<STDIN>) {
+        next if !/Generating\s*image:\s*(.*pgm)/i;
+        my $image = $1;
+        convert($last_image) if $last_image;
+        $last_image = $image;
+    }
+    convert($last_image) if $last_image;
+}
+
+sub convert {
+    my ($file_pgm) = @_;
+    my $file_png = $file_pgm;
+    $file_png =~ s/pgm$/png/;
+    system("convert $file_pgm $file_png");
+    print STDERR "Write: $file_png\n";
+    unlink $file_pgm;
+    1;
+}
+
+sub convert_im {
+    my ($file_pgm) = @_;
+    my $file_png = $file_pgm;
+    $file_png =~ s/pgm$/png/;
+    require Image::Magick;
+    my $image = Image::Magick->new;
+    $image->Read($file_pgm);
+    $image->Write($file_png);
+    print STDERR "Write: $file_png\n";
+    unlink $file_pgm;
+    1;
+}

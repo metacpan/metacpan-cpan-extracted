@@ -1,0 +1,34 @@
+---
+name: dthumb
+version: 0.2
+author:
+  - 'Copyright (C) 2009-2011 by Daniel Friesel E<lt>derf@chaosdorf.deE<gt>'
+abstract: Generate Thumbnails + Index for a set of images
+license: unrestricted
+build_requires:
+  Test::Compile: 0
+  Test::More: 0
+  Test::Pod: 0
+requires:
+  Cwd: 0
+  Data::Section: 0
+  Getopt::Long: 0
+  IO::Handle: 0
+  Image::Imlib2: 0
+  MIME::Base64: 0
+  Time::Progress: 0
+  autodie: 0
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  App::Dthumb:
+    file: lib/App/Dthumb.pm
+    version: 0.2
+  App::Dthumb::Data:
+    file: lib/App/Dthumb/Data.pm
+    version: 0.2
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

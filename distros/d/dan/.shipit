@@ -1,0 +1,8 @@
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+svk.tagpattern = release-%v
+
+# if directory, where the normal "make dist" puts its file.
+#MakeDist.destination = ~/shipit-dist
+#svn.tagpattern = ShipIt-%v
+
+#CheckChangeLog.files = ChangeLog

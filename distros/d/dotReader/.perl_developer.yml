@@ -1,0 +1,32 @@
+upload:
+  url_base: "http://dotreader.com/downloads/"
+not_kwalitee:
+  - has_test_pod
+  - has_test_pod_coverage
+  - no_pod_errors # grr, Module::Build forces me to have pod errors
+publish:
+  process:
+    - clean
+    - create_build
+    - .check
+    - .testpod
+    - .testpodcoverage
+    - check_kwalitee
+    - check_manifest
+    - check_changes
+    - .testall
+    - .dist
+    - .disttest
+    - .restore_par_cache
+    - ".testbinary --mini --release V"
+    - ".binary_package --mini --release V"
+    - ".binary_package --bare --mini --release V"
+    - check_version_control
+    - wait
+  shipit:
+    - ".package_push --mini --release V"
+    - ".package_push --bare --mini --release V"
+    - ".parts_push --release V"
+    - .dist_push
+    - .release_links
+    - tag_version_control
